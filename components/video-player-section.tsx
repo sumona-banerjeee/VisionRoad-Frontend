@@ -12,6 +12,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1
 type VideoPlayerSectionProps = {
   data: DetectionData
   videoId: string
+  videoFile: File
   detectionType: DetectionType
 }
 
@@ -109,8 +110,10 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   )
 }
 
-export default function VideoPlayerSection({ data, videoId, detectionType }: VideoPlayerSectionProps) {
+export default function VideoPlayerSection({ data, videoId, videoFile, detectionType }: VideoPlayerSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [currentFrame, setCurrentFrame] = useState(0)
   const [detectionsCount, setDetectionsCount] = useState(0)
   const [logs, setLogs] = useState<DetectionLog[]>([])
@@ -147,23 +150,131 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
     frameDetectionMap.current = map
   }, [data, isPothole])
 
-  // Load processed video from backend
+  // Function to draw bounding boxes on canvas
+  const drawBoundingBoxes = useCallback((detections: any[]) => {
+    const canvas = canvasRef.current
+    const video = videoRef.current
+    
+    if (!canvas || !video) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    if (!detections || detections.length === 0) return
+
+    // Calculate scale between video natural size and displayed size
+    const scaleX = canvas.width / data.video_info.width
+    const scaleY = canvas.height / data.video_info.height
+
+    detections.forEach((detection) => {
+      const bbox = detection.bbox
+      if (!bbox) return
+
+      // Scale coordinates to match displayed video size
+      const x1 = bbox.x1 * scaleX
+      const y1 = bbox.y1 * scaleY
+      const x2 = bbox.x2 * scaleX
+      const y2 = bbox.y2 * scaleY
+      const width = x2 - x1
+      const height = y2 - y1
+
+      // Set colors based on detection type
+      const boxColor = isPothole ? '#ef4444' : '#3b82f6' // red for potholes, blue for signboards
+      const textBgColor = isPothole ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'
+      
+      // Draw bounding box
+      ctx.strokeStyle = boxColor
+      ctx.lineWidth = 3
+      ctx.strokeRect(x1, y1, width, height)
+
+      // Draw semi-transparent fill
+      ctx.fillStyle = isPothole ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)'
+      ctx.fillRect(x1, y1, width, height)
+
+      // Prepare label text
+      const id = isPothole ? detection.pothole_id : detection.signboard_id
+      const confidence = (detection.confidence * 100).toFixed(1)
+      let labelText = isPothole 
+        ? `Pothole #${id}` 
+        : `${detection.type || 'Sign'} #${id}`
+      labelText += ` ${confidence}%`
+
+      // Draw label background
+      ctx.font = 'bold 14px system-ui'
+      const textMetrics = ctx.measureText(labelText)
+      const textWidth = textMetrics.width + 16
+      const textHeight = 26
+
+      ctx.fillStyle = textBgColor
+      ctx.fillRect(x1, y1 - textHeight - 2, textWidth, textHeight)
+
+      // Draw label text
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(labelText, x1 + 8, y1 - 8)
+    })
+  }, [data.video_info.width, data.video_info.height, isPothole])
+
+  // Resize canvas to match video display size
+  const resizeCanvas = useCallback(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const container = containerRef.current
+    
+    if (!video || !canvas || !container) return
+
+    // Get the displayed size of the video
+    const rect = video.getBoundingClientRect()
+    canvas.width = rect.width
+    canvas.height = rect.height
+
+    // Redraw current frame's detections
+    const frame = Math.round(video.currentTime * data.video_info.fps)
+    const detections = frameDetectionMap.current.get(frame)
+    if (detections) {
+      drawBoundingBoxes(detections)
+    }
+  }, [data.video_info.fps, drawBoundingBoxes])
+
+  // Handle window resize
   useEffect(() => {
-    if (videoRef.current && videoId) {
-      const videoUrl = `${API_URL}/video/${videoId}`
-      console.log(`[VideoPlayer] Loading processed video from: ${videoUrl}`)
+    window.addEventListener('resize', resizeCanvas)
+    return () => window.removeEventListener('resize', resizeCanvas)
+  }, [resizeCanvas])
+
+  // Initialize canvas size when video loads
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const handleLoadedMetadata = () => {
+      resizeCanvas()
+    }
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata)
+    return () => video.removeEventListener('loadedmetadata', handleLoadedMetadata)
+  }, [resizeCanvas])
+
+  // Load video from uploaded file
+  useEffect(() => {
+    if (videoRef.current && videoFile) {
+      const videoUrl = URL.createObjectURL(videoFile)
+      console.log(`[VideoPlayer] Loading video from uploaded file`)
       
       videoRef.current.src = videoUrl
       
       // Handle video load errors
       const handleError = () => {
-        console.error("[VideoPlayer] Failed to load processed video")
-        setVideoError("Failed to load processed video. Please try refreshing the page.")
+        console.error("[VideoPlayer] Failed to load video")
+        setVideoError("Failed to load video. Please try refreshing the page.")
       }
       
       const handleLoaded = () => {
-        console.log("[VideoPlayer] Processed video loaded successfully")
+        console.log("[VideoPlayer] Video loaded successfully")
         setVideoError(null)
+        resizeCanvas()
       }
 
       videoRef.current.addEventListener("error", handleError)
@@ -174,9 +285,11 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
           videoRef.current.removeEventListener("error", handleError)
           videoRef.current.removeEventListener("loadeddata", handleLoaded)
         }
+        // Revoke object URL to free memory
+        URL.revokeObjectURL(videoUrl)
       }
     }
-  }, [videoId])
+  }, [videoFile, resizeCanvas])
 
   // Add detection log with deduplication and size limit
   const addDetectionLog = useCallback((frame: number, detections: any[]) => {
@@ -215,11 +328,14 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
       const detections = frameDetectionMap.current.get(frame)
       setDetectionsCount(detections?.length || 0)
       
+      // Draw bounding boxes for current frame
+      drawBoundingBoxes(detections || [])
+      
       if (detections && detections.length > 0) {
         addDetectionLog(frame, detections)
       }
     }
-  }, [data.video_info.fps, addDetectionLog])
+  }, [data.video_info.fps, addDetectionLog, drawBoundingBoxes])
 
   // Video playback monitoring
   useEffect(() => {
@@ -270,6 +386,9 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
       
       const detections = frameDetectionMap.current.get(frame)
       setDetectionsCount(detections?.length || 0)
+      
+      // Draw bounding boxes for current frame
+      drawBoundingBoxes(detections || [])
     }
 
     const handleSeeked = () => {
@@ -294,7 +413,7 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
       video.removeEventListener("seeked", handleSeeked)
       video.removeEventListener("play", handlePlay)
     }
-  }, [data.video_info.fps])
+  }, [data.video_info.fps, drawBoundingBoxes])
 
   return (
     <div className="space-y-6">
@@ -302,12 +421,12 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
         <CardHeader>
           <CardTitle>Video Playback with Detection</CardTitle>
           <CardDescription>
-            Watch the processed video with {isPothole ? "pothole" : "signboard"} detections already drawn
+            Watch the video with real-time {isPothole ? "pothole" : "signboard"} detection overlays
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Video Player */}
+            {/* Video Player with Canvas Overlay */}
             <div className="lg:col-span-2 space-y-4">
               {videoError && (
                 <div className="bg-destructive/10 text-destructive p-4 rounded-lg mb-4">
@@ -315,17 +434,27 @@ export default function VideoPlayerSection({ data, videoId, detectionType }: Vid
                 </div>
               )}
               
-              <div className="relative bg-black rounded-lg overflow-hidden">
+              <div 
+                ref={containerRef}
+                className="relative bg-black rounded-lg overflow-hidden"
+                style={{
+                  aspectRatio: `${data.video_info.width} / ${data.video_info.height}`,
+                }}
+              >
                 <video
                   ref={videoRef}
                   controls
-                  className="w-full h-auto"
-                  style={{
-                    aspectRatio: `${data.video_info.width} / ${data.video_info.height}`,
-                  }}
+                  className="w-full h-full"
                 >
                   Your browser does not support the video tag.
                 </video>
+                
+                {/* Canvas overlay for bounding boxes */}
+                <canvas
+                  ref={canvasRef}
+                  className="absolute top-0 left-0 pointer-events-none"
+                  style={{ width: '100%', height: '100%' }}
+                />
               </div>
 
               {/* Video Info */}

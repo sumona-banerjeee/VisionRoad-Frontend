@@ -13,8 +13,9 @@ import type { DetectionData, DetectionType } from "@/app/page"
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000/api/v1"
 
+
 type UploadSectionProps = {
-  onDetectionComplete: (data: DetectionData, videoId: string) => void
+  onDetectionComplete: (data: DetectionData, videoId: string, file: File) => void
   onDetectionTypeChange: (type: DetectionType) => void
 }
 
@@ -110,8 +111,10 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
       setStatusMessage("✓ Complete!")
       setError(null)
 
-      // Pass video_id instead of file
-      onDetectionComplete(detectionData, videoId)
+      // Pass detection data, video_id, and the original file
+      if (file) {
+        onDetectionComplete(detectionData, videoId, file)
+      }
     } catch (error) {
       console.error("[Upload] Failed to load results:", error)
       setError("Failed to load results. Please try again.")
@@ -139,6 +142,10 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
     try {
       console.log("[Upload] Uploading to:", `${API_URL}/upload`)
       console.log("[Upload] Detection type:", detectionType)
+      console.log("[Upload] FormData contents:")
+      console.log("  - file:", file.name)
+      console.log("  - detection_type:", detectionType)
+      console.log("  - speed_kmh:", speed)
       
       const response = await fetch(`${API_URL}/upload`, {
         method: "POST",
@@ -159,6 +166,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
       const videoId = result.video_id
 
       console.log("[Upload] Video uploaded successfully, ID:", videoId)
+      console.log("[Upload] Response:", result)
       setStatusMessage("Uploaded! Starting processing...")
       setProgress(10)
 

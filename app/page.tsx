@@ -65,6 +65,7 @@ export type DetectionData = {
 export default function DetectionPage() {
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null)
   const [videoId, setVideoId] = useState<string | null>(null)
+  const [videoFile, setVideoFile] = useState<File | null>(null)
   const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
 
   const getTitle = () => {
@@ -93,20 +94,22 @@ export default function DetectionPage() {
         {/* Upload Section */}
         <div className="animate-in fade-in slide-in-from-bottom duration-700 delay-100">
           <UploadSection
-            onDetectionComplete={(data, vId) => {
+            onDetectionComplete={(data, vId, file) => {
               setDetectionData(data)
               setVideoId(vId)
+              setVideoFile(file)
             }}
             onDetectionTypeChange={setDetectionType}
           />
         </div>
 
         {/* Video Player Section */}
-        {detectionData && videoId && (
+        {detectionData && videoId && videoFile && (
           <div className="mt-6 animate-in fade-in slide-in-from-bottom duration-700 delay-200">
             <VideoPlayerSection 
               data={detectionData} 
               videoId={videoId}
+              videoFile={videoFile}
               detectionType={detectionType}
             />
           </div>
