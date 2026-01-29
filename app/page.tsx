@@ -2,11 +2,14 @@
 
 import { useState } from "react"
 import { UploadSection } from "@/components/upload-section"
-// import { SummarySection } from "@/components/summary-section"
 import VideoPlayerSection from "@/components/video-player-section"
+
+export type DetectionType = "pothole-detection" | "sign-board-detection"
 
 export type DetectionData = {
   video_id: string
+  detection_type?: string
+  output_video_path?: string
   video_info: {
     fps: number
     width: number
@@ -14,15 +17,40 @@ export type DetectionData = {
     total_frames: number
   }
   summary: {
-    unique_potholes: number
+    unique_potholes?: number
+    unique_signboards?: number
     total_detections: number
     total_frames: number
     detection_rate: number
   }
+  pothole_list?: Array<{
+    pothole_id: number
+    first_detected_frame: number
+    first_detected_time: number
+    confidence: number
+  }>
+  signboard_list?: Array<{
+    signboard_id: number
+    type: string
+    first_detected_frame: number
+    first_detected_time: number
+    confidence: number
+  }>
   frames: Array<{
     frame_id: number
-    potholes: Array<{
+    potholes?: Array<{
       pothole_id: number
+      bbox: {
+        x1: number
+        y1: number
+        x2: number
+        y2: number
+      }
+      confidence: number
+    }>
+    signboards?: Array<{
+      signboard_id: number
+      type: string
       bbox: {
         x1: number
         y1: number
@@ -34,9 +62,22 @@ export type DetectionData = {
   }>
 }
 
-export default function PotholeDetectionPage() {
+export default function DetectionPage() {
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null)
-  const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [videoId, setVideoId] = useState<string | null>(null)
+  const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
+
+  const getTitle = () => {
+    return detectionType === "pothole-detection" 
+      ? "Pothole Detection System" 
+      : "Signboard Detection System"
+  }
+
+  const getDescription = () => {
+    return detectionType === "pothole-detection"
+      ? "Upload a video to detect and track potholes with AI-powered analysis"
+      : "Upload a video to detect and identify signboards with AI-powered analysis"
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -44,32 +85,30 @@ export default function PotholeDetectionPage() {
         {/* Header */}
         <div className="mb-8 animate-in fade-in slide-in-from-top duration-700">
           <h1 className="text-4xl font-bold mb-2 text-balance bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Pothole Detection System
+            {getTitle()}
           </h1>
-          <p className="text-muted-foreground">Upload a video to detect and track potholes with AI-powered analysis</p>
+          <p className="text-muted-foreground">{getDescription()}</p>
         </div>
 
         {/* Upload Section */}
         <div className="animate-in fade-in slide-in-from-bottom duration-700 delay-100">
           <UploadSection
-            onDetectionComplete={(data, file) => {
+            onDetectionComplete={(data, vId) => {
               setDetectionData(data)
-              setVideoFile(file)
+              setVideoId(vId)
             }}
+            onDetectionTypeChange={setDetectionType}
           />
         </div>
 
-        {/* Summary Section */}
-        {/* {detectionData && (
-          <div className="mt-6 animate-in fade-in slide-in-from-bottom duration-700">
-            <SummarySection data={detectionData} />
-          </div>
-        )} */}
-
         {/* Video Player Section */}
-        {detectionData && videoFile && (
+        {detectionData && videoId && (
           <div className="mt-6 animate-in fade-in slide-in-from-bottom duration-700 delay-200">
-            <VideoPlayerSection data={detectionData} videoFile={videoFile} />
+            <VideoPlayerSection 
+              data={detectionData} 
+              videoId={videoId}
+              detectionType={detectionType}
+            />
           </div>
         )}
       </div>
