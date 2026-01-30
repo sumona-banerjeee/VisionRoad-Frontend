@@ -473,6 +473,9 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
           setLastDetectedLng(gpsCoords.lng)
           console.log(`[Seek] Updated GPS: ${gpsCoords.lat}, ${gpsCoords.lng} at frame ${frame}`)
         }
+        
+        // Add detection log for the seeked frame
+        addDetectionLog(frame, detections)
       }
       
       // Draw bounding boxes for seeked frame
@@ -496,7 +499,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       video.removeEventListener("seeked", handleSeeked)
       video.removeEventListener("play", handlePlay)
     }
-  }, [data.video_info.fps, drawBoundingBoxes, isPothole])
+  }, [data.video_info.fps, drawBoundingBoxes, isPothole, addDetectionLog])
 
   return (
     <div className="space-y-6">
