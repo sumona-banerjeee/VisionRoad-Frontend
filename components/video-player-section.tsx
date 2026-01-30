@@ -453,8 +453,30 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     }
 
     const handleSeeked = () => {
+      // Clear logged frames to allow re-logging if seeking back
       loggedFrames.current.clear()
-      handleTimeUpdate()
+      
+      // Immediately update frame info
+      const frame = Math.round(video.currentTime * data.video_info.fps)
+      setCurrentFrame(frame)
+      
+      const detections = frameDetectionMap.current.get(frame)
+      setDetectionsCount(detections?.length || 0)
+      
+      // Update GPS coordinates immediately on seek
+      if (detections && detections.length > 0) {
+        const detectionId = isPothole ? detections[0].pothole_id : detections[0].signboard_id
+        const gpsCoords = gpsMap.current.get(detectionId)
+        
+        if (gpsCoords) {
+          setLastDetectedLat(gpsCoords.lat)
+          setLastDetectedLng(gpsCoords.lng)
+          console.log(`[Seek] Updated GPS: ${gpsCoords.lat}, ${gpsCoords.lng} at frame ${frame}`)
+        }
+      }
+      
+      // Draw bounding boxes for seeked frame
+      drawBoundingBoxes(detections || [])
     }
 
     const handlePlay = () => {
@@ -474,7 +496,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       video.removeEventListener("seeked", handleSeeked)
       video.removeEventListener("play", handlePlay)
     }
-  }, [data.video_info.fps, drawBoundingBoxes])
+  }, [data.video_info.fps, drawBoundingBoxes, isPothole])
 
   return (
     <div className="space-y-6">
