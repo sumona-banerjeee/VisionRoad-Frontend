@@ -556,12 +556,6 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Resolution:</span>
-                  <Badge variant="outline">
-                    {data.video_info.width}×{data.video_info.height}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">FPS:</span>
                   <Badge variant="outline">{data.video_info.fps.toFixed(1)}</Badge>
                 </div>
@@ -570,13 +564,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                     <div className="flex items-center gap-1">
                       <span className="text-muted-foreground text-xs">Lat:</span>
                       <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
-                        {lastDetectedLat.toFixed(6)}
+                        {lastDetectedLat}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="text-muted-foreground text-xs">Lng:</span>
                       <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
-                        {lastDetectedLng.toFixed(6)}
+                        {lastDetectedLng}
                       </Badge>
                     </div>
                   </>
@@ -630,7 +624,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                                 </div>
                                 {det.latitude !== undefined && det.longitude !== undefined && (
                                   <div className="text-muted-foreground font-mono text-[10px]">
-                                    GPS: {det.latitude.toFixed(6)}, {det.longitude.toFixed(6)}
+                                    GPS: {det.latitude}, {det.longitude}
                                   </div>
                                 )}
                               </div>
