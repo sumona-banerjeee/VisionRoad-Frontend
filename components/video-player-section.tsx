@@ -170,6 +170,19 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     return `${minutes}:${secs.toString().padStart(2, '0')}`
   }, [])
 
+  // Function to seek video to a specific frame
+  const seekToFrame = useCallback((frame: number) => {
+    const video = videoRef.current
+    if (!video) return
+    
+    // Calculate time from frame number
+    const time = frame / data.video_info.fps
+    
+    // Set video currentTime (this will trigger seeked event)
+    video.currentTime = time
+    
+    console.log(`[SeekToFrame] Jumping to frame ${frame} at ${time.toFixed(2)}s`)
+  }, [data.video_info.fps])
 
   // Build optimized frame detection map
   useEffect(() => {
@@ -596,7 +609,8 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                     logs.map((log, index) => (
                       <div
                         key={`${log.frame}-${index}`}
-                        className={`text-xs p-3 bg-card rounded-md border-l-2 ${
+                        onClick={() => seekToFrame(log.frame)}
+                        className={`text-xs p-3 bg-card rounded-md border-l-2 cursor-pointer hover:bg-accent/50 transition-colors ${
                           isPothole ? "border-red-500" : "border-blue-500"
                         }`}
                       >
