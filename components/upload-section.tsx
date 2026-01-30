@@ -21,6 +21,7 @@ type UploadSectionProps = {
 
 export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: UploadSectionProps) {
   const [file, setFile] = useState<File | null>(null)
+  const [jsonFile, setJsonFile] = useState<File | null>(null)
   const [speed, setSpeed] = useState(30)
   const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
   const [uploading, setUploading] = useState(false)
@@ -28,6 +29,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
   const [statusMessage, setStatusMessage] = useState("")
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const jsonFileInputRef = useRef<HTMLInputElement>(null)
   const wsRef = useRef<WebSocket | null>(null)
 
   const handleDetectionTypeChange = (value: DetectionType) => {
@@ -133,6 +135,11 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
     formData.append("file", file)
     formData.append("detection_type", detectionType)
     formData.append("speed_kmh", speed.toString())
+    
+    // Add JSON file if provided
+    if (jsonFile) {
+      formData.append("json_file", jsonFile)
+    }
 
     setUploading(true)
     setProgress(0)
@@ -199,7 +206,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* File Input */}
           <div className="space-y-2">
             <Label htmlFor="video-file">Video File</Label>
@@ -224,6 +231,30 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
             )}
           </div>
 
+          {/* JSON File Input */}
+          <div className="space-y-2">
+            <Label htmlFor="json-file">GPS JSON File</Label>
+            <div className="flex gap-2">
+              <Input
+                ref={jsonFileInputRef}
+                id="json-file"
+                type="file"
+                accept=".json,application/json"
+                onChange={(e) => {
+                  setJsonFile(e.target.files?.[0] || null)
+                  setError(null)
+                }}
+                disabled={uploading}
+                className="flex-1"
+              />
+            </div>
+            {jsonFile && (
+              <p className="text-sm text-muted-foreground">
+                Selected: {jsonFile.name} ({(jsonFile.size / 1024).toFixed(2)} KB)
+              </p>
+            )}
+          </div>
+
           {/* Detection Type Selector */}
           <div className="space-y-2">
             <Label htmlFor="detection-type">Detection Type</Label>
@@ -238,13 +269,11 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
               <SelectContent>
                 <SelectItem value="pothole-detection">
                   <div className="flex items-center gap-2">
-                    <span>🕳️</span>
                     <span>Pothole Detection</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="sign-board-detection">
                   <div className="flex items-center gap-2">
-                    <span>🚦</span>
                     <span>Signboard Detection</span>
                   </div>
                 </SelectItem>

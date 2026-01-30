@@ -23,8 +23,10 @@ type DetectionLog = {
     type?: string // For signboards
     bbox: { x1: number; y1: number; x2: number; y2: number }
     confidence: number
+    latitude?: number
+    longitude?: number
   }>
-  timestamp: string
+  videoTime: string // Video timestamp (MM:SS)
 }
 
 function SummarySection({ data, show, detectionType }: { data: DetectionData; show: boolean; detectionType: DetectionType }) {
@@ -120,6 +122,8 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   const [showSummary, setShowSummary] = useState(false)
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false)
   const [videoError, setVideoError] = useState<string | null>(null)
+  const [lastDetectedLat, setLastDetectedLat] = useState<number | null>(null)
+  const [lastDetectedLng, setLastDetectedLng] = useState<number | null>(null)
   const frameDetectionMap = useRef<Map<number, any[]>>(new Map())
   const lastProcessedFrame = useRef(-1)
   const loggedFrames = useRef<Set<number>>(new Set())
@@ -127,6 +131,45 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
   const isPothole = detectionType === "pothole-detection"
   const isSignboard = detectionType === "sign-board-detection"
+
+  // Create GPS coordinate map from signboard_list or pothole_list
+  const gpsMap = useRef<Map<number, { lat: number; lng: number }>>(new Map())
+
+  // Build GPS map from signboard_list or pothole_list
+  useEffect(() => {
+    const map = new Map()
+    
+    if (isPothole && data.pothole_list) {
+      data.pothole_list.forEach(item => {
+        if (item.lat !== undefined && item.lng !== undefined) {
+          map.set(item.pothole_id, { lat: item.lat, lng: item.lng })
+        }
+      })
+    } else if (isSignboard && data.signboard_list) {
+      data.signboard_list.forEach(item => {
+        if (item.lat !== undefined && item.lng !== undefined) {
+          map.set(item.signboard_id, { lat: item.lat, lng: item.lng })
+        }
+      })
+    }
+    
+    gpsMap.current = map
+    console.log(`[VideoPlayer] GPS map built with ${map.size} entries`)
+  }, [data, isPothole, isSignboard])
+
+  // Helper function to format video time from frame number
+  const formatVideoTime = useCallback((frame: number, fps: number): string => {
+    const seconds = frame / fps
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = Math.floor(seconds % 60)
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`
+  }, [])
+
 
   // Build optimized frame detection map
   useEffect(() => {
@@ -297,22 +340,40 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     
     loggedFrames.current.add(frame)
     
+    // Update last detected GPS coordinates if available
+    if (detections.length > 0) {
+      const detectionId = isPothole ? detections[0].pothole_id : detections[0].signboard_id
+      const gpsCoords = gpsMap.current.get(detectionId)
+      
+      if (gpsCoords) {
+        setLastDetectedLat(gpsCoords.lat)
+        setLastDetectedLng(gpsCoords.lng)
+      }
+    }
+    
     setLogs((prev) => {
       const newLog: DetectionLog = {
         frame,
-        detections: detections.map((det) => ({
-          id: isPothole ? det.pothole_id : det.signboard_id,
-          type: isSignboard ? det.type : undefined,
-          bbox: det.bbox,
-          confidence: det.confidence,
-        })),
-        timestamp: new Date().toLocaleTimeString(),
+        detections: detections.map((det) => {
+          const detectionId = isPothole ? det.pothole_id : det.signboard_id
+          const gpsCoords = gpsMap.current.get(detectionId)
+          
+          return {
+            id: detectionId,
+            type: isSignboard ? det.type : undefined,
+            bbox: det.bbox,
+            confidence: det.confidence,
+            latitude: gpsCoords?.lat,
+            longitude: gpsCoords?.lng,
+          }
+        }),
+        videoTime: formatVideoTime(frame, data.video_info.fps),
       }
       
       const updated = [newLog, ...prev].slice(0, MAX_LOGS)
       return updated
     })
-  }, [isPothole, isSignboard])
+  }, [isPothole, isSignboard, formatVideoTime, data.video_info.fps])
 
   // Track current frame and log detections
   const updateFrameInfo = useCallback(() => {
@@ -479,6 +540,22 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                   <span className="text-muted-foreground">FPS:</span>
                   <Badge variant="outline">{data.video_info.fps.toFixed(1)}</Badge>
                 </div>
+                {lastDetectedLat !== null && lastDetectedLng !== null && (
+                  <>
+                    <div className="flex items-center gap-1">
+                      <span className="text-muted-foreground text-xs">Lat:</span>
+                      <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
+                        {lastDetectedLat.toFixed(6)}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-muted-foreground text-xs">Lng:</span>
+                      <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
+                        {lastDetectedLng.toFixed(6)}
+                      </Badge>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -506,7 +583,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-semibold text-foreground">Frame: {log.frame}</span>
-                          <span className="text-muted-foreground text-[10px]">{log.timestamp}</span>
+                          <span className="text-muted-foreground text-[10px]">{log.videoTime}</span>
                         </div>
 
                         {log.detections.length === 0 ? (
@@ -526,6 +603,11 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                                 <div className="text-muted-foreground font-mono text-[10px]">
                                   Coordinates: ({Math.round(det.bbox.x1)}, {Math.round(det.bbox.y1)}) → ({Math.round(det.bbox.x2)}, {Math.round(det.bbox.y2)})
                                 </div>
+                                {det.latitude !== undefined && det.longitude !== undefined && (
+                                  <div className="text-muted-foreground font-mono text-[10px]">
+                                    GPS: {det.latitude.toFixed(6)}, {det.longitude.toFixed(6)}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>

@@ -28,6 +28,8 @@ export type DetectionData = {
     first_detected_frame: number
     first_detected_time: number
     confidence: number
+    lat?: number
+    lng?: number
   }>
   signboard_list?: Array<{
     signboard_id: number
@@ -35,6 +37,8 @@ export type DetectionData = {
     first_detected_frame: number
     first_detected_time: number
     confidence: number
+    lat?: number
+    lng?: number
   }>
   frames: Array<{
     frame_id: number
