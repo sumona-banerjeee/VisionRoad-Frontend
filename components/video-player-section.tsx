@@ -5,14 +5,75 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Target, AlertTriangle, Film, Activity, Gauge, Monitor, SignpostBig } from "lucide-react"
-import type { DetectionData, DetectionType } from "@/app/page"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+
+type DetectionType = "pothole-detection" | "sign-board-detection"
+
+type DetectionData = {
+  video_id: string
+  detection_type?: string
+  output_video_path?: string
+  video_info: {
+    fps: number
+    width: number
+    height: number
+    total_frames: number
+  }
+  summary: {
+    unique_potholes?: number
+    unique_signboards?: number
+    total_detections: number
+    total_frames: number
+    detection_rate: number
+  }
+  pothole_list?: Array<{
+    pothole_id: number
+    first_detected_frame: number
+    first_detected_time: number
+    confidence: number
+    lat?: number
+    lng?: number
+  }>
+  signboard_list?: Array<{
+    signboard_id: number
+    type: string
+    first_detected_frame: number
+    first_detected_time: number
+    confidence: number
+    lat?: number
+    lng?: number
+  }>
+  frames: Array<{
+    frame_id: number
+    potholes?: Array<{
+      pothole_id: number
+      bbox: {
+        x1: number
+        y1: number
+        x2: number
+        y2: number
+      }
+      confidence: number
+    }>
+    signboards?: Array<{
+      signboard_id: number
+      type: string
+      bbox: {
+        x1: number
+        y1: number
+        x2: number
+        y2: number
+      }
+      confidence: number
+    }>
+  }>
+}
 
 type VideoPlayerSectionProps = {
   data: DetectionData
   videoId: string
-  videoFile: File
+  videoFile: File | null  // null when loading from server (results page)
   detectionType: DetectionType
 }
 
@@ -138,7 +199,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   // Build GPS map from signboard_list or pothole_list
   useEffect(() => {
     const map = new Map()
-    
+
     if (isPothole && data.pothole_list) {
       data.pothole_list.forEach(item => {
         if (item.lat !== undefined && item.lng !== undefined) {
@@ -152,7 +213,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
         }
       })
     }
-    
+
     gpsMap.current = map
     console.log(`[VideoPlayer] GPS map built with ${map.size} entries`)
   }, [data, isPothole, isSignboard])
@@ -163,7 +224,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
     const secs = Math.floor(seconds % 60)
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
@@ -174,13 +235,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   const seekToFrame = useCallback((frame: number) => {
     const video = videoRef.current
     if (!video) return
-    
+
     // Calculate time from frame number
     const time = frame / data.video_info.fps
-    
+
     // Set video currentTime (this will trigger seeked event)
     video.currentTime = time
-    
+
     console.log(`[SeekToFrame] Jumping to frame ${frame} at ${time.toFixed(2)}s`)
   }, [data.video_info.fps])
 
@@ -192,7 +253,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       console.log(`[VideoPlayer] Building frame map from ${data.frames.length} frames`)
       data.frames.forEach((frameData) => {
         const frameId = frameData.frame_id
-        
+
         // Handle both pothole and signboard detections
         const detections = isPothole ? (frameData.potholes || []) : (frameData.signboards || [])
 
@@ -210,7 +271,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   const drawBoundingBoxes = useCallback((detections: any[]) => {
     const canvas = canvasRef.current
     const video = videoRef.current
-    
+
     if (!canvas || !video) return
 
     const ctx = canvas.getContext('2d')
@@ -240,7 +301,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       // Set colors based on detection type
       const boxColor = isPothole ? '#ef4444' : '#3b82f6' // red for potholes, blue for signboards
       const textBgColor = isPothole ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'
-      
+
       // Draw bounding box
       ctx.strokeStyle = boxColor
       ctx.lineWidth = 3
@@ -253,8 +314,8 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       // Prepare label text
       const id = isPothole ? detection.pothole_id : detection.signboard_id
       const confidence = (detection.confidence * 100).toFixed(1)
-      let labelText = isPothole 
-        ? `Pothole #${id}` 
+      let labelText = isPothole
+        ? `Pothole #${id}`
         : `${detection.type || 'Sign'} #${id}`
       labelText += ` ${confidence}%`
 
@@ -278,7 +339,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     const video = videoRef.current
     const canvas = canvasRef.current
     const container = containerRef.current
-    
+
     if (!video || !canvas || !container) return
 
     // Get the displayed size of the video
@@ -313,64 +374,76 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     return () => video.removeEventListener('loadedmetadata', handleLoadedMetadata)
   }, [resizeCanvas])
 
-  // Load video from uploaded file
+  // Load video from uploaded file or from server
   useEffect(() => {
-    if (videoRef.current && videoFile) {
-      const videoUrl = URL.createObjectURL(videoFile)
+    const video = videoRef.current
+    if (!video) return
+
+    let videoUrl: string
+
+    if (videoFile) {
+      // Load from local file (upload page)
+      videoUrl = URL.createObjectURL(videoFile)
       console.log(`[VideoPlayer] Loading video from uploaded file`)
-      
-      videoRef.current.src = videoUrl
-      
-      // Handle video load errors
-      const handleError = () => {
-        console.error("[VideoPlayer] Failed to load video")
-        setVideoError("Failed to load video. Please try refreshing the page.")
-      }
-      
-      const handleLoaded = () => {
-        console.log("[VideoPlayer] Video loaded successfully")
-        setVideoError(null)
-        resizeCanvas()
-      }
+    } else if (videoId) {
+      // Load from server (results page)
+      videoUrl = `${API_URL}/video/${videoId}`
+      console.log(`[VideoPlayer] Loading video from server: ${videoUrl}`)
+    } else {
+      return
+    }
 
-      videoRef.current.addEventListener("error", handleError)
-      videoRef.current.addEventListener("loadeddata", handleLoaded)
+    video.src = videoUrl
 
-      return () => {
-        if (videoRef.current) {
-          videoRef.current.removeEventListener("error", handleError)
-          videoRef.current.removeEventListener("loadeddata", handleLoaded)
-        }
-        // Revoke object URL to free memory
+    // Handle video load errors
+    const handleError = () => {
+      console.error("[VideoPlayer] Failed to load video")
+      setVideoError("Failed to load video. Please try refreshing the page.")
+    }
+
+    const handleLoaded = () => {
+      console.log("[VideoPlayer] Video loaded successfully")
+      setVideoError(null)
+      resizeCanvas()
+    }
+
+    video.addEventListener("error", handleError)
+    video.addEventListener("loadeddata", handleLoaded)
+
+    return () => {
+      video.removeEventListener("error", handleError)
+      video.removeEventListener("loadeddata", handleLoaded)
+      // Revoke object URL only if it was created from a file
+      if (videoFile) {
         URL.revokeObjectURL(videoUrl)
       }
     }
-  }, [videoFile, resizeCanvas])
+  }, [videoFile, videoId, resizeCanvas])
 
   // Add detection log with deduplication and size limit
   const addDetectionLog = useCallback((frame: number, detections: any[]) => {
     if (loggedFrames.current.has(frame)) return
-    
+
     loggedFrames.current.add(frame)
-    
+
     // Update last detected GPS coordinates if available
     if (detections.length > 0) {
       const detectionId = isPothole ? detections[0].pothole_id : detections[0].signboard_id
       const gpsCoords = gpsMap.current.get(detectionId)
-      
+
       if (gpsCoords) {
         setLastDetectedLat(gpsCoords.lat)
         setLastDetectedLng(gpsCoords.lng)
       }
     }
-    
+
     setLogs((prev) => {
       const newLog: DetectionLog = {
         frame,
         detections: detections.map((det) => {
           const detectionId = isPothole ? det.pothole_id : det.signboard_id
           const gpsCoords = gpsMap.current.get(detectionId)
-          
+
           return {
             id: detectionId,
             type: isSignboard ? det.type : undefined,
@@ -382,7 +455,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
         }),
         videoTime: formatVideoTime(frame, data.video_info.fps),
       }
-      
+
       const updated = [newLog, ...prev].slice(0, MAX_LOGS)
       return updated
     })
@@ -394,17 +467,17 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     if (!video) return
 
     const frame = Math.round(video.currentTime * data.video_info.fps)
-    
+
     if (!video.paused && !video.ended && frame !== lastProcessedFrame.current) {
       lastProcessedFrame.current = frame
       setCurrentFrame(frame)
-      
+
       const detections = frameDetectionMap.current.get(frame)
       setDetectionsCount(detections?.length || 0)
-      
+
       // Draw bounding boxes for current frame
       drawBoundingBoxes(detections || [])
-      
+
       if (detections && detections.length > 0) {
         addDetectionLog(frame, detections)
       }
@@ -457,10 +530,10 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     const handleTimeUpdate = () => {
       const frame = Math.round(video.currentTime * data.video_info.fps)
       setCurrentFrame(frame)
-      
+
       const detections = frameDetectionMap.current.get(frame)
       setDetectionsCount(detections?.length || 0)
-      
+
       // Draw bounding boxes for current frame
       drawBoundingBoxes(detections || [])
     }
@@ -468,29 +541,29 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     const handleSeeked = () => {
       // Clear logged frames to allow re-logging if seeking back
       loggedFrames.current.clear()
-      
+
       // Immediately update frame info
       const frame = Math.round(video.currentTime * data.video_info.fps)
       setCurrentFrame(frame)
-      
+
       const detections = frameDetectionMap.current.get(frame)
       setDetectionsCount(detections?.length || 0)
-      
+
       // Update GPS coordinates immediately on seek
       if (detections && detections.length > 0) {
         const detectionId = isPothole ? detections[0].pothole_id : detections[0].signboard_id
         const gpsCoords = gpsMap.current.get(detectionId)
-        
+
         if (gpsCoords) {
           setLastDetectedLat(gpsCoords.lat)
           setLastDetectedLng(gpsCoords.lng)
           console.log(`[Seek] Updated GPS: ${gpsCoords.lat}, ${gpsCoords.lng} at frame ${frame}`)
         }
-        
+
         // Add detection log for the seeked frame
         addDetectionLog(frame, detections)
       }
-      
+
       // Draw bounding boxes for seeked frame
       drawBoundingBoxes(detections || [])
     }
@@ -532,8 +605,8 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                   {videoError}
                 </div>
               )}
-              
-              <div 
+
+              <div
                 ref={containerRef}
                 className="relative bg-black rounded-lg overflow-hidden"
                 style={{
@@ -547,7 +620,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                 >
                   Your browser does not support the video tag.
                 </video>
-                
+
                 {/* Canvas overlay for bounding boxes */}
                 <canvas
                   ref={canvasRef}
@@ -610,9 +683,8 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                       <div
                         key={`${log.frame}-${index}`}
                         onClick={() => seekToFrame(log.frame)}
-                        className={`text-xs p-3 bg-card rounded-md border-l-2 cursor-pointer hover:bg-accent/50 transition-colors ${
-                          isPothole ? "border-red-500" : "border-blue-500"
-                        }`}
+                        className={`text-xs p-3 bg-card rounded-md border-l-2 cursor-pointer hover:bg-accent/50 transition-colors ${isPothole ? "border-red-500" : "border-blue-500"
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-semibold text-foreground">Frame: {log.frame}</span>

@@ -101,3 +101,78 @@ export const emptySessionContext: SessionContext = {
     locationId: null,
     locationName: null
 }
+
+// Session Storage Keys
+const SESSION_KEY = "visionroad_session"
+const VIDEO_DATA_KEY = "visionroad_video_data"
+const DETECTION_TYPE_KEY = "visionroad_detection_type"
+
+/**
+ * Save session to sessionStorage
+ */
+export function saveSession(session: SessionContext): void {
+    if (typeof window !== "undefined") {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
+    }
+}
+
+/**
+ * Load session from sessionStorage
+ */
+export function loadSession(): SessionContext {
+    if (typeof window !== "undefined") {
+        const stored = sessionStorage.getItem(SESSION_KEY)
+        if (stored) {
+            return JSON.parse(stored)
+        }
+    }
+    return emptySessionContext
+}
+
+/**
+ * Clear all session data
+ */
+export function clearSession(): void {
+    if (typeof window !== "undefined") {
+        sessionStorage.removeItem(SESSION_KEY)
+        sessionStorage.removeItem(VIDEO_DATA_KEY)
+        sessionStorage.removeItem(DETECTION_TYPE_KEY)
+    }
+}
+
+/**
+ * Video data for results page
+ */
+export interface VideoResultData {
+    videoId: string
+    detectionType: string
+}
+
+/**
+ * Save video result data
+ */
+export function saveVideoData(data: VideoResultData): void {
+    if (typeof window !== "undefined") {
+        sessionStorage.setItem(VIDEO_DATA_KEY, JSON.stringify(data))
+    }
+}
+
+/**
+ * Load video result data
+ */
+export function loadVideoData(): VideoResultData | null {
+    if (typeof window !== "undefined") {
+        const stored = sessionStorage.getItem(VIDEO_DATA_KEY)
+        if (stored) {
+            return JSON.parse(stored)
+        }
+    }
+    return null
+}
+
+/**
+ * Check if session is complete
+ */
+export function isSessionValid(session: SessionContext): boolean {
+    return !!(session.projectId && session.packageId && session.locationId)
+}
