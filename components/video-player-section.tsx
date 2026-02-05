@@ -4,7 +4,9 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-import { Target, AlertTriangle, Film, Activity, Gauge, Monitor, SignpostBig } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Target, AlertTriangle, Film, Activity, Gauge, Monitor, SignpostBig, Map as MapIcon } from "lucide-react"
+import MapModal from "@/components/map-modal"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
 
@@ -143,6 +145,7 @@ function DetailedSummarySection({
 }) {
   const [summaryData, setSummaryData] = useState<LocationSummaryData | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showMap, setShowMap] = useState(false)
 
   useEffect(() => {
     if (!show || !videoId || !projectId) return
@@ -193,10 +196,23 @@ function DetailedSummarySection({
       {/* Location-based Summary */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Detection Locations</CardTitle>
-          <CardDescription className="text-xs">
-            {isPothole ? "Potholes" : "Signboards"} detected across project locations
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Detection Locations</CardTitle>
+              <CardDescription className="text-xs">
+                {isPothole ? "Potholes" : "Signboards"} detected across project locations
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMap(true)}
+              className="gap-2"
+            >
+              <MapIcon className="h-4 w-4" />
+              Show Map
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -265,6 +281,14 @@ function DetailedSummarySection({
           </ScrollArea>
         </CardContent>
       </Card>
+
+      {/* Map Modal */}
+      <MapModal
+        open={showMap}
+        onClose={() => setShowMap(false)}
+        detections={allDetections.map(({ detection }) => detection)}
+        detectionType={detectionType}
+      />
     </div>
   )
 }
