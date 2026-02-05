@@ -75,6 +75,7 @@ type VideoPlayerSectionProps = {
   videoId: string
   videoFile: File | null  // null when loading from server (results page)
   detectionType: DetectionType
+  projectId?: string  // Optional project ID for fetching detailed summary
 }
 
 type DetectionLog = {
@@ -88,6 +89,184 @@ type DetectionLog = {
     longitude?: number
   }>
   videoTime: string // Video timestamp (MM:SS)
+}
+
+type LocationSummaryData = {
+  project: {
+    id: string
+    name: string
+    corridor_name: string | null
+    state: string | null
+  }
+  packages: {
+    [packageName: string]: {
+      package_id: string
+      region: string | null
+      locations: {
+        [locationName: string]: {
+          location_id: string
+          chainage: string | null
+          detection_count: number
+          detections: Array<{
+            id: number
+            video_id: string
+            type: string
+            class: string
+            confidence: number
+            latitude: number
+            longitude: number
+            frame_number: number
+            timestamp_ms: number
+            bounding_box: {
+              x1: number
+              y1: number
+              x2: number
+              y2: number
+            }
+          }>
+        }
+      }
+    }
+  }
+}
+
+function DetailedSummarySection({
+  projectId,
+  videoId,
+  show,
+  detectionType
+}: {
+  projectId: string
+  videoId: string
+  show: boolean
+  detectionType: DetectionType
+}) {
+  const [summaryData, setSummaryData] = useState<LocationSummaryData | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!show || !videoId || !projectId) return
+
+    const fetchSummary = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch(`${API_URL}/summary/projects/${projectId}?video_id=${videoId}`, {
+          headers: { "ngrok-skip-browser-warning": "true" }
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setSummaryData(data)
+        } else {
+          console.error(`Failed to fetch summary: ${response.status}`)
+        }
+      } catch (err) {
+        console.error("Failed to fetch summary:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSummary()
+  }, [show, videoId, projectId])
+
+  if (!show || loading || !summaryData) return null
+
+  const isPothole = detectionType === "pothole-detection"
+
+  // Flatten all detections for the scrollable list
+  const allDetections: Array<{
+    detection: any
+    locationName: string
+    packageName: string
+  }> = []
+
+  Object.entries(summaryData.packages).forEach(([packageName, packageData]) => {
+    Object.entries(packageData.locations).forEach(([locationName, locationData]) => {
+      locationData.detections.forEach(detection => {
+        allDetections.push({ detection, locationName, packageName })
+      })
+    })
+  })
+
+  return (
+    <div className="space-y-4">
+      {/* Location-based Summary */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Detection Locations</CardTitle>
+          <CardDescription className="text-xs">
+            {isPothole ? "Potholes" : "Signboards"} detected across project locations
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {/* Project Info */}
+            <div className="text-xs space-y-1 pb-2 border-b">
+              <div><span className="text-muted-foreground">Project:</span> <span className="font-medium">{summaryData.project.name}</span></div>
+              {summaryData.project.corridor_name && (
+                <div><span className="text-muted-foreground">Corridor:</span> {summaryData.project.corridor_name}</div>
+              )}
+            </div>
+
+            {/* Packages and Locations */}
+            {Object.entries(summaryData.packages).map(([packageName, packageData]) => (
+              <div key={packageData.package_id} className="space-y-2">
+                <div className="text-xs font-medium">{packageName}</div>
+                <div className="pl-3 space-y-2">
+                  {Object.entries(packageData.locations).map(([locationName, locationData]) => (
+                    <div key={locationData.location_id} className="text-xs p-2 rounded bg-muted/30">
+                      <div className="font-medium mb-1">{locationName}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {locationData.detection_count} {isPothole ? "pothole" : "signboard"}{locationData.detection_count !== 1 ? "s" : ""} detected
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* All Detections List */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">All Detections</CardTitle>
+          <CardDescription className="text-xs">
+            Complete list of {isPothole ? "potholes" : "signboards"} with GPS coordinates
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[300px] rounded-md border bg-muted/30 p-3">
+            <div className="space-y-2">
+              {allDetections.map(({ detection, locationName, packageName }, idx) => (
+                <div
+                  key={`${detection.id}-${idx}`}
+                  className="text-xs p-2 bg-card rounded border-l-2 border-blue-500"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold">
+                      {isPothole ? "Pothole" : detection.class.replace(/_/g, " ")} #{detection.id}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Frame {detection.frame_number}
+                    </span>
+                  </div>
+                  <div className="space-y-0.5 text-[10px] text-muted-foreground">
+                    <div>Location: {locationName}</div>
+                    <div>Confidence: {(detection.confidence * 100).toFixed(1)}%</div>
+                    <div className="font-mono">
+                      GPS: {detection.latitude}, {detection.longitude}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
 function SummarySection({ data, show, detectionType }: { data: DetectionData; show: boolean; detectionType: DetectionType }) {
@@ -143,27 +322,27 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
 
   return (
     <Card className="animate-in fade-in slide-in-from-bottom duration-500">
-      <CardHeader>
-        <CardTitle>Detection Summary</CardTitle>
-        <CardDescription>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Quick Stats</CardTitle>
+        <CardDescription className="text-xs">
           Overview of {isPothole ? "pothole" : "signboard"} detection results
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center justify-center p-4 rounded-lg transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500"
+                className="flex flex-col items-center justify-center p-2 rounded-lg transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className={`${stat.bgColor} p-3 rounded-full mb-3 transition-all`}>
-                  <Icon className={`h-5 w-5 ${stat.color}`} />
+                <div className={`${stat.bgColor} p-1.5 rounded-full mb-1.5 transition-all`}>
+                  <Icon className={`h-3 w-3 ${stat.color}`} />
                 </div>
-                <div className={`text-3xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
-                <div className="text-xs text-muted-foreground text-center">{stat.label}</div>
+                <div className={`text-lg font-bold ${stat.color} mb-0.5`}>{stat.value}</div>
+                <div className="text-[10px] text-muted-foreground text-center leading-tight">{stat.label}</div>
               </div>
             )
           })}
@@ -173,7 +352,7 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   )
 }
 
-export default function VideoPlayerSection({ data, videoId, videoFile, detectionType }: VideoPlayerSectionProps) {
+export default function VideoPlayerSection({ data, videoId, videoFile, detectionType, projectId }: VideoPlayerSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -636,12 +815,6 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                   <Badge variant="secondary">{currentFrame}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Detections:</span>
-                  <Badge variant={detectionsCount > 0 ? (isPothole ? "destructive" : "default") : "secondary"}>
-                    {detectionsCount}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">FPS:</span>
                   <Badge variant="outline">{data.video_info.fps.toFixed(1)}</Badge>
                 </div>
@@ -727,8 +900,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
         </CardContent>
       </Card>
 
-      {/* Summary Section - Shows after first complete playback and persists */}
-      <SummarySection data={data} show={showSummary} detectionType={detectionType} />
+      {/* Summary Sections - Show after first complete playback and persist */}
+      {showSummary && (
+        <div className="space-y-4">
+          <SummarySection data={data} show={showSummary} detectionType={detectionType} />
+          <DetailedSummarySection projectId={projectId || ""} videoId={videoId} show={showSummary} detectionType={detectionType} />
+        </div>
+      )}
     </div>
   )
 }

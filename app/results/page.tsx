@@ -229,6 +229,7 @@ export default function ResultsPage() {
                             videoId={videoId}
                             videoFile={videoFile}
                             detectionType={detectionType}
+                            projectId={session?.projectId || undefined}
                         />
                     </div>
                 )}
