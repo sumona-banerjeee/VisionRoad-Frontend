@@ -6,9 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, Loader2, AlertCircle, ArrowLeft, MapPin, Package, FolderKanban } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import { SidebarNavigation } from "@/components/sidebar-navigation"
 import {
     type SessionContext,
     loadSession,
@@ -71,7 +71,6 @@ export default function UploadPage() {
             if (data.type === "complete" || data.status === "completed") {
                 setStatusMessage("Processing completed! Saving video...")
                 ws.close()
-                // Store video file in IndexedDB for results page
                 if (file) {
                     try {
                         await storeVideoFile(videoId, file)
@@ -79,7 +78,6 @@ export default function UploadPage() {
                         console.error("Failed to store video file:", err)
                     }
                 }
-                // Save video data and navigate to results
                 saveVideoData({ videoId, detectionType })
                 setStatusMessage("Redirecting to results...")
                 setTimeout(() => router.push("/results"), 500)
@@ -154,184 +152,244 @@ export default function UploadPage() {
 
     const getTitle = () => {
         return detectionType === "pothole-detection"
-            ? "Pothole Detection System"
-            : "Signboard Detection System"
+            ? "Pothole Detection"
+            : "Signboard Detection"
     }
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center">
+                <div className="p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
+                    <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
-                {/* Header */}
-                <div className="mb-8 animate-in fade-in slide-in-from-top duration-700">
-                    <h1 className="text-4xl font-bold mb-2 text-balance bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                        {getTitle()}
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Upload a video to detect and analyze with AI-powered processing
-                    </p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+            {/* Sidebar Navigation */}
+            <SidebarNavigation />
+
+            {/* Main Content */}
+            <main className="ml-16 min-h-screen relative overflow-hidden flex flex-col">
+                {/* Decorative background elements */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-40 -left-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
                 </div>
 
-                {/* Session Info Bar */}
-                {session && (
-                    <div className="mb-6 animate-in fade-in slide-in-from-top duration-500">
-                        <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
-                            <div className="flex items-center gap-6 text-sm">
-                                <div className="flex items-center gap-2">
-                                    <FolderKanban className="h-4 w-4 text-primary" />
-                                    <span className="text-muted-foreground">Project:</span>
-                                    <span className="font-medium">{session.projectName}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Package className="h-4 w-4 text-primary" />
-                                    <span className="text-muted-foreground">Package:</span>
-                                    <span className="font-medium">{session.packageName}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-primary" />
-                                    <span className="text-muted-foreground">Location:</span>
-                                    <span className="font-medium">{session.locationName}</span>
-                                </div>
-                            </div>
-                            <Button variant="ghost" size="sm" onClick={handleBackToSelection}>
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Change Selection
-                            </Button>
+                <div className="flex-1 container mx-auto px-4 py-6 max-w-6xl relative z-10 flex flex-col">
+                    {/* Compact Header */}
+                    <div className="mb-4 animate-in fade-in slide-in-from-top duration-700">
+                        <div className="text-center">
+                            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent leading-tight">
+                                {getTitle()}
+                            </h1>
                         </div>
                     </div>
-                )}
 
-                {/* Upload Card */}
-                <Card className="transition-all hover:shadow-lg animate-in fade-in slide-in-from-bottom duration-700">
-                    <CardHeader>
-                        <CardTitle>Upload Video</CardTitle>
-                        <CardDescription>
-                            Select a video file, detection type, and vehicle speed to start AI-powered analysis
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Video File Input */}
-                            <div className="space-y-2">
-                                <Label htmlFor="video-file">Video File</Label>
-                                <Input
-                                    id="video-file"
-                                    type="file"
-                                    accept="video/*"
-                                    onChange={(e) => {
-                                        setFile(e.target.files?.[0] || null)
-                                        setError(null)
-                                    }}
-                                    disabled={uploading}
-                                />
-                                {file && (
-                                    <p className="text-sm text-muted-foreground">
-                                        Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* JSON File Input */}
-                            <div className="space-y-2">
-                                <Label htmlFor="json-file">GPS JSON File</Label>
-                                <Input
-                                    id="json-file"
-                                    type="file"
-                                    accept=".json,application/json"
-                                    onChange={(e) => {
-                                        setJsonFile(e.target.files?.[0] || null)
-                                        setError(null)
-                                    }}
-                                    disabled={uploading}
-                                />
-                                {jsonFile && (
-                                    <p className="text-sm text-muted-foreground">
-                                        Selected: {jsonFile.name} ({(jsonFile.size / 1024).toFixed(2)} KB)
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Detection Type */}
-                            <div className="space-y-2">
-                                <Label htmlFor="detection-type">Detection Type</Label>
-                                <Select
-                                    value={detectionType}
-                                    onValueChange={(v) => setDetectionType(v as DetectionType)}
-                                    disabled={uploading}
-                                >
-                                    <SelectTrigger id="detection-type">
-                                        <SelectValue placeholder="Select detection type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="pothole-detection">Pothole Detection</SelectItem>
-                                        <SelectItem value="sign-board-detection">Signboard Detection</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Speed Input */}
-                            <div className="space-y-2">
-                                <Label htmlFor="speed">Speed (km/h)</Label>
-                                <Input
-                                    id="speed"
-                                    type="number"
-                                    min={1}
-                                    max={200}
-                                    value={speed}
-                                    onChange={(e) => setSpeed(Number(e.target.value))}
-                                    disabled={uploading}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Error Display */}
-                        {error && (
-                            <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
-                                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                                <p className="text-sm whitespace-pre-line">{error}</p>
-                            </div>
-                        )}
-
-                        {/* Upload Button */}
-                        <Button
-                            onClick={handleUpload}
-                            disabled={!file || uploading}
-                            className="w-full"
-                            size="lg"
-                        >
-                            {uploading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Processing...
-                                </>
-                            ) : (
-                                <>
-                                    <Upload className="mr-2 h-4 w-4" />
-                                    Upload & Process
-                                </>
-                            )}
-                        </Button>
-
-                        {/* Progress Section */}
-                        {uploading && (
-                            <div className="space-y-3 animate-in fade-in slide-in-from-top duration-500">
-                                <Progress value={progress} className="h-3" />
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">{statusMessage}</span>
-                                    <span className="font-semibold">{progress}%</span>
+                    {/* Compact Session Info Bar */}
+                    {session && (
+                        <div className="mb-4 animate-in fade-in slide-in-from-top duration-500 delay-100">
+                            <div className="rounded-xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-6 text-sm">
+                                        <div>
+                                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Project</p>
+                                            <p className="font-medium text-gray-900 dark:text-white text-sm">{session.projectName}</p>
+                                        </div>
+                                        <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                                        <div>
+                                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Package</p>
+                                            <p className="font-medium text-gray-900 dark:text-white text-sm">{session.packageName}</p>
+                                        </div>
+                                        <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                                        <div>
+                                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Location</p>
+                                            <p className="font-medium text-gray-900 dark:text-white text-sm">{session.locationName}</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleBackToSelection}
+                                        className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs"
+                                    >
+                                        Change Selection
+                                    </Button>
                                 </div>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
+                        </div>
+                    )}
+
+                    {/* Upload Card */}
+                    <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-700 delay-150 flex-1">
+                        <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+                            <CardTitle className="text-xl font-bold">
+                                <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                                    Upload Video
+                                </span>
+                            </CardTitle>
+                            <CardDescription className="text-sm">
+                                Select video file, detection type, and vehicle speed for analysis
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Video File Input */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="video-file" className="text-sm font-semibold">
+                                        Video File
+                                    </Label>
+                                    <Input
+                                        id="video-file"
+                                        type="file"
+                                        accept="video/*"
+                                        onChange={(e) => {
+                                            setFile(e.target.files?.[0] || null)
+                                            setError(null)
+                                        }}
+                                        disabled={uploading}
+                                        className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-100 dark:file:bg-indigo-900/50 file:text-indigo-600 dark:file:text-indigo-400 file:font-medium file:text-xs hover:file:bg-indigo-200"
+                                    />
+                                    {file && (
+                                        <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800">
+                                            <p className="text-xs font-medium text-gray-900 dark:text-white">{file.name}</p>
+                                            <p className="text-[10px] text-gray-500">
+                                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* JSON File Input */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="json-file" className="text-sm font-semibold">
+                                        GPS JSON File <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+                                    </Label>
+                                    <Input
+                                        id="json-file"
+                                        type="file"
+                                        accept=".json,application/json"
+                                        onChange={(e) => {
+                                            setJsonFile(e.target.files?.[0] || null)
+                                            setError(null)
+                                        }}
+                                        disabled={uploading}
+                                        className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-100 dark:file:bg-indigo-900/50 file:text-indigo-600 dark:file:text-indigo-400 file:font-medium file:text-xs hover:file:bg-indigo-200"
+                                    />
+                                    {jsonFile && (
+                                        <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800">
+                                            <p className="text-xs font-medium text-gray-900 dark:text-white">{jsonFile.name}</p>
+                                            <p className="text-[10px] text-gray-500">
+                                                {(jsonFile.size / 1024).toFixed(2)} KB
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Detection Type */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="detection-type" className="text-sm font-semibold">
+                                        Detection Type
+                                    </Label>
+                                    <Select
+                                        value={detectionType}
+                                        onValueChange={(v) => setDetectionType(v as DetectionType)}
+                                        disabled={uploading}
+                                    >
+                                        <SelectTrigger id="detection-type" className="h-10 bg-gray-50 dark:bg-gray-800">
+                                            <SelectValue placeholder="Select detection type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="pothole-detection">
+                                                <span className="font-medium">Pothole Detection</span>
+                                            </SelectItem>
+                                            <SelectItem value="sign-board-detection">
+                                                <span className="font-medium">Signboard Detection</span>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Speed Input */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="speed" className="text-sm font-semibold">
+                                        Vehicle Speed (km/h)
+                                    </Label>
+                                    <Input
+                                        id="speed"
+                                        type="number"
+                                        min={1}
+                                        max={200}
+                                        value={speed}
+                                        onChange={(e) => setSpeed(Number(e.target.value))}
+                                        disabled={uploading}
+                                        className="h-10 bg-gray-50 dark:bg-gray-800"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Error Display */}
+                            {error && (
+                                <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top duration-300">
+                                    <div className="w-4 h-4 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-[10px] font-bold text-red-500">!</span>
+                                    </div>
+                                    <p className="text-xs text-red-600 dark:text-red-400 leading-relaxed whitespace-pre-line">{error}</p>
+                                </div>
+                            )}
+
+                            {/* Upload Button */}
+                            <Button
+                                onClick={handleUpload}
+                                disabled={!file || uploading}
+                                className={`w-full h-12 text-sm font-semibold transition-all rounded-xl ${file && !uploading ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25' : ''
+                                    }`}
+                                size="lg"
+                            >
+                                {uploading ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Processing...
+                                    </span>
+                                ) : (
+                                    "Upload and Process"
+                                )}
+                            </Button>
+
+                            {/* Progress Section */}
+                            {uploading && (
+                                <div className="space-y-3 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 animate-in fade-in slide-in-from-top duration-500">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="font-medium text-gray-700 dark:text-gray-300 text-xs">Processing Progress</span>
+                                            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xs">{progress}%</span>
+                                        </div>
+                                        <div className="h-2 rounded-full bg-indigo-100 dark:bg-indigo-900/50 overflow-hidden">
+                                            <div
+                                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300"
+                                                style={{ width: `${progress}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                    {statusMessage && (
+                                        <p className="text-xs text-gray-500">{statusMessage}</p>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Footer */}
+                    <div className="mt-4 text-center animate-in fade-in duration-700 delay-300">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                            Sentient Geeks Pvt. Ltd.
+                        </p>
+                    </div>
+                </div>
+            </main>
         </div>
     )
 }

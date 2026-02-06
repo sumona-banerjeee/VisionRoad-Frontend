@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, MapPin, Package, FolderKanban, ArrowRight, AlertCircle } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import {
     fetchProjects,
     fetchPackagesByProject,
@@ -139,153 +139,176 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
 
     const isComplete = selectedProject && selectedPackage && selectedLocation
 
+    // Step status helpers
+    const getStepStatus = (step: number) => {
+        if (step === 1) return selectedProject ? 'completed' : 'active'
+        if (step === 2) return selectedPackage ? 'completed' : selectedProject ? 'active' : 'pending'
+        if (step === 3) return selectedLocation ? 'completed' : selectedPackage ? 'active' : 'pending'
+        return 'pending'
+    }
+
     return (
-        <Card className="transition-all hover:shadow-lg border-0 bg-gradient-to-br from-card via-card to-muted/30">
-            <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5">
-                        <FolderKanban className="h-6 w-6 text-primary" />
-                    </div>
+        <Card className="glass-card card-glow border-0 overflow-hidden">
+            <CardHeader className="pb-6 border-b border-border/50">
+                <div className="flex flex-col gap-4">
                     <div>
-                        <CardTitle className="text-xl">Select Project Location</CardTitle>
-                        <CardDescription className="mt-1">
-                            Choose your project, package, and location to begin video analysis
+                        <CardTitle className="text-2xl font-semibold">Select Project Location</CardTitle>
+                        <CardDescription className="mt-2 text-base">
+                            Select Project, Package & Location to begin intelligent road analysis with advanced computer vision.
                         </CardDescription>
+                    </div>
+
+                    {/* Step Progress Indicator */}
+                    <div className="flex items-center justify-center gap-2 pt-2">
+                        {[1, 2, 3].map((step, index) => {
+                            const status = getStepStatus(step)
+                            const labels = ['Project', 'Package', 'Location']
+                            return (
+                                <div key={step} className="flex items-center">
+                                    <div className="flex flex-col items-center">
+                                        <div
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${status === 'completed' ? 'step-completed' :
+                                                status === 'active' ? 'step-active' :
+                                                    'step-pending'
+                                                }`}
+                                        >
+                                            {step}
+                                        </div>
+                                        <span className={`text-xs mt-1.5 font-medium transition-colors ${status === 'pending' ? 'text-muted-foreground/60' : 'text-foreground'
+                                            }`}>
+                                            {labels[index]}
+                                        </span>
+                                    </div>
+                                    {index < 2 && (
+                                        <div className={`w-12 h-0.5 mx-2 mt-[-16px] rounded-full transition-colors duration-300 ${getStepStatus(step + 1) !== 'pending' ? 'bg-primary' : 'bg-border'
+                                            }`} />
+                                    )}
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+
+            <CardContent className="pt-6 space-y-6">
                 {/* Error Display */}
                 {error && (
-                    <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive animate-in fade-in slide-in-from-top duration-300">
-                        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm">{error}</p>
+                    <div className="flex items-start gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive animate-in fade-in slide-in-from-top duration-300">
+                        <div className="w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs font-bold">!</span>
+                        </div>
+                        <p className="text-sm leading-relaxed">{error}</p>
                     </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Project Dropdown */}
-                    <div className="space-y-2">
-                        <Label htmlFor="project" className="flex items-center gap-2 text-sm font-medium">
-                            <FolderKanban className="h-4 w-4 text-muted-foreground" />
+                    <div className="space-y-3">
+                        <Label htmlFor="project" className="text-sm font-semibold text-foreground">
                             Project
                         </Label>
-                        <Select
-                            value={selectedProject?.id || ""}
-                            onValueChange={handleProjectChange}
-                            disabled={loadingProjects}
-                        >
-                            <SelectTrigger id="project" className="h-11">
-                                {loadingProjects ? (
-                                    <div className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        <span>Loading...</span>
-                                    </div>
-                                ) : (
-                                    <SelectValue placeholder="Select a project" />
-                                )}
-                            </SelectTrigger>
-                            <SelectContent>
-                                {projects.map((project) => (
-                                    <SelectItem key={project.id} value={project.id}>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{project.name}</span>
-                                            {project.corridor_name && (
-                                                <span className="text-xs text-muted-foreground">{project.corridor_name}</span>
-                                            )}
+                        <div className="input-glow rounded-lg">
+                            <Select
+                                value={selectedProject?.id || ""}
+                                onValueChange={handleProjectChange}
+                                disabled={loadingProjects}
+                            >
+                                <SelectTrigger id="project" className="h-12 bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
+                                    {loadingProjects ? (
+                                        <div className="flex items-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                            <span className="text-muted-foreground">Loading...</span>
                                         </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {selectedProject?.state && (
-                            <p className="text-xs text-muted-foreground">
-                                State: {selectedProject.state}
-                            </p>
-                        )}
+                                    ) : (
+                                        <SelectValue placeholder="Select a project" />
+                                    )}
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {projects.map((project) => (
+                                        <SelectItem key={project.id} value={project.id}>
+                                            <span className="font-medium">{project.name}</span>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     {/* Package Dropdown */}
-                    <div className="space-y-2">
-                        <Label htmlFor="package" className="flex items-center gap-2 text-sm font-medium">
-                            <Package className="h-4 w-4 text-muted-foreground" />
+                    <div className="space-y-3">
+                        <Label htmlFor="package" className="text-sm font-semibold text-foreground">
                             Package
                         </Label>
-                        <Select
-                            value={selectedPackage?.id || ""}
-                            onValueChange={handlePackageChange}
-                            disabled={!selectedProject || loadingPackages}
-                        >
-                            <SelectTrigger id="package" className="h-11">
-                                {loadingPackages ? (
-                                    <div className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        <span>Loading...</span>
-                                    </div>
-                                ) : (
-                                    <SelectValue placeholder={selectedProject ? "Select a package" : "Select project first"} />
-                                )}
-                            </SelectTrigger>
-                            <SelectContent>
-                                {packages.map((pkg) => (
-                                    <SelectItem key={pkg.id} value={pkg.id}>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{pkg.name}</span>
-                                            {pkg.region && (
-                                                <span className="text-xs text-muted-foreground">{pkg.region}</span>
-                                            )}
+                        <div className="input-glow rounded-lg">
+                            <Select
+                                value={selectedPackage?.id || ""}
+                                onValueChange={handlePackageChange}
+                                disabled={!selectedProject || loadingPackages}
+                            >
+                                <SelectTrigger id="package" className="h-12 bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
+                                    {loadingPackages ? (
+                                        <div className="flex items-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                            <span className="text-muted-foreground">Loading...</span>
                                         </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                                    ) : (
+                                        <SelectValue placeholder={selectedProject ? "Select a package" : "Select project first"} />
+                                    )}
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {packages.map((pkg) => (
+                                        <SelectItem key={pkg.id} value={pkg.id}>
+                                            <span className="font-medium">{pkg.name}</span>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     {/* Location Dropdown */}
-                    <div className="space-y-2">
-                        <Label htmlFor="location" className="flex items-center gap-2 text-sm font-medium">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <div className="space-y-3">
+                        <Label htmlFor="location" className="text-sm font-semibold text-foreground">
                             Location
                         </Label>
-                        <Select
-                            value={selectedLocation?.id || ""}
-                            onValueChange={handleLocationChange}
-                            disabled={!selectedPackage || loadingLocations}
-                        >
-                            <SelectTrigger id="location" className="h-11">
-                                {loadingLocations ? (
-                                    <div className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        <span>Loading...</span>
-                                    </div>
-                                ) : (
-                                    <SelectValue placeholder={selectedPackage ? "Select a location" : "Select package first"} />
-                                )}
-                            </SelectTrigger>
-                            <SelectContent>
-                                {locations.map((location) => (
-                                    <SelectItem key={location.id} value={location.id}>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{location.segment_name}</span>
-                                            {location.chainage_start_km !== null && location.chainage_end_km !== null && (
-                                                <span className="text-xs text-muted-foreground">
-                                                    KM {location.chainage_start_km} - {location.chainage_end_km}
-                                                </span>
-                                            )}
+                        <div className="input-glow rounded-lg">
+                            <Select
+                                value={selectedLocation?.id || ""}
+                                onValueChange={handleLocationChange}
+                                disabled={!selectedPackage || loadingLocations}
+                            >
+                                <SelectTrigger id="location" className="h-12 bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
+                                    {loadingLocations ? (
+                                        <div className="flex items-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                            <span className="text-muted-foreground">Loading...</span>
                                         </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                                    ) : (
+                                        <SelectValue placeholder={selectedPackage ? "Select a location" : "Select package first"} />
+                                    )}
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {locations.map((location) => (
+                                        <SelectItem key={location.id} value={location.id}>
+                                            <span className="font-medium">{location.segment_name}</span>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 
                 {/* Selected Summary */}
                 {isComplete && (
-                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 animate-in fade-in slide-in-from-bottom duration-300">
-                        <p className="text-sm text-muted-foreground mb-1">Selected:</p>
-                        <p className="font-medium">
-                            {selectedProject?.name} → {selectedPackage?.name} → {selectedLocation?.segment_name}
+                    <div className="px-4 py-3 rounded-lg bg-primary/5 border border-primary/15 animate-in fade-in slide-in-from-bottom duration-300">
+                        <p className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+                            <span className="font-medium">Path:</span>
+                            <span className="text-foreground">{selectedProject?.name}</span>
+                            <span>/</span>
+                            <span className="text-foreground">{selectedPackage?.name}</span>
+                            <span>/</span>
+                            <span className="text-foreground">{selectedLocation?.segment_name}</span>
                         </p>
                     </div>
                 )}
@@ -294,14 +317,12 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                 <Button
                     onClick={handleProceed}
                     disabled={!isComplete}
-                    className="w-full h-12 text-base font-semibold transition-all"
+                    className={`w-full h-14 text-base font-semibold transition-all rounded-xl ${isComplete ? 'btn-gradient text-white' : ''
+                        }`}
                     size="lg"
                 >
                     {isComplete ? (
-                        <>
-                            Proceed to Upload
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </>
+                        "Proceed to Upload"
                     ) : (
                         "Complete all selections to proceed"
                     )}

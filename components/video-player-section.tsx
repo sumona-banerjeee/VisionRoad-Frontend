@@ -1,12 +1,15 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import dynamic from "next/dynamic"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Target, AlertTriangle, Film, Activity, Gauge, Monitor, SignpostBig, Map as MapIcon } from "lucide-react"
-import MapModal from "@/components/map-modal"
+
+// Dynamically import MapModal with SSR disabled (Leaflet requires window object)
+const MapModal = dynamic(() => import("@/components/map-modal"), { ssr: false })
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
 
@@ -194,22 +197,31 @@ function DetailedSummarySection({
   return (
     <div className="space-y-4">
       {/* Location-based Summary */}
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
+        <CardHeader className="pb-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">Detection Locations</CardTitle>
-              <CardDescription className="text-xs">
-                {isPothole ? "Potholes" : "Signboards"} detected across project locations
-              </CardDescription>
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 shadow-md shadow-cyan-500/30">
+                <MapIcon className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-base font-bold">
+                  <span className="bg-gradient-to-r from-cyan-600 via-blue-500 to-cyan-600 dark:from-cyan-400 dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                    Detection Locations
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {isPothole ? "Potholes" : "Signboards"} detected across project locations
+                </CardDescription>
+              </div>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowMap(true)}
-              className="gap-2"
+              className="gap-2 border-cyan-200 dark:border-cyan-800 hover:bg-cyan-50 dark:hover:bg-cyan-900/50"
             >
-              <MapIcon className="h-4 w-4" />
+              <MapIcon className="h-4 w-4 text-cyan-500" />
               Show Map
             </Button>
           </div>
@@ -245,12 +257,23 @@ function DetailedSummarySection({
       </Card>
 
       {/* All Detections List */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">All Detections</CardTitle>
-          <CardDescription className="text-xs">
-            Complete list of {isPothole ? "potholes" : "signboards"} with GPS coordinates
-          </CardDescription>
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
+        <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 shadow-md shadow-indigo-500/30">
+              <Target className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-bold">
+                <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                  All Detections
+                </span>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Complete list of {isPothole ? "potholes" : "signboards"} with GPS coordinates
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[300px] rounded-md border bg-muted/30 p-3">
@@ -345,12 +368,23 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   ]
 
   return (
-    <Card className="animate-in fade-in slide-in-from-bottom duration-500">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">Quick Stats</CardTitle>
-        <CardDescription className="text-xs">
-          Overview of {isPothole ? "pothole" : "signboard"} detection results
-        </CardDescription>
+    <Card className="animate-in fade-in slide-in-from-bottom duration-500 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
+      <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
+            <Activity className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <CardTitle className="text-base font-bold">
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400 bg-clip-text text-transparent">
+                Quick Stats
+              </span>
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Overview of {isPothole ? "pothole" : "signboard"} detection results
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -359,14 +393,14 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center justify-center p-2 rounded-lg transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500"
+                className="flex flex-col items-center justify-center p-3 rounded-xl transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500 border border-gray-100 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className={`${stat.bgColor} p-1.5 rounded-full mb-1.5 transition-all`}>
-                  <Icon className={`h-3 w-3 ${stat.color}`} />
+                <div className={`${stat.bgColor} p-2 rounded-lg mb-2 transition-all shadow-inner`}>
+                  <Icon className={`h-4 w-4 ${stat.color}`} />
                 </div>
-                <div className={`text-lg font-bold ${stat.color} mb-0.5`}>{stat.value}</div>
-                <div className="text-[10px] text-muted-foreground text-center leading-tight">{stat.label}</div>
+                <div className={`text-xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
+                <div className="text-[10px] text-muted-foreground text-center leading-tight font-medium uppercase tracking-wide">{stat.label}</div>
               </div>
             )
           })}
@@ -792,12 +826,23 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Video Playback with Detection</CardTitle>
-          <CardDescription>
-            Watch the video with real-time {isPothole ? "pothole" : "signboard"} detection overlays
-          </CardDescription>
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-100 dark:from-gray-900/50 dark:to-slate-900/50 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-gray-900 to-slate-700 dark:from-white dark:to-gray-300 shadow-lg shadow-gray-500/20">
+              <Film className="h-5 w-5 text-white dark:text-gray-900" />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-bold">
+                <span className="bg-gradient-to-r from-gray-900 via-slate-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
+                  Video Playback with Detection
+                </span>
+              </CardTitle>
+              <CardDescription>
+                Watch the video with real-time {isPothole ? "pothole" : "signboard"} detection overlays
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

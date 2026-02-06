@@ -82,6 +82,111 @@ export async function fetchLocationsByPackage(packageId: string): Promise<Locati
 }
 
 /**
+ * Fetch all packages (for dashboard)
+ */
+export async function fetchAllPackages(): Promise<Package[]> {
+    return apiRequest<Package[]>("/packages/")
+}
+
+/**
+ * Fetch all locations (for dashboard)
+ */
+export async function fetchAllLocations(): Promise<Location[]> {
+    return apiRequest<Location[]>("/locations/")
+}
+
+// Video type for dashboard
+export interface Video {
+    id: string
+    filename: string
+    detection_type: "pothole-detection" | "sign-board-detection"
+    status: "pending" | "processing" | "completed" | "failed"
+    unique_potholes?: number
+    unique_signboards?: number
+    total_detections?: number
+    created_at: string
+    updated_at: string
+}
+
+/**
+ * Fetch all videos (for dashboard)
+ */
+export async function fetchVideos(): Promise<Video[]> {
+    const response = await apiRequest<{ videos: Array<{ video_id: string; status: string; progress: number; summary?: { unique_potholes?: number; unique_signboards?: number; total_detections?: number } }> }>("/videos")
+
+    // Transform the response to match our Video interface
+    return response.videos.map(v => ({
+        id: v.video_id,
+        filename: v.video_id, // Using video_id as filename since backend doesn't provide it
+        detection_type: v.summary?.unique_potholes !== undefined ? "pothole-detection" : "sign-board-detection" as const,
+        status: v.status as Video["status"],
+        unique_potholes: v.summary?.unique_potholes,
+        unique_signboards: v.summary?.unique_signboards,
+        total_detections: v.summary?.total_detections,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    }))
+}
+
+// Detection type for map display
+export interface Detection {
+    id: number
+    video_id: string
+    type: string
+    class: string
+    confidence: number
+    latitude: number | null
+    longitude: number | null
+    frame_number: number
+    timestamp_ms: number
+}
+
+/**
+ * Fetch all detections from completed videos (for dashboard map)
+ * Uses the summary endpoint to get detections for each project
+ */
+export async function fetchAllDetections(): Promise<Detection[]> {
+    try {
+        // First get all projects
+        const projects = await fetchProjects()
+
+        // Then fetch detections for each project
+        const allDetections: Detection[] = []
+
+        for (const project of projects) {
+            try {
+                const summary = await apiRequest<{
+                    packages: {
+                        [key: string]: {
+                            locations: {
+                                [key: string]: {
+                                    detections: Detection[]
+                                }
+                            }
+                        }
+                    }
+                }>(`/summary/projects/${project.id}`)
+
+                // Extract detections from the nested structure
+                for (const pkg of Object.values(summary.packages || {})) {
+                    for (const loc of Object.values(pkg.locations || {})) {
+                        allDetections.push(...(loc.detections || []))
+                    }
+                }
+            } catch (e) {
+                // Skip projects that fail to load
+                console.warn(`Failed to load detections for project ${project.id}:`, e)
+            }
+        }
+
+        return allDetections
+    } catch (e) {
+        console.error("Failed to fetch all detections:", e)
+        return []
+    }
+}
+
+/**
  * Session context type for storing user selections
  */
 export interface SessionContext {
