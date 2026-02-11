@@ -211,7 +211,10 @@ export default function CreatePackagePage() {
 
             {/* Modal Dialog */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent
+                    className="max-w-2xl"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                >
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Package className="h-5 w-5 text-blue-500" />
@@ -240,11 +243,11 @@ export default function CreatePackagePage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-8">
                         {/* Step 1: Select Project */}
-                        <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
+                        <div className="p-4 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm">
                             <div className="flex items-center gap-2 mb-3">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
                                     <span className="text-white text-xs font-bold">1</span>
                                 </div>
                                 <p className="text-sm font-bold text-blue-700 dark:text-blue-400">Select Project</p>
@@ -264,54 +267,49 @@ export default function CreatePackagePage() {
                                     {projects.map(project => (
                                         <SelectItem key={project.id} value={project.id}>
                                             <span className="font-medium">{project.name}</span>
-                                            {project.state && <span className="text-gray-400 ml-2">({project.state})</span>}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {selectedProject && (
-                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 text-xs text-blue-600 dark:text-blue-400">
-                                    Selected: <span className="font-semibold">{selectedProject.name}</span>
-                                    {selectedProject.corridor_name && ` • ${selectedProject.corridor_name}`}
-                                </div>
-                            )}
                         </div>
 
                         {/* Step 2: Package Info */}
                         <div className={`space-y-4 transition-opacity duration-300 ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
                             <div className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
                                     <span className="text-white text-xs font-bold">2</span>
                                 </div>
                                 <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Package Information</p>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="pkg-name" className="text-sm font-semibold flex items-center gap-1">
-                                    Package Name <span className="text-red-500">*</span>
-                                </Label>
-                                <Input
-                                    id="pkg-name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="e.g., Package A - Section 1"
-                                    className="h-11"
-                                    required
-                                />
-                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="pkg-name" className="text-sm font-semibold flex items-center gap-1">
+                                        Package Name <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Input
+                                        id="pkg-name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Package Name"
+                                        className="h-10 text-sm"
+                                        required
+                                    />
+                                </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="region" className="text-sm font-semibold flex items-center gap-1">
-                                    <Globe className="h-3.5 w-3.5 text-gray-400" />
-                                    Region <span className="text-gray-400 font-normal text-xs">(Optional)</span>
-                                </Label>
-                                <Input
-                                    id="region"
-                                    value={region}
-                                    onChange={(e) => setRegion(e.target.value)}
-                                    placeholder="e.g., Delhi, Haryana, Punjab"
-                                    className="h-11"
-                                />
+                                <div className="space-y-2">
+                                    <Label htmlFor="region" className="text-sm font-semibold flex items-center gap-1">
+                                        <Globe className="h-3.5 w-3.5 text-gray-400" />
+                                        Region <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+                                    </Label>
+                                    <Input
+                                        id="region"
+                                        value={region}
+                                        onChange={(e) => setRegion(e.target.value)}
+                                        placeholder="Region"
+                                        className="h-10 text-sm"
+                                    />
+                                </div>
                             </div>
                         </div>
 

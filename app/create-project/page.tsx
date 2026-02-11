@@ -183,8 +183,11 @@ export default function CreateProjectPage() {
             </main>
 
             {/* Modal Dialog */}
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) { setIsModalOpen(false); resetForm(); } else { setIsModalOpen(true); } }}>
+                <DialogContent
+                    className="max-w-2xl"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                >
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <FolderPlus className="h-5 w-5 text-blue-500" />
@@ -215,7 +218,7 @@ export default function CreateProjectPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Project Name */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <Label htmlFor="name" className="text-sm font-semibold flex items-center gap-1">
                                 Project Name <span className="text-red-500">*</span>
                             </Label>
@@ -223,15 +226,15 @@ export default function CreateProjectPage() {
                                 id="name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="e.g., Delhi-Chandigarh Highway"
-                                className="h-11"
+                                placeholder="Project Name"
+                                className="h-10 text-sm"
                                 required
                             />
                         </div>
 
                         {/* State & Corridor Row */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 <Label htmlFor="state" className="text-sm font-semibold">
                                     State <span className="text-gray-400 font-normal text-xs">(Optional)</span>
                                 </Label>
@@ -239,11 +242,11 @@ export default function CreateProjectPage() {
                                     id="state"
                                     value={state}
                                     onChange={(e) => setState(e.target.value)}
-                                    placeholder="e.g., Haryana"
-                                    className="h-11"
+                                    placeholder="State"
+                                    className="h-10 text-sm"
                                 />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 <Label htmlFor="corridor" className="text-sm font-semibold flex items-center gap-1">
                                     <Route className="h-3.5 w-3.5 text-gray-400" />
                                     Corridor Name <span className="text-gray-400 font-normal text-xs">(Optional)</span>
@@ -252,79 +255,75 @@ export default function CreateProjectPage() {
                                     id="corridor"
                                     value={corridorName}
                                     onChange={(e) => setCorridorName(e.target.value)}
-                                    placeholder="e.g., National Highway 44"
-                                    className="h-11"
+                                    placeholder="Corridor Name"
+                                    className="h-10 text-sm"
                                 />
                             </div>
                         </div>
 
-                        {/* GPS Coordinates Section */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/20">
-                                    <MapPin className="h-4 w-4 text-white" />
-                                </div>
-                                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">GPS Coordinates</h3>
-                                <span className="text-xs text-gray-400">(Optional)</span>
-                            </div>
-
+                        {/* GPS Coordinates Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {/* Start Point */}
-                            <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
-                                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">Start Point</p>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="start-lat" className="text-xs text-gray-500">Latitude</Label>
+                            <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm">
+                                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wide flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" /> Start Point
+                                </p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1">
+                                        <Label htmlFor="start-lat" className="text-[10px] text-gray-500">Lat</Label>
                                         <Input
                                             id="start-lat"
                                             type="number"
                                             step="any"
                                             value={startLat}
                                             onChange={(e) => setStartLat(e.target.value)}
-                                            placeholder="-90 to 90"
-                                            className="h-10 text-sm"
+                                            placeholder="Lat"
+                                            className="h-8 text-[11px]"
                                         />
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="start-lng" className="text-xs text-gray-500">Longitude</Label>
+                                    <div className="space-y-1">
+                                        <Label htmlFor="start-lng" className="text-[10px] text-gray-500">Lng</Label>
                                         <Input
                                             id="start-lng"
                                             type="number"
                                             step="any"
                                             value={startLng}
                                             onChange={(e) => setStartLng(e.target.value)}
-                                            placeholder="-180 to 180"
-                                            className="h-10 text-sm"
+                                            placeholder="Lng"
+                                            className="h-8 text-[11px]"
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* End Point */}
-                            <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
-                                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">End Point</p>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="end-lat" className="text-xs text-gray-500">Latitude</Label>
+                            <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm">
+                                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wide flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" /> End Point
+                                </p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1">
+                                        <Label htmlFor="end-lat" className="text-[10px] text-gray-500">Lat</Label>
                                         <Input
                                             id="end-lat"
                                             type="number"
                                             step="any"
                                             value={endLat}
                                             onChange={(e) => setEndLat(e.target.value)}
-                                            placeholder="-90 to 90"
-                                            className="h-10 text-sm"
+                                            placeholder="Lat"
+                                            className="h-8 text-[11px]"
                                         />
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="end-lng" className="text-xs text-gray-500">Longitude</Label>
+                                    <div className="space-y-1">
+                                        <Label htmlFor="end-lng" className="text-[10px] text-gray-500">Lng</Label>
                                         <Input
                                             id="end-lng"
                                             type="number"
                                             step="any"
                                             value={endLng}
                                             onChange={(e) => setEndLng(e.target.value)}
-                                            placeholder="-180 to 180"
-                                            className="h-10 text-sm"
+                                            placeholder="Lng"
+                                            className="h-8 text-[11px]"
                                         />
                                     </div>
                                 </div>

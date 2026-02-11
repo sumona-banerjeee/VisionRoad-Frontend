@@ -290,7 +290,10 @@ export default function CreateLocationPage() {
 
             {/* Modal Dialog */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent
+                    className="max-w-2xl"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                >
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <MapPin className="h-5 w-5 text-blue-500" />
@@ -321,12 +324,12 @@ export default function CreateLocationPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Step 1: Select Project */}
-                        <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                                    <span className="text-white text-xs font-bold">1</span>
+                        <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                                    <span className="text-white text-[10px] font-bold">1</span>
                                 </div>
-                                <p className="text-sm font-bold text-blue-700 dark:text-blue-400">Select Project</p>
+                                <p className="text-xs font-bold text-blue-700 dark:text-blue-400">Select Project</p>
                             </div>
                             <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
                                 <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
@@ -343,25 +346,19 @@ export default function CreateLocationPage() {
                                     {projects.map(project => (
                                         <SelectItem key={project.id} value={project.id}>
                                             <span className="font-medium">{project.name}</span>
-                                            {project.state && <span className="text-gray-400 ml-2">({project.state})</span>}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {selectedProject && (
-                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 text-xs text-blue-600 dark:text-blue-400">
-                                    Selected: <span className="font-semibold">{selectedProject.name}</span>
-                                </div>
-                            )}
                         </div>
 
                         {/* Step 2: Select Package */}
-                        <div className={`p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50 transition-opacity duration-300 ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                    <span className="text-white text-xs font-bold">2</span>
+                        <div className={`p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm transition-opacity duration-300 ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                    <span className="text-white text-[10px] font-bold">2</span>
                                 </div>
-                                <p className="text-sm font-bold text-blue-700 dark:text-blue-400">Select Package</p>
+                                <p className="text-xs font-bold text-blue-700 dark:text-blue-400">Select Package</p>
                             </div>
                             <Select value={selectedPackageId} onValueChange={setSelectedPackageId} disabled={!selectedProjectId}>
                                 <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
@@ -378,116 +375,101 @@ export default function CreateLocationPage() {
                                     {packages.map(pkg => (
                                         <SelectItem key={pkg.id} value={pkg.id}>
                                             <span className="font-medium">{pkg.name}</span>
-                                            {pkg.region && <span className="text-gray-400 ml-2">({pkg.region})</span>}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {selectedPackage && (
-                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 text-xs text-blue-600 dark:text-blue-400">
-                                    Selected: <span className="font-semibold">{selectedPackage.name}</span>
-                                    {selectedPackage.region && ` • ${selectedPackage.region}`}
-                                </div>
-                            )}
                         </div>
 
                         {/* Step 3: Location Details */}
-                        <div className={`space-y-5 transition-opacity duration-300 ${selectedPackageId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                        <div className={`space-y-4 transition-opacity duration-300 ${selectedPackageId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
                             <div className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedPackageId ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                    <span className="text-white text-xs font-bold">3</span>
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedPackageId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                    <span className="text-white text-[10px] font-bold">3</span>
                                 </div>
-                                <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Location Information</p>
+                                <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Location Information</p>
                             </div>
 
-                            {/* Segment Name */}
-                            <div className="space-y-2">
-                                <Label htmlFor="segment" className="text-sm font-semibold flex items-center gap-1">
-                                    Segment Name <span className="text-red-500">*</span>
-                                </Label>
-                                <Input
-                                    id="segment"
-                                    value={segmentName}
-                                    onChange={(e) => setSegmentName(e.target.value)}
-                                    placeholder="e.g., KM 120 to KM 135"
-                                    className="h-11"
-                                    required
-                                />
-                            </div>
-
-                            {/* Chainage */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="ch-start" className="text-sm font-semibold flex items-center gap-1">
-                                        <Milestone className="h-3.5 w-3.5 text-gray-400" />
-                                        Chainage Start (km) <span className="text-gray-400 font-normal text-xs">(Opt)</span>
+                            {/* Segment Name & Chainage Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="segment" className="text-xs font-semibold flex items-center gap-1">
+                                        Segment Name <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
-                                        id="ch-start"
-                                        type="number"
-                                        step="any"
-                                        min="0"
-                                        value={chainageStartKm}
-                                        onChange={(e) => setChainageStartKm(e.target.value)}
-                                        placeholder="0"
-                                        className="h-10 text-sm"
+                                        id="segment"
+                                        value={segmentName}
+                                        onChange={(e) => setSegmentName(e.target.value)}
+                                        placeholder="Location to Location"
+                                        className="h-9 text-sm"
+                                        required
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="ch-end" className="text-sm font-semibold flex items-center gap-1">
-                                        <Milestone className="h-3.5 w-3.5 text-gray-400" />
-                                        Chainage End (km) <span className="text-gray-400 font-normal text-xs">(Opt)</span>
-                                    </Label>
-                                    <Input
-                                        id="ch-end"
-                                        type="number"
-                                        step="any"
-                                        min="0"
-                                        value={chainageEndKm}
-                                        onChange={(e) => setChainageEndKm(e.target.value)}
-                                        placeholder="0"
-                                        className="h-10 text-sm"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* GPS Coordinates */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/20">
-                                        <MapPin className="h-4 w-4 text-white" />
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="ch-start" className="text-[10px] font-semibold flex items-center gap-1">
+                                            Start (km)
+                                        </Label>
+                                        <Input
+                                            id="ch-start"
+                                            type="number"
+                                            step="any"
+                                            min="0"
+                                            value={chainageStartKm}
+                                            onChange={(e) => setChainageStartKm(e.target.value)}
+                                            placeholder="0"
+                                            className="h-9 text-sm"
+                                        />
                                     </div>
-                                    <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">GPS Coordinates</h3>
-                                    <span className="text-xs text-red-500 font-medium">Required</span>
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="ch-end" className="text-[10px] font-semibold flex items-center gap-1">
+                                            End (km)
+                                        </Label>
+                                        <Input
+                                            id="ch-end"
+                                            type="number"
+                                            step="any"
+                                            min="0"
+                                            value={chainageEndKm}
+                                            onChange={(e) => setChainageEndKm(e.target.value)}
+                                            placeholder="0"
+                                            className="h-9 text-sm"
+                                        />
+                                    </div>
                                 </div>
+                            </div>
 
+                            {/* GPS Coordinates Grid */}
+                            <div className="grid grid-cols-2 gap-3">
                                 {/* Start Point */}
-                                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
-                                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">Start Point</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="s-lat" className="text-xs text-gray-500">Latitude *</Label>
+                                <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50">
+                                    <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wide flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" /> Start Point
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="s-lat" className="text-[10px] text-gray-500 w-8">Lat</Label>
                                             <Input
                                                 id="s-lat"
                                                 type="number"
                                                 step="any"
                                                 value={startLat}
                                                 onChange={(e) => setStartLat(e.target.value)}
-                                                placeholder="-90 to 90"
-                                                className="h-10 text-sm"
+                                                placeholder="Lat"
+                                                className="h-8 text-[11px]"
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="s-lng" className="text-xs text-gray-500">Longitude *</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="s-lng" className="text-[10px] text-gray-500 w-8">Lng</Label>
                                             <Input
                                                 id="s-lng"
                                                 type="number"
                                                 step="any"
                                                 value={startLng}
                                                 onChange={(e) => setStartLng(e.target.value)}
-                                                placeholder="-180 to 180"
-                                                className="h-10 text-sm"
+                                                placeholder="Lng"
+                                                className="h-8 text-[11px]"
                                                 required
                                             />
                                         </div>
@@ -495,32 +477,34 @@ export default function CreateLocationPage() {
                                 </div>
 
                                 {/* End Point */}
-                                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
-                                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">End Point</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="e-lat" className="text-xs text-gray-500">Latitude *</Label>
+                                <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50">
+                                    <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-2 uppercase tracking-wide flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" /> End Point
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="e-lat" className="text-[10px] text-gray-500 w-8">Lat</Label>
                                             <Input
                                                 id="e-lat"
                                                 type="number"
                                                 step="any"
                                                 value={endLat}
                                                 onChange={(e) => setEndLat(e.target.value)}
-                                                placeholder="-90 to 90"
-                                                className="h-10 text-sm"
+                                                placeholder="Lat"
+                                                className="h-8 text-[11px]"
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="e-lng" className="text-xs text-gray-500">Longitude *</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="e-lng" className="text-[10px] text-gray-500 w-8">Lng</Label>
                                             <Input
                                                 id="e-lng"
                                                 type="number"
                                                 step="any"
                                                 value={endLng}
                                                 onChange={(e) => setEndLng(e.target.value)}
-                                                placeholder="-180 to 180"
-                                                className="h-10 text-sm"
+                                                placeholder="Lng"
+                                                className="h-8 text-[11px]"
                                                 required
                                             />
                                         </div>
