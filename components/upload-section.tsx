@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, Loader2, AlertCircle } from "lucide-react"
-import type { DetectionData, DetectionType } from "@/app/page"
+import type { DetectionData, DetectionType } from "@/lib/types"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000/api/v1"
@@ -57,14 +57,14 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
         setProgress(progressValue)
 
         let message = data.message || "Processing..."
-        
+
         // Handle both pothole and signboard progress messages
         if (data.unique_potholes !== undefined) {
           message += ` | Unique: ${data.unique_potholes} | Total: ${data.total_detections || 0}`
         } else if (data.unique_signboards !== undefined) {
           message += ` | Unique: ${data.unique_signboards} | Total: ${data.total_detections || 0}`
         }
-        
+
         setStatusMessage(message)
       }
 
@@ -135,7 +135,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
     formData.append("file", file)
     formData.append("detection_type", detectionType)
     formData.append("speed_kmh", speed.toString())
-    
+
     // Add JSON file if provided
     if (jsonFile) {
       formData.append("json_file", jsonFile)
@@ -153,7 +153,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
       console.log("  - file:", file.name)
       console.log("  - detection_type:", detectionType)
       console.log("  - speed_kmh:", speed)
-      
+
       const response = await fetch(`${API_URL}/upload`, {
         method: "POST",
         headers: {
@@ -183,7 +183,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
       console.error("[Upload] Upload error:", error)
 
       let errorMessage = "Upload failed"
-      
+
       if (error instanceof TypeError && error.message === "Failed to fetch") {
         errorMessage = "Cannot connect to server. Please check:\n• Backend is running on " + API_URL + "\n• CORS is configured properly\n• No firewall blocking the connection"
       } else if (error instanceof Error) {
@@ -305,10 +305,11 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
         )}
 
         {/* Upload Button */}
-        <Button 
-          onClick={handleUpload} 
-          disabled={!file || uploading} 
-          className="w-full transition-all" 
+        <Button
+          onClick={handleUpload}
+          disabled={!file || uploading}
+          className="w-full transition-all bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25"
+
           size="lg"
         >
           {uploading ? (

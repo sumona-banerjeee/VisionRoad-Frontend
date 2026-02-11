@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Target, AlertTriangle, Film, Activity, Gauge, Monitor } from "lucide-react"
-import type { DetectionData } from "@/app/page"
+import type { DetectionData } from "@/lib/types"
 
 type SummarySectionProps = {
   data: DetectionData

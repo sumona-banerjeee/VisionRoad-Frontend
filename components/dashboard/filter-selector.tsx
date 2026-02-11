@@ -39,7 +39,7 @@ export function FilterSelector({
         <div className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-card border border-[var(--border)] shadow-sm">
             {/* Project Dropdown */}
             <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
+                <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50">
                     <FolderOpen className="h-4 w-4 text-indigo-500" />
                 </div>
                 <Select

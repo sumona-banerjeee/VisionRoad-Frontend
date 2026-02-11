@@ -296,7 +296,8 @@ function DetailedSummarySection({
               {allDetections.map(({ detection, locationName, packageName }, idx) => (
                 <div
                   key={`${detection.id}-${idx}`}
-                  className="text-xs p-2 bg-card rounded border-l-2 border-blue-500"
+                  className="text-xs p-2 bg-white dark:bg-gray-900 rounded shadow-sm border border-gray-100 dark:border-gray-800"
+
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-semibold">
@@ -413,8 +414,8 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
                 className="flex flex-col items-center justify-center p-3 rounded-xl transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500 border border-gray-100 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className={`${stat.bgColor} p-2.5 rounded-lg mb-2 transition-all shadow-inner`}>
-                  <Icon className={`h-5 w-5 ${stat.color}`} />
+                <div className={`${stat.bgColor} p-3 rounded-lg mb-2 transition-all shadow-inner`}>
+                  <Icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
                 <div className={`text-xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
                 <div className="text-[10px] text-muted-foreground text-center leading-tight font-medium uppercase tracking-wide">{stat.label}</div>
@@ -940,8 +941,8 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                       <div
                         key={`${log.frame}-${index}`}
                         onClick={() => seekToFrame(log.frame)}
-                        className={`text-xs p-3 bg-card rounded-md border-l-2 cursor-pointer hover:bg-accent/50 transition-colors ${isPothole ? "border-red-500" : "border-blue-500"
-                          }`}
+                        className="text-xs p-3 bg-white dark:bg-gray-900 rounded-md cursor-pointer hover:bg-accent/50 transition-colors shadow-sm"
+
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-semibold text-foreground">Frame: {log.frame}</span>

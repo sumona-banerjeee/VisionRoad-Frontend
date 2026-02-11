@@ -36,7 +36,7 @@ export function DataTable<T extends Record<string, any>>({
                 </div>
                 <Button
                     onClick={onAddNew}
-                    className="bg-blue-600 hover:bg-blue-800 text-white shadow-md transition-all duration-300 hover:scale-105 active:scale-95 border-none h-8 px-4 text-xs font-semibold"
+                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border-none h-8 px-4 text-xs font-semibold"
                 >
                     <Plus className="h-3.5 w-3.5 mr-1.5 stroke-[3px]" />
                     {addButtonText}

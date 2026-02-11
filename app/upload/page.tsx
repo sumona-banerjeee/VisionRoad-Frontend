@@ -213,13 +213,13 @@ export default function UploadPage() {
                                         </div>
                                     </div>
                                     <Button
-                                        variant="ghost"
                                         size="sm"
                                         onClick={handleBackToSelection}
-                                        className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
                                     >
                                         Change Selection
                                     </Button>
+
                                 </div>
                             </div>
                         </div>
@@ -229,7 +229,7 @@ export default function UploadPage() {
                     <Card className="rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-700 delay-150 flex-1">
                         <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
                             <CardTitle className="text-xl font-bold">
-                                <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-blue-400 dark:via-blue-300 dark:to-blue-400  bg-clip-text text-transparent">
                                     Upload Video
                                 </span>
                             </CardTitle>
@@ -253,7 +253,7 @@ export default function UploadPage() {
                                             setError(null)
                                         }}
                                         disabled={uploading}
-                                        className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-100 dark:file:bg-indigo-900/50 file:text-indigo-600 dark:file:text-indigo-400 file:font-medium file:text-xs hover:file:bg-indigo-200"
+                                        className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-100 dark:file:bg-blue-900/50 file:text-blue-600 dark:file:text-blue-400 file:font-medium file:text-xs hover:file:bg-blue-200"
                                     />
                                 </div>
 
@@ -271,7 +271,7 @@ export default function UploadPage() {
                                             setError(null)
                                         }}
                                         disabled={uploading}
-                                        className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-100 dark:file:bg-indigo-900/50 file:text-indigo-600 dark:file:text-indigo-400 file:font-medium file:text-xs hover:file:bg-indigo-200"
+                                        className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-100 dark:file:bg-blue-900/50 file:text-blue-600 dark:file:text-blue-400 file:font-medium file:text-xs hover:file:bg-blue-200"
                                     />
                                 </div>
 
@@ -331,7 +331,9 @@ export default function UploadPage() {
                             <Button
                                 onClick={handleUpload}
                                 disabled={!file || uploading}
-                                className={`w-full h-12 text-sm font-semibold transition-all rounded-xl ${file && !uploading ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25' : ''
+                                className={`w-full h-12 text-sm font-semibold transition-all rounded-xl ${file && !uploading
+                                    ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25'
+                                    : ''
                                     }`}
                                 size="lg"
                             >
@@ -347,13 +349,13 @@ export default function UploadPage() {
 
                             {/* Progress Section */}
                             {uploading && (
-                                <div className="space-y-3 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 animate-in fade-in slide-in-from-top duration-500">
+                                <div className="space-y-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 animate-in fade-in slide-in-from-top duration-500">
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="font-medium text-gray-700 dark:text-gray-300 text-xs">Processing Progress</span>
-                                            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-xs">{progress}%</span>
+                                            <span className="font-bold text-blue-600 dark:text-blue-400 text-xs">{progress}%</span>
                                         </div>
-                                        <div className="h-2 rounded-full bg-indigo-100 dark:bg-indigo-900/50 overflow-hidden">
+                                        <div className="h-2 rounded-full bg-blue-100 dark:bg-blue-900/50 overflow-hidden">
                                             <div
                                                 className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300"
                                                 style={{ width: `${progress}%` }}
