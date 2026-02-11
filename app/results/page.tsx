@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Loader2, ArrowLeft, MapPin, Package, FolderKanban, RotateCcw } from "lucide-react"
+import { Loader2, ArrowLeft, MapPin, Package, FolderKanban, RotateCcw, TrendingUp } from "lucide-react"
 import VideoPlayerSection from "@/components/video-player-section"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import {
@@ -185,53 +185,45 @@ export default function ResultsPage() {
 
             {/* Main Content */}
             <main className="ml-16 min-h-screen">
-                <div className="container mx-auto px-4 py-8 max-w-7xl">
-                    {/* Header */}
-                    <div className="mb-8 animate-in fade-in slide-in-from-top duration-700">
-                        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
-                            {getTitle()}
-                        </h1>
-                        <p className="text-gray-500 dark:text-gray-400">
-                            View your AI-powered road analysis results
-                        </p>
+                <div className="container mx-auto px-6 py-8 max-w-full">
+                    {/* Refined Header */}
+                    <div className="mb-8 flex items-center gap-5 animate-in fade-in slide-in-from-top duration-700">
+                        <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
+                            <TrendingUp className="h-8 w-8 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent leading-tight">
+                                {getTitle()}
+                            </h1>
+                            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                                View your AI-powered road analysis results
+                            </p>
+                        </div>
                     </div>
 
                     {/* Session Info Bar */}
                     {session && (
                         <div className="mb-6 animate-in fade-in slide-in-from-top duration-500">
                             <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-[var(--border)] shadow-sm">
-                                <div className="flex items-center gap-6 text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 shadow-md shadow-indigo-500/30">
-                                            <FolderKanban className="h-4 w-4 text-white" />
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold tracking-wide">Project:</span>
-                                        <span className="font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">{session.projectName}</span>
+                                <div className="flex items-center gap-12">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Project</span>
+                                        <span className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+                                            {session.projectName}
+                                        </span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
-                                            <Package className="h-4 w-4 text-white" />
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold tracking-wide">Package:</span>
-                                        <span className="font-bold text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{session.packageName}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Package</span>
+                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
+                                            {session.packageName}
+                                        </span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 shadow-md shadow-purple-500/30">
-                                            <MapPin className="h-4 w-4 text-white" />
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold tracking-wide">Location:</span>
-                                        <span className="font-bold text-gray-900 dark:text-white bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{session.locationName}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Location</span>
+                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
+                                            {session.locationName}
+                                        </span>
                                     </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" size="sm" onClick={handleBackToUpload} className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                                        <ArrowLeft className="h-4 w-4 mr-2" />
-                                        Back to Upload
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={handleNewAnalysis} className="border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/50">
-                                        <RotateCcw className="h-4 w-4 mr-2" />
-                                        New Analysis
-                                    </Button>
                                 </div>
                             </div>
                         </div>

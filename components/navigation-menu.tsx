@@ -89,12 +89,12 @@ export function NavigationMenu() {
                     <Menu className="h-5 w-5 text-foreground" />
                 </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[320px] sm:w-[380px] bg-background/95 backdrop-blur-xl border-r border-white/10">
-                <SheetHeader className="pb-6 border-b border-white/10">
-                    <SheetTitle className="text-2xl font-bold text-gradient">
+            <SheetContent side="left" className="w-[320px] sm:w-[380px] bg-white backdrop-blur-xl border-r border-slate-200">
+                <SheetHeader className="pb-6 border-b border-slate-100">
+                    <SheetTitle className="text-2xl font-bold text-[#3b82f6]">
                         VisionRoad
                     </SheetTitle>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-500">
                         AI-Powered Road Detection System
                     </p>
                 </SheetHeader>
@@ -110,28 +110,30 @@ export function NavigationMenu() {
                                 key={item.href}
                                 onClick={() => handleNavigation(item.href)}
                                 className={`w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all duration-300 group ${isActive
-                                    ? "bg-primary/15 border border-primary/30"
-                                    : "hover:bg-white/5 border border-transparent hover:border-white/10"
+                                    ? "bg-slate-50 border border-slate-200"
+                                    : "hover:bg-slate-50 border border-transparent hover:border-slate-100"
                                     }`}
                             >
-                                <div className={`p-2.5 rounded-lg transition-all duration-300 ${isActive
-                                    ? "bg-[#60a5fa] text-white"
-                                    : "bg-white/5 text-muted-foreground group-hover:bg-[#60a5fa]/10 group-hover:text-[#60a5fa]"
+                                <div className={`p-2.5 rounded-lg transition-all duration-300 border shadow-sm ${isActive
+                                    ? "bg-[#2563eb] text-white border-[#2563eb]"
+                                    : "bg-[#f0fafd] text-slate-900 group-hover:bg-[#2563eb] group-hover:text-white group-hover:border-[#2563eb] border-slate-100"
                                     }`}>
-                                    <Icon className="h-5 w-5" />
+                                    <Icon
+                                        className={`h-5 w-5 ${isActive ? 'stroke-[2.5]' : 'stroke-[2]'}`}
+                                    />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className={`font-semibold text-sm ${isActive ? "text-primary" : "text-foreground"
+                                    <h3 className={`font-semibold text-sm ${isActive ? "text-[#1e40af]" : "text-gray-700"
                                         }`}>
                                         {item.title}
                                     </h3>
-                                    <p className="text-xs text-muted-foreground truncate mt-0.5">
+                                    <p className="text-xs text-gray-400 truncate mt-0.5">
                                         {item.description}
                                     </p>
                                 </div>
                                 <ChevronRight className={`h-4 w-4 transition-all duration-300 ${isActive
-                                    ? "text-primary opacity-100"
-                                    : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                                    ? "text-[#1e40af] opacity-100"
+                                    : "text-gray-300 opacity-0 group-hover:opacity-100"
                                     }`} />
                             </button>
                         )
@@ -140,7 +142,7 @@ export function NavigationMenu() {
 
                 {/* Footer */}
                 <div className="absolute bottom-4 left-4 right-4 text-center">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-400">
                         Sentient Geeks Pvt. Ltd.
                     </p>
                 </div>

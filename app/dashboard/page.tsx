@@ -276,11 +276,20 @@ export default function DashboardPage() {
 
             {/* Main Content - offset by sidebar width */}
             <main className="ml-16 min-h-screen">
-                <div className="p-6 max-w-[1600px] mx-auto">
+                <div className="p-4 px-8 max-w-full mx-auto">
                     {/* Header */}
-                    <div className="mb-6 animate-in fade-in slide-in-from-top duration-500">
+                    <div className="mb-8 flex items-center gap-5 animate-in fade-in slide-in-from-top duration-500">
+                        <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
+                            {/* Constant orbit animations */}
+                            <div className="absolute inset-0 bg-white/20 animate-logo-spin-slow opacity-50"></div>
+                            <div className="absolute inset-0 border-2 border-white/30 rounded-2xl animate-logo-spin-reverse-slow opacity-30"></div>
+                            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white relative z-10 animate-logo-float">
+                                <path d="M50 20L85 80H15L50 20Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
+                                <path d="M40 80L50 55L60 80" stroke="currentColor" strokeWidth="6" />
+                            </svg>
+                        </div>
                         <div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
                                 VisionRoad Analytics Dashboard
                             </h1>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -304,7 +313,7 @@ export default function DashboardPage() {
                             subtitle="All detected objects"
                             value={stats.totalDetections}
                             icon={TrendingUp}
-                            gradient="green"
+                            gradient="purple"
                             isLoading={isLoading}
                         />
                         <GradientStatsCard
@@ -312,7 +321,7 @@ export default function DashboardPage() {
                             subtitle="Road surface damage"
                             value={stats.totalPotholes}
                             icon={AlertTriangle}
-                            gradient="coral"
+                            gradient="green"
                             isLoading={isLoading}
                         />
                         <GradientStatsCard

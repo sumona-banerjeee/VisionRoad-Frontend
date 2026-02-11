@@ -28,16 +28,14 @@ export function CompactProjectSelector({
     return (
         <div className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
             {/* Project Dropdown */}
-            <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
-                    <FolderOpen className="h-4 w-4 text-indigo-500" />
-                </div>
+            <div className="flex flex-col min-w-[120px]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Project</span>
                 <Select
                     value={selectedProjectId || ""}
                     onValueChange={onProjectChange}
                     disabled={isLoading || projects.length === 0}
                 >
-                    <SelectTrigger className="w-[220px] h-8 text-sm bg-transparent border-0 shadow-none focus:ring-0 px-1">
+                    <SelectTrigger className="h-auto p-0 border-0 shadow-none focus:ring-0 text-sm font-bold text-gray-900 dark:text-white bg-transparent text-left">
                         <SelectValue placeholder="Select project" />
                     </SelectTrigger>
                     <SelectContent>
@@ -53,12 +51,10 @@ export function CompactProjectSelector({
             {/* Corridor Badge */}
             {selectedProject?.corridor_name && (
                 <>
-                    <div className="h-5 w-px bg-gray-300 dark:bg-gray-600" />
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-                            <MapPin className="h-3.5 w-3.5 text-emerald-500" />
-                        </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                    <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">Corridor</span>
+                        <span className="text-xs font-bold text-gray-600 dark:text-gray-400">
                             {selectedProject.corridor_name}
                         </span>
                     </div>
@@ -68,12 +64,10 @@ export function CompactProjectSelector({
             {/* State Badge */}
             {selectedProject?.state && (
                 <>
-                    <div className="h-5 w-px bg-gray-300 dark:bg-gray-600" />
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/50">
-                            <Building2 className="h-3.5 w-3.5 text-purple-500" />
-                        </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                    <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1">State</span>
+                        <span className="text-xs font-bold text-gray-600 dark:text-gray-400">
                             {selectedProject.state}
                         </span>
                     </div>

@@ -148,8 +148,8 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
     }
 
     return (
-        <Card className="glass-card card-glow border-0 overflow-hidden">
-            <CardHeader className="pb-6 border-b border-border/50">
+        <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 overflow-hidden">
+            <CardHeader className="pb-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
                 <div className="flex flex-col gap-4">
                     <div>
                         <CardTitle className="text-2xl font-semibold">Select Project Location</CardTitle>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+import { Loader2, TrendingUp } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import {
     type SessionContext,
@@ -174,10 +174,13 @@ export default function UploadPage() {
             {/* Main Content */}
             <main className="ml-16 min-h-screen relative overflow-hidden flex flex-col">
 
-                <div className="flex-1 container mx-auto px-4 py-6 max-w-6xl relative z-10 flex flex-col">
-                    {/* Compact Header */}
-                    <div className="mb-4 animate-in fade-in slide-in-from-top duration-700">
-                        <div className="text-center">
+                <div className="flex-1 container mx-auto px-6 py-6 max-w-7xl relative z-10 flex flex-col">
+                    {/* Refined Header */}
+                    <div className="mb-6 flex items-center gap-5 animate-in fade-in slide-in-from-top duration-700">
+                        <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
+                            <TrendingUp className="h-8 w-8 text-white" />
+                        </div>
+                        <div>
                             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent leading-tight">
                                 {getTitle()}
                             </h1>
@@ -189,20 +192,24 @@ export default function UploadPage() {
                         <div className="mb-4 animate-in fade-in slide-in-from-top duration-500 delay-100">
                             <div className="rounded-xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
                                 <div className="flex items-center justify-between gap-4">
-                                    <div className="flex items-center gap-6 text-sm">
-                                        <div>
-                                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Project</p>
-                                            <p className="font-medium text-gray-900 dark:text-white text-sm">{session.projectName}</p>
+                                    <div className="flex items-center gap-12">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Project</span>
+                                            <span className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+                                                {session.projectName}
+                                            </span>
                                         </div>
-                                        <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
-                                        <div>
-                                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Package</p>
-                                            <p className="font-medium text-gray-900 dark:text-white text-sm">{session.packageName}</p>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Package</span>
+                                            <span className="text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
+                                                {session.packageName}
+                                            </span>
                                         </div>
-                                        <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
-                                        <div>
-                                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Location</p>
-                                            <p className="font-medium text-gray-900 dark:text-white text-sm">{session.locationName}</p>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Location</span>
+                                            <span className="text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
+                                                {session.locationName}
+                                            </span>
                                         </div>
                                     </div>
                                     <Button
@@ -220,7 +227,7 @@ export default function UploadPage() {
 
                     {/* Upload Card */}
                     <Card className="rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-700 delay-150 flex-1">
-                        <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+                        <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
                             <CardTitle className="text-xl font-bold">
                                 <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
                                     Upload Video
@@ -248,14 +255,6 @@ export default function UploadPage() {
                                         disabled={uploading}
                                         className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-100 dark:file:bg-indigo-900/50 file:text-indigo-600 dark:file:text-indigo-400 file:font-medium file:text-xs hover:file:bg-indigo-200"
                                     />
-                                    {file && (
-                                        <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800">
-                                            <p className="text-xs font-medium text-gray-900 dark:text-white">{file.name}</p>
-                                            <p className="text-[10px] text-gray-500">
-                                                {(file.size / 1024 / 1024).toFixed(2)} MB
-                                            </p>
-                                        </div>
-                                    )}
                                 </div>
 
                                 {/* JSON File Input */}
@@ -274,14 +273,6 @@ export default function UploadPage() {
                                         disabled={uploading}
                                         className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-100 dark:file:bg-indigo-900/50 file:text-indigo-600 dark:file:text-indigo-400 file:font-medium file:text-xs hover:file:bg-indigo-200"
                                     />
-                                    {jsonFile && (
-                                        <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800">
-                                            <p className="text-xs font-medium text-gray-900 dark:text-white">{jsonFile.name}</p>
-                                            <p className="text-[10px] text-gray-500">
-                                                {(jsonFile.size / 1024).toFixed(2)} KB
-                                            </p>
-                                        </div>
-                                    )}
                                 </div>
 
                                 {/* Detection Type */}

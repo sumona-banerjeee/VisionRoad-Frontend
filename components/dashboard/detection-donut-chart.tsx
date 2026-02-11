@@ -10,7 +10,7 @@ interface DetectionDonutChartProps {
 }
 
 const COLORS = {
-    pothole: "#ef4444",
+    pothole: "#10b981",
     signboard: "#3b82f6"
 }
 

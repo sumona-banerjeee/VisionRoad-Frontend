@@ -193,19 +193,45 @@ export default function CreateLocationPage() {
             render: (location: Location) => getPackageName(location.package_id)
         },
         {
+            key: "project",
+            header: "Project",
+            render: (location: Location) => {
+                const pkg = allPackages.find(p => p.id === location.package_id)
+                const project = projects.find(p => p.id === pkg?.project_id)
+                return project?.name || "—"
+            }
+        },
+        {
             key: "chainage",
             header: "Chainage (km)",
             render: (location: Location) => {
-                if (location.chainage_start_km && location.chainage_end_km) {
-                    return `${location.chainage_start_km} - ${location.chainage_end_km}`
+                if (location.chainage_start_km !== null && location.chainage_end_km !== null) {
+                    return (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] font-semibold border border-amber-100 dark:border-amber-800 whitespace-nowrap">
+                            {location.chainage_start_km} - {location.chainage_end_km}
+                        </span>
+                    )
                 }
                 return "—"
             }
         },
         {
-            key: "created_at",
-            header: "Created",
-            render: (location: Location) => new Date(location.created_at).toLocaleDateString()
+            key: "start_gps",
+            header: "Start GPS",
+            render: (location: Location) => (
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-mono border border-blue-100 dark:border-blue-800 whitespace-nowrap">
+                    {location.start_lat.toFixed(4)}, {location.start_lng.toFixed(4)}
+                </span>
+            )
+        },
+        {
+            key: "end_gps",
+            header: "End GPS",
+            render: (location: Location) => (
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-mono border border-blue-100 dark:border-blue-800 whitespace-nowrap">
+                    {location.end_lat.toFixed(4)}, {location.end_lng.toFixed(4)}
+                </span>
+            )
         },
     ]
 
@@ -213,16 +239,16 @@ export default function CreateLocationPage() {
         <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
             <SidebarNavigation />
             <main className="ml-16 min-h-screen relative overflow-hidden">
-                <div className="mx-auto px-4 py-8 max-w-6xl relative z-10">
-                    {/* Header */}
+                <div className="mx-auto px-6 py-8 max-w-7xl relative z-10">
+                    {/* Refined Header */}
                     <div className="mb-8 animate-in fade-in slide-in-from-left duration-700">
-                        <div className="flex items-center gap-6">
-                            <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-white shadow-xl border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110 flex items-center justify-center">
-                                <MapPin className="h-8 w-8 text-[#2563eb]" />
+                        <div className="flex items-center gap-5">
+                            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
+                                <MapPin className="h-8 w-8 text-white" />
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-3xl md:text-4xl font-extrabold text-[#2563eb] tracking-tight">
-                                    Locations
+                                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
+                                    Location Management
                                 </h1>
                                 <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium italic">
                                     Manage road segment locations
@@ -267,7 +293,7 @@ export default function CreateLocationPage() {
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-amber-500" />
+                            <MapPin className="h-5 w-5 text-blue-500" />
                             Create New Location
                         </DialogTitle>
                         <DialogDescription>
@@ -277,9 +303,9 @@ export default function CreateLocationPage() {
 
                     {/* Success Message in Modal */}
                     {success && (
-                        <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 animate-in fade-in slide-in-from-top duration-300">
-                            <CheckCircle2 className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                            <p className="text-sm font-medium text-amber-700 dark:text-amber-400">Location created successfully!</p>
+                        <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 animate-in fade-in slide-in-from-top duration-300">
+                            <CheckCircle2 className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                            <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Location created successfully!</p>
                         </div>
                     )}
 
@@ -295,18 +321,18 @@ export default function CreateLocationPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Step 1: Select Project */}
-                        <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-100 dark:border-amber-900/50">
+                        <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
                             <div className="flex items-center gap-2 mb-3">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                     <span className="text-white text-xs font-bold">1</span>
                                 </div>
-                                <p className="text-sm font-bold text-amber-700 dark:text-amber-400">Select Project</p>
+                                <p className="text-sm font-bold text-blue-700 dark:text-blue-400">Select Project</p>
                             </div>
                             <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                                <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-amber-200 dark:border-amber-800 focus:border-amber-400">
+                                <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
                                     {loadingProjects ? (
                                         <div className="flex items-center gap-2">
-                                            <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
+                                            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                                             <span className="text-gray-400">Loading projects...</span>
                                         </div>
                                     ) : (
@@ -323,25 +349,25 @@ export default function CreateLocationPage() {
                                 </SelectContent>
                             </Select>
                             {selectedProject && (
-                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-amber-100/50 dark:bg-amber-900/20 text-xs text-amber-600 dark:text-amber-400">
+                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 text-xs text-blue-600 dark:text-blue-400">
                                     Selected: <span className="font-semibold">{selectedProject.name}</span>
                                 </div>
                             )}
                         </div>
 
                         {/* Step 2: Select Package */}
-                        <div className={`p-4 rounded-xl bg-gradient-to-r from-orange-50/50 to-rose-50/50 dark:from-orange-950/20 dark:to-rose-950/20 border border-orange-100 dark:border-orange-900/50 transition-opacity duration-300 ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                        <div className={`p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50 transition-opacity duration-300 ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
                             <div className="flex items-center gap-2 mb-3">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-gradient-to-br from-orange-500 to-rose-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
                                     <span className="text-white text-xs font-bold">2</span>
                                 </div>
-                                <p className="text-sm font-bold text-orange-700 dark:text-orange-400">Select Package</p>
+                                <p className="text-sm font-bold text-blue-700 dark:text-blue-400">Select Package</p>
                             </div>
                             <Select value={selectedPackageId} onValueChange={setSelectedPackageId} disabled={!selectedProjectId}>
-                                <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-orange-200 dark:border-orange-800 focus:border-orange-400">
+                                <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
                                     {loadingPackages ? (
                                         <div className="flex items-center gap-2">
-                                            <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
+                                            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                                             <span className="text-gray-400">Loading packages...</span>
                                         </div>
                                     ) : (
@@ -358,7 +384,7 @@ export default function CreateLocationPage() {
                                 </SelectContent>
                             </Select>
                             {selectedPackage && (
-                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-orange-100/50 dark:bg-orange-900/20 text-xs text-orange-600 dark:text-orange-400">
+                                <div className="mt-2 px-3 py-1.5 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 text-xs text-blue-600 dark:text-blue-400">
                                     Selected: <span className="font-semibold">{selectedPackage.name}</span>
                                     {selectedPackage.region && ` • ${selectedPackage.region}`}
                                 </div>
@@ -368,7 +394,7 @@ export default function CreateLocationPage() {
                         {/* Step 3: Location Details */}
                         <div className={`space-y-5 transition-opacity duration-300 ${selectedPackageId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
                             <div className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedPackageId ? 'bg-gradient-to-br from-rose-500 to-red-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedPackageId ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
                                     <span className="text-white text-xs font-bold">3</span>
                                 </div>
                                 <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Location Information</p>
@@ -428,7 +454,7 @@ export default function CreateLocationPage() {
                             {/* GPS Coordinates */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/20">
+                                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/20">
                                         <MapPin className="h-4 w-4 text-white" />
                                     </div>
                                     <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">GPS Coordinates</h3>
@@ -436,8 +462,8 @@ export default function CreateLocationPage() {
                                 </div>
 
                                 {/* Start Point */}
-                                <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50/50 to-yellow-50/50 dark:from-amber-950/20 dark:to-yellow-950/20 border border-amber-100 dark:border-amber-900/50">
-                                    <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-3 uppercase tracking-wide">Start Point</p>
+                                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
+                                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">Start Point</p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1.5">
                                             <Label htmlFor="s-lat" className="text-xs text-gray-500">Latitude *</Label>
@@ -469,8 +495,8 @@ export default function CreateLocationPage() {
                                 </div>
 
                                 {/* End Point */}
-                                <div className="p-4 rounded-xl bg-gradient-to-r from-orange-50/50 to-red-50/50 dark:from-orange-950/20 dark:to-red-950/20 border border-orange-100 dark:border-orange-900/50">
-                                    <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 mb-3 uppercase tracking-wide">End Point</p>
+                                <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/50">
+                                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">End Point</p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1.5">
                                             <Label htmlFor="e-lat" className="text-xs text-gray-500">Latitude *</Label>
@@ -520,7 +546,7 @@ export default function CreateLocationPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting || !isFormComplete}
-                                className="flex-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-600 hover:via-orange-600 hover:to-red-700 text-white"
+                                className="flex-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:from-blue-600 hover:via-indigo-600 hover:to-blue-700 text-white"
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">

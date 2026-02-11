@@ -54,7 +54,7 @@ export default function DashboardMapContent({ detections }: DashboardMapContentP
     // Get marker color based on detection type
     const getMarkerColor = (type: string) => {
         if (type.toLowerCase().includes("pothole")) {
-            return { fill: "#ef4444", stroke: "#dc2626" } // Red for potholes
+            return { fill: "#10b981", stroke: "#065f46" } // Green for potholes
         }
         return { fill: "#3b82f6", stroke: "#2563eb" } // Blue for signboards
     }

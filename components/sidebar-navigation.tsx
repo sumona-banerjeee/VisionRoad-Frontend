@@ -57,14 +57,7 @@ export function SidebarNavigation() {
     const isNewAnalysisActive = pathname === "/new-analysis"
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-20 bg-[#2563eb] border-r border-[#2563eb]/20 z-50 flex flex-col items-center py-8 shadow-2xl">
-            {/* Logo */}
-            <div className="mb-6">
-                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-lg border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110">
-                    <span className="text-[#2563eb] font-black text-xl">V</span>
-                </div>
-            </div>
-
+        <aside className="fixed left-0 top-0 h-screen w-20 bg-white border-r border-slate-200 z-50 flex flex-col items-center py-8 shadow-sm">
             {/* Navigation Items */}
             <nav className="flex-1 flex flex-col items-center gap-4">
                 {/* Dashboard - first item */}
@@ -77,14 +70,15 @@ export function SidebarNavigation() {
                                 onClick={() => handleNavigation(item)}
                                 className={`
                                     relative w-12 h-12 rounded-xl flex items-center justify-center
-                                    bg-white text-[#2563eb] shadow-lg border-2
-                                    ${isActive ? 'border-[#2563eb] ring-2 ring-white/30' : 'border-[#1e40af]'}
+                                    ${isActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
                                     transition-all duration-300 ease-out
-                                    hover:scale-110 hover:shadow-xl
-                                    active:scale-95
+                                    hover:scale-110 hover:shadow-lg hover:bg-[#2563eb] hover:border-[#2563eb]
+                                    active:scale-95 border
                                 `}
                             >
-                                <Icon className={`h-6 w-6 ${isActive ? 'stroke-[2.5]' : 'stroke-[2]'}`} />
+                                <Icon
+                                    className={`h-6 w-6 transition-all duration-300 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
+                                />
                             </button>
                             <div className="
                                 absolute left-full ml-3 top-1/2 -translate-y-1/2
@@ -107,14 +101,15 @@ export function SidebarNavigation() {
                         onClick={() => router.push("/new-analysis")}
                         className={`
                             relative w-12 h-12 rounded-xl flex items-center justify-center
-                            bg-white text-[#2563eb] shadow-lg border-2
-                            ${isNewAnalysisActive ? 'border-[#2563eb] ring-2 ring-white/30' : 'border-[#1e40af]'}
+                            ${isNewAnalysisActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
                             transition-all duration-300 ease-out
-                            hover:scale-110 hover:shadow-xl
-                            active:scale-95
+                            hover:scale-110 hover:shadow-lg hover:bg-[#2563eb] hover:border-[#2563eb]
+                            active:scale-95 border
                         `}
                     >
-                        <Plus className={`h-6 w-6 ${isNewAnalysisActive ? 'stroke-[2.5]' : 'stroke-[2]'}`} />
+                        <Plus
+                            className={`h-6 w-6 transition-all duration-300 ${isNewAnalysisActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
+                        />
                     </button>
                     <div className="
                         absolute left-full ml-3 top-1/2 -translate-y-1/2
@@ -130,7 +125,7 @@ export function SidebarNavigation() {
                 </div>
 
                 {/* Divider */}
-                <div className="w-8 h-px bg-white/20 my-1" />
+                <div className="w-8 h-px bg-slate-200 my-1" />
 
                 {/* Create items */}
                 {navItems.slice(1, 4).map((item) => {
@@ -142,14 +137,15 @@ export function SidebarNavigation() {
                                 onClick={() => handleNavigation(item)}
                                 className={`
                                     relative w-12 h-12 rounded-xl flex items-center justify-center
-                                    bg-white text-[#2563eb] shadow-lg border-2
-                                    ${isActive ? 'border-[#2563eb] ring-2 ring-white/30' : 'border-[#1e40af]'}
+                                    ${isActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
                                     transition-all duration-300 ease-out
-                                    hover:scale-110 hover:shadow-xl
-                                    active:scale-95
+                                    hover:scale-110 hover:shadow-lg hover:bg-[#2563eb] hover:border-[#2563eb]
+                                    active:scale-95 border
                                 `}
                             >
-                                <Icon className={`h-6 w-6 ${isActive ? 'stroke-[2.5]' : 'stroke-[2]'}`} />
+                                <Icon
+                                    className={`h-6 w-6 transition-all duration-300 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
+                                />
                             </button>
                             <div className="
                                 absolute left-full ml-3 top-1/2 -translate-y-1/2
@@ -172,10 +168,10 @@ export function SidebarNavigation() {
                 <div className="relative group">
                     <button
                         onClick={() => { }}
-                        className="w-12 h-12 rounded-full bg-white flex items-center justify-center cursor-not-allowed opacity-80 border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110"
+                        className="w-12 h-12 rounded-full bg-[#f0fafd] flex items-center justify-center cursor-not-allowed opacity-80 border border-slate-100 transition-all duration-300 hover:scale-110 hover:bg-[#2563eb] hover:border-[#2563eb]"
                         disabled
                     >
-                        <User className="h-6 w-6 text-[#2563eb]" />
+                        <User className="h-6 w-6 text-slate-900 transition-colors duration-300 group-hover:text-white" />
                     </button>
                     <div className="
                         absolute left-full ml-3 top-1/2 -translate-y-1/2

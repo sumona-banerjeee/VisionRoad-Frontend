@@ -28,9 +28,19 @@ function FitBounds({ bounds }: { bounds: LatLngBounds }) {
     const map = useMap()
 
     useEffect(() => {
-        if (bounds.isValid()) {
-            map.fitBounds(bounds, { padding: [50, 50] })
-        }
+        if (!map || !bounds.isValid()) return
+
+        // Small delay to ensure the container dimensions are fully calculated (prevents _leaflet_pos error)
+        const timer = setTimeout(() => {
+            map.invalidateSize()
+            map.fitBounds(bounds, {
+                padding: [50, 50],
+                maxZoom: 16,
+                animate: true
+            })
+        }, 200)
+
+        return () => clearTimeout(timer)
     }, [bounds, map])
 
     return null
@@ -75,9 +85,9 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl h-[600px] p-0">
-                <DialogHeader className="px-6 pt-6 pb-2">
-                    <DialogTitle>
+            <DialogContent className="max-w-6xl h-[80vh] p-0 flex flex-col overflow-hidden border-none shadow-2xl">
+                <DialogHeader className="px-6 pt-6 pb-4 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                    <DialogTitle className="text-xl font-bold">
                         {isPothole ? "Pothole" : "Signboard"} Detection Map
                     </DialogTitle>
                     <p className="text-sm text-muted-foreground">
@@ -85,7 +95,7 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
                     </p>
                 </DialogHeader>
 
-                <div className="h-[calc(100%-80px)] w-full">
+                <div className="flex-1 w-full bg-gray-50 dark:bg-gray-950 relative">
                     <MapContainer
                         center={center}
                         zoom={13}
@@ -111,8 +121,8 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
                                 key={`${detection.id}-${idx}`}
                                 center={[detection.latitude, detection.longitude]}
                                 radius={8}
-                                fillColor="#ef4444"
-                                color="#dc2626"
+                                fillColor="#10b981"
+                                color="#065f46"
                                 weight={2}
                                 opacity={1}
                                 fillOpacity={0.8}

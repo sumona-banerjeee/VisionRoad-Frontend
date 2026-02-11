@@ -195,20 +195,22 @@ function DetailedSummarySection({
   })
 
   return (
-    <div className="space-y-4">
-      {/* Location-based Summary */}
-      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-        <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden flex flex-col lg:col-span-2">
+        <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
-                <MapIcon className="h-4 w-4 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-white/20 animate-logo-spin-slow opacity-50"></div>
+                <div className="absolute inset-0 border-2 border-white/30 rounded-xl animate-logo-spin-reverse-slow opacity-30"></div>
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10 animate-logo-float">
+                  <path d="M50 20L85 80H15L50 20Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
+                  <path d="M40 80L50 55L60 80" stroke="currentColor" strokeWidth="6" />
+                </svg>
               </div>
               <div>
-                <CardTitle className="text-base font-bold">
-                  <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400 bg-clip-text text-transparent">
-                    Detection Locations
-                  </span>
+                <CardTitle className="text-base font-bold text-gray-900 dark:text-white">
+                  Detection Locations
                 </CardTitle>
                 <CardDescription className="text-xs">
                   {isPothole ? "Potholes" : "Signboards"} detected across project locations
@@ -226,48 +228,61 @@ function DetailedSummarySection({
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {/* Project Info */}
-            <div className="text-xs space-y-1 pb-2 border-b">
-              <div><span className="text-muted-foreground">Project:</span> <span className="font-medium">{summaryData.project.name}</span></div>
-              {summaryData.project.corridor_name && (
-                <div><span className="text-muted-foreground">Corridor:</span> {summaryData.project.corridor_name}</div>
-              )}
-            </div>
-
-            {/* Packages and Locations */}
-            {Object.entries(summaryData.packages).map(([packageName, packageData]) => (
-              <div key={packageData.package_id} className="space-y-2">
-                <div className="text-xs font-medium">{packageName}</div>
-                <div className="pl-3 space-y-2">
-                  {Object.entries(packageData.locations).map(([locationName, locationData]) => (
-                    <div key={locationData.location_id} className="text-xs p-2 rounded bg-muted/30">
-                      <div className="font-medium mb-1">{locationName}</div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {locationData.detection_count} {isPothole ? "pothole" : "signboard"}{locationData.detection_count !== 1 ? "s" : ""} detected
-                      </div>
-                    </div>
-                  ))}
+        <CardContent className="flex-1 p-0 overflow-hidden">
+          <ScrollArea className="h-[300px] p-6 pt-3">
+            <div className="space-y-3">
+              {/* Project Info */}
+              <div className="pb-3 border-b mb-3">
+                <div className="flex flex-col mb-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Project</span>
+                  <span className="text-base font-bold text-gray-900 dark:text-white">
+                    {summaryData.project.name}
+                  </span>
                 </div>
+                {summaryData.project.corridor_name && (
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Corridor</span>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                      {summaryData.project.corridor_name}
+                    </span>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+
+              {/* Packages and Locations */}
+              {Object.entries(summaryData.packages).map(([packageName, packageData]) => (
+                <div key={packageData.package_id} className="space-y-2">
+                  <div className="text-xs font-medium">{packageName}</div>
+                  <div className="pl-3 space-y-2">
+                    {Object.entries(packageData.locations).map(([locationName, locationData]) => (
+                      <div key={locationData.location_id} className="text-xs p-2 rounded bg-muted/30 flex items-center justify-between gap-4">
+                        <div className="font-medium truncate">{locationName}</div>
+                        <div className="text-[10px] text-muted-foreground whitespace-nowrap">
+                          {locationData.detection_count} {isPothole ? "pothole" : "signboard"}{locationData.detection_count !== 1 ? "s" : ""} detected
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
         </CardContent>
       </Card>
 
-      {/* All Detections List */}
-      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-        <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 shadow-md shadow-indigo-500/30">
-              <Target className="h-4 w-4 text-white" />
+      <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden flex flex-col lg:col-span-3">
+        <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-white/10 animate-logo-spin-slow opacity-40"></div>
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10 animate-logo-float">
+                <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15 7H21V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
             <div>
-              <CardTitle className="text-base font-bold">
-                <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                  All Detections
-                </span>
+              <CardTitle className="text-base font-bold text-gray-900 dark:text-white">
+                All Detections
               </CardTitle>
               <CardDescription className="text-xs">
                 Complete list of {isPothole ? "potholes" : "signboards"} with GPS coordinates
@@ -275,8 +290,8 @@ function DetailedSummarySection({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[300px] rounded-md border bg-muted/30 p-3">
+        <CardContent className="flex-1 p-0 overflow-hidden">
+          <ScrollArea className="h-[300px] p-4">
             <div className="space-y-2">
               {allDetections.map(({ detection, locationName, packageName }, idx) => (
                 <div
@@ -368,17 +383,19 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   ]
 
   return (
-    <Card className="animate-in fade-in slide-in-from-bottom duration-500 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-      <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
-            <Activity className="h-4 w-4 text-white" />
+    <Card className="animate-in fade-in slide-in-from-bottom duration-500 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden">
+      <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-white/10 animate-logo-spin-slow opacity-40"></div>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10 animate-logo-float">
+              <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M15 7H21V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
           <div>
-            <CardTitle className="text-base font-bold">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400 bg-clip-text text-transparent">
-                Quick Stats
-              </span>
+            <CardTitle className="text-base font-bold text-gray-900 dark:text-white">
+              Quick Stats
             </CardTitle>
             <CardDescription className="text-xs">
               Overview of {isPothole ? "pothole" : "signboard"} detection results
@@ -396,8 +413,8 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
                 className="flex flex-col items-center justify-center p-3 rounded-xl transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500 border border-gray-100 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className={`${stat.bgColor} p-2 rounded-lg mb-2 transition-all shadow-inner`}>
-                  <Icon className={`h-4 w-4 ${stat.color}`} />
+                <div className={`${stat.bgColor} p-2.5 rounded-lg mb-2 transition-all shadow-inner`}>
+                  <Icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
                 <div className={`text-xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
                 <div className="text-[10px] text-muted-foreground text-center leading-tight font-medium uppercase tracking-wide">{stat.label}</div>
@@ -826,17 +843,15 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-100 dark:from-gray-900/50 dark:to-slate-900/50 border-b border-gray-100 dark:border-gray-800">
+      <Card className="bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden">
+        <CardHeader className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-gray-900 to-slate-700 dark:from-white dark:to-gray-300 shadow-lg shadow-gray-500/20">
-              <Film className="h-5 w-5 text-white dark:text-gray-900" />
+            <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-lg shadow-[#60a5fa]/20">
+              <Film className="h-5 w-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold">
-                <span className="bg-gradient-to-r from-gray-900 via-slate-700 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
-                  Video Playback with Detection
-                </span>
+              <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">
+                Video Playback with Detection
               </CardTitle>
               <CardDescription>
                 Watch the video with real-time {isPothole ? "pothole" : "signboard"} detection overlays

@@ -9,7 +9,7 @@
   --primary-foreground: oklch(0.98 0.01 264);
 
   /* Background & Surfaces */
-  --background: hsla(210, 100%, 98%, 1);
+  --background: #f8fafc;
   --foreground: oklch(0.15 0.02 280);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0.02 280);
@@ -51,14 +51,14 @@
   --radius: 0.75rem;
 
   /* Sidebar */
-  --sidebar: oklch(0.98 0.01 280);
-  --sidebar-foreground: oklch(0.15 0.02 280);
-  --sidebar-primary: oklch(0.55 0.24 264);
-  --sidebar-primary-foreground: oklch(0.98 0.01 264);
-  --sidebar-accent: oklch(0.94 0.03 264);
-  --sidebar-accent-foreground: oklch(0.25 0.05 264);
-  --sidebar-border: oklch(0.90 0.02 280);
-  --sidebar-ring: oklch(0.55 0.24 264);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #64748b;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #3b82f6;
 }
 
 .dark {
@@ -167,8 +167,7 @@
 /* Premium Background with Animated Mesh Gradient */
 @layer utilities {
   .bg-mesh-gradient {
-    background: hsla(210, 100%, 98%, 1);
-    background: linear-gradient(135deg, hsla(210, 100%, 98%, 1) 0%, hsla(220, 100%, 95%, 1) 100%);
+    background: #f8fafc;
   }
 
   .dark .bg-mesh-gradient {
