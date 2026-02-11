@@ -14,38 +14,38 @@ interface GradientStatsCardProps {
 
 const gradientStyles = {
     green: {
-        background: "bg-gradient-to-br from-emerald-50 via-emerald-50 to-teal-100 dark:from-emerald-950/40 dark:via-emerald-950/30 dark:to-teal-950/40",
-        border: "border-l-4 border-l-emerald-500",
-        iconBg: "bg-gradient-to-br from-emerald-400 to-teal-500",
-        iconShadow: "shadow-lg shadow-emerald-500/30",
-        valueGradient: "bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 dark:from-emerald-400 dark:via-teal-400 dark:to-emerald-400"
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-[#60a5fa]",
+        iconShadow: "shadow-lg shadow-[#60a5fa]/20",
+        valueGradient: "text-gray-900 dark:text-white"
     },
     coral: {
-        background: "bg-gradient-to-br from-red-50 via-red-50 to-orange-100 dark:from-red-950/40 dark:via-red-950/30 dark:to-orange-950/40",
-        border: "border-l-4 border-l-red-500",
-        iconBg: "bg-gradient-to-br from-red-400 to-orange-500",
-        iconShadow: "shadow-lg shadow-red-500/30",
-        valueGradient: "bg-gradient-to-r from-red-600 via-orange-500 to-red-600 dark:from-red-400 dark:via-orange-400 dark:to-red-400"
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-[#60a5fa]",
+        iconShadow: "shadow-lg shadow-[#60a5fa]/20",
+        valueGradient: "text-gray-900 dark:text-white"
     },
     blue: {
-        background: "bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-100 dark:from-blue-950/40 dark:via-blue-950/30 dark:to-indigo-950/40",
-        border: "border-l-4 border-l-blue-500",
-        iconBg: "bg-gradient-to-br from-blue-400 to-indigo-500",
-        iconShadow: "shadow-lg shadow-blue-500/30",
-        valueGradient: "bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400"
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-[#60a5fa]",
+        iconShadow: "shadow-lg shadow-[#60a5fa]/20",
+        valueGradient: "text-gray-900 dark:text-white"
     },
     purple: {
-        background: "bg-gradient-to-br from-purple-50 via-purple-50 to-pink-100 dark:from-purple-950/40 dark:via-purple-950/30 dark:to-pink-950/40",
-        border: "border-l-4 border-l-purple-500",
-        iconBg: "bg-gradient-to-br from-purple-400 to-pink-500",
-        iconShadow: "shadow-lg shadow-purple-500/30",
-        valueGradient: "bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 dark:from-purple-400 dark:via-pink-400 dark:to-purple-400"
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-[#60a5fa]",
+        iconShadow: "shadow-lg shadow-[#60a5fa]/20",
+        valueGradient: "text-gray-900 dark:text-white"
     }
 }
 
 export function GradientStatsCard({
     title,
-    subtitle = "Work level distribution",
+    subtitle,
     value,
     icon: Icon,
     gradient,
@@ -54,40 +54,36 @@ export function GradientStatsCard({
     const styles = gradientStyles[gradient]
 
     return (
-        <Card className={`
-            ${styles.background} ${styles.border}
-            border-0 rounded-xl overflow-hidden
-            shadow-md hover:shadow-lg
-            transition-all duration-300 ease-out
-            hover:-translate-y-1 hover:scale-[1.02]
-        `}>
-            <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                    {/* Large gradient icon */}
-                    <div className={`
-                        w-14 h-14 rounded-xl flex items-center justify-center
-                        ${styles.iconBg} ${styles.iconShadow}
-                    `}>
-                        <Icon className="h-7 w-7 text-white" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 truncate">
-                            {title}
-                        </h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                            {subtitle}
-                        </p>
-
+        <Card className="bg-white dark:bg-gray-900 border-none shadow-xl shadow-blue-500/5 overflow-hidden py-8 px-6 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 group">
+            <CardContent className="p-0 flex items-center justify-between gap-6">
+                <div className="flex flex-col gap-1 min-w-0">
+                    <h3 className="text-sm font-bold text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest">
+                        {title}
+                    </h3>
+                    <div className="flex flex-col">
                         {isLoading ? (
-                            <div className="h-9 w-20 bg-gray-200 dark:bg-gray-700 rounded mt-1 animate-pulse" />
+                            <div className="h-14 w-24 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse mt-2" />
                         ) : (
-                            <p className={`text-3xl font-extrabold mt-1 ${styles.valueGradient} bg-clip-text text-transparent`}>
-                                {value}
-                            </p>
+                            <>
+                                <p className="text-5xl md:text-6xl font-black tracking-tighter text-gray-900 dark:text-white leading-tight">
+                                    {value}
+                                </p>
+                                {subtitle && (
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1 opacity-80 italic">
+                                        {subtitle}
+                                    </p>
+                                )}
+                            </>
                         )}
                     </div>
+                </div>
+
+                <div className={`
+                    w-20 h-20 rounded-3xl flex items-center justify-center flex-shrink-0
+                    ${styles.iconBg} shadow-[0_10px_30px_rgba(37,99,235,0.2)]
+                    transition-all duration-500 group-hover:scale-110 group-hover:rotate-6
+                `}>
+                    <Icon className="h-10 w-10 text-white" />
                 </div>
             </CardContent>
         </Card>

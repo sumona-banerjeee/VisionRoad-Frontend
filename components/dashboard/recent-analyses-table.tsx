@@ -43,13 +43,13 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
         if (type === "pothole-detection") {
             return <Badge className="bg-orange-500/20 text-orange-600 border-orange-500/30">Pothole</Badge>
         }
-        return <Badge className="bg-cyan-500/20 text-cyan-600 border-cyan-500/30">Signboard</Badge>
+        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">Signboard</Badge>
     }
 
     return (
-        <Card className="glass-card card-glow border-0 overflow-hidden">
+        <Card className="overflow-hidden">
             <CardHeader className="pb-3 border-b border-border/50">
-                <CardTitle className="text-lg font-semibold">Recent Analyses</CardTitle>
+                <CardTitle className="text-lg font-bold text-blue-600">Recent Analyses</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
                 {isLoading ? (

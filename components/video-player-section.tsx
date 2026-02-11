@@ -198,15 +198,15 @@ function DetailedSummarySection({
     <div className="space-y-4">
       {/* Location-based Summary */}
       <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-        <CardHeader className="pb-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30">
+        <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 shadow-md shadow-cyan-500/30">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
                 <MapIcon className="h-4 w-4 text-white" />
               </div>
               <div>
                 <CardTitle className="text-base font-bold">
-                  <span className="bg-gradient-to-r from-cyan-600 via-blue-500 to-cyan-600 dark:from-cyan-400 dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400 bg-clip-text text-transparent">
                     Detection Locations
                   </span>
                 </CardTitle>
@@ -219,9 +219,9 @@ function DetailedSummarySection({
               variant="outline"
               size="sm"
               onClick={() => setShowMap(true)}
-              className="gap-2 border-cyan-200 dark:border-cyan-800 hover:bg-cyan-50 dark:hover:bg-cyan-900/50"
+              className="gap-2 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/50"
             >
-              <MapIcon className="h-4 w-4 text-cyan-500" />
+              <MapIcon className="h-4 w-4 text-blue-500" />
               Show Map
             </Button>
           </div>
@@ -362,8 +362,8 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
       label: "Resolution",
       value: `${data.video_info.width}×${data.video_info.height}`,
       icon: Monitor,
-      color: "text-cyan-500",
-      bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
     },
   ]
 

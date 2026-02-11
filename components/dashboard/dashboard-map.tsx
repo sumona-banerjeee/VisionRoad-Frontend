@@ -21,30 +21,59 @@ const DashboardMapContent = dynamic(
 
 interface DashboardMapProps {
     className?: string
+    selectedProjectId?: string | null
+    selectedPackageId?: string | null
+    selectedLocationId?: string | null
+    projectSummary?: any
 }
 
-export function DashboardMap({ className }: DashboardMapProps) {
+export function DashboardMap({
+    className,
+    selectedProjectId,
+    selectedPackageId,
+    selectedLocationId,
+    projectSummary
+}: DashboardMapProps) {
     const [detections, setDetections] = useState<Detection[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const loadDetections = async () => {
-            try {
-                setIsLoading(true)
-                setError(null)
-                const data = await fetchAllDetections()
-                setDetections(data)
-            } catch (err) {
-                console.error("Failed to load detections:", err)
-                setError("Failed to load detection data")
-            } finally {
-                setIsLoading(false)
-            }
+        if (!projectSummary) {
+            setDetections([])
+            setIsLoading(false)
+            return
         }
 
-        loadDetections()
-    }, [])
+        try {
+            setIsLoading(true)
+            setError(null)
+
+            const filteredDetections: Detection[] = []
+
+            const packagesToProcess = selectedPackageId && selectedPackageId !== "all"
+                ? { [selectedPackageId]: projectSummary.packages[selectedPackageId] }
+                : projectSummary.packages || {}
+
+            for (const [pkgName, pkg] of Object.entries(packagesToProcess)) {
+                const locationsToProcess = selectedLocationId && selectedLocationId !== "all"
+                    ? { [selectedLocationId]: (pkg as any).locations[selectedLocationId] }
+                    : (pkg as any).locations || {}
+
+                for (const [locName, loc] of Object.entries(locationsToProcess)) {
+                    const locationDetections = (loc as any).detections || []
+                    filteredDetections.push(...locationDetections)
+                }
+            }
+
+            setDetections(filteredDetections)
+        } catch (err) {
+            console.error("Failed to extract detections:", err)
+            setError("Failed to load detection data")
+        } finally {
+            setIsLoading(false)
+        }
+    }, [projectSummary, selectedPackageId, selectedLocationId])
 
     // Filter detections with valid GPS coordinates
     const validDetections = detections.filter(d => d.latitude && d.longitude)
@@ -57,18 +86,16 @@ export function DashboardMap({ className }: DashboardMapProps) {
     const signboardCount = validDetections.length - potholeCount
 
     return (
-        <Card className={`bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden ${className}`}>
-            <CardHeader className="pb-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+        <Card className={`overflow-hidden ${className}`}>
+            <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 shadow-md shadow-indigo-500/30">
-                            <MapPin className="h-4 w-4 text-white" />
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-lg border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110">
+                            <MapPin className="h-5 w-5 text-[#2563eb]" />
                         </div>
                         <div>
-                            <CardTitle className="text-base font-bold">
-                                <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                                    Detection Map
-                                </span>
+                            <CardTitle className="text-base font-bold text-[#2563eb]">
+                                Detection Map
                             </CardTitle>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {isLoading ? "Loading..." : `${validDetections.length} detections with GPS coordinates`}

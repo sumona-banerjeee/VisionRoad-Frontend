@@ -1,12 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-    Plus,
-    Loader2,
     AlertCircle,
     TrendingUp,
     MapPin as MapPinIcon,
@@ -17,6 +13,7 @@ import {
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { GradientStatsCard } from "@/components/dashboard/gradient-stats-card"
 import { CompactProjectSelector } from "@/components/dashboard/compact-project-selector"
+import { FilterSelector } from "@/components/dashboard/filter-selector"
 import { DetectionDonutChart } from "@/components/dashboard/detection-donut-chart"
 import { LocationBarChart } from "@/components/dashboard/location-bar-chart"
 import { DashboardMap } from "@/components/dashboard/dashboard-map"
@@ -114,7 +111,6 @@ function calculateStats(summary: ProjectSummary | null): DetectionStats {
 }
 
 export default function DashboardPage() {
-    const router = useRouter()
     const [isLoading, setIsLoading] = useState(true)
     const [projects, setProjects] = useState<Project[]>([])
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
@@ -150,11 +146,31 @@ export default function DashboardPage() {
         loadProjects()
     }, [])
 
+    const selectedProject = projects.find(p => p.id === selectedProjectId)
+
+    // Extract packages from project summary
+    const packages = projectSummary
+        ? Object.keys(projectSummary.packages || {}).map(pkgName => ({
+            id: pkgName,
+            name: pkgName
+        }))
+        : []
+
+    // Extract locations from selected package
+    const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null)
+    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null)
+
+    const locations = projectSummary && selectedPackageId && selectedPackageId !== "all"
+        ? Object.keys(projectSummary.packages[selectedPackageId]?.locations || {}).map(locName => ({
+            id: locName,
+            name: locName
+        }))
+        : []
+
     // Load project summary when project changes
     useEffect(() => {
         if (!selectedProjectId) {
             setProjectSummary(null)
-            setStats({ totalPotholes: 0, totalSignboards: 0, totalDetections: 0, locationData: [] })
             return
         }
 
@@ -176,12 +192,10 @@ export default function DashboardPage() {
 
                 const summary: ProjectSummary = await response.json()
                 setProjectSummary(summary)
-                setStats(calculateStats(summary))
             } catch (err) {
                 console.error("Failed to load project summary:", err)
                 setError("Failed to load project summary.")
                 setProjectSummary(null)
-                setStats({ totalPotholes: 0, totalSignboards: 0, totalDetections: 0, locationData: [] })
             } finally {
                 setIsLoading(false)
             }
@@ -190,14 +204,73 @@ export default function DashboardPage() {
         loadProjectSummary()
     }, [selectedProjectId])
 
-    const handleNewAnalysis = () => {
-        router.push("/")
-    }
+    // Reset package and location when project changes
+    useEffect(() => {
+        setSelectedPackageId(null)
+        setSelectedLocationId(null)
+    }, [selectedProjectId])
 
-    const selectedProject = projects.find(p => p.id === selectedProjectId)
+    // Reset location when package changes
+    useEffect(() => {
+        setSelectedLocationId(null)
+    }, [selectedPackageId])
+
+    // Filter stats based on selections
+    useEffect(() => {
+        if (!projectSummary) {
+            setStats({ totalPotholes: 0, totalSignboards: 0, totalDetections: 0, locationData: [] })
+            return
+        }
+
+        let totalPotholes = 0
+        let totalSignboards = 0
+        const locationData: DetectionStats["locationData"] = []
+
+        const packagesToProcess = selectedPackageId && selectedPackageId !== "all"
+            ? { [selectedPackageId]: projectSummary.packages[selectedPackageId] }
+            : projectSummary.packages || {}
+
+        for (const [pkgName, pkg] of Object.entries(packagesToProcess)) {
+            const locationsToProcess = selectedLocationId && selectedLocationId !== "all"
+                ? { [selectedLocationId]: pkg.locations[selectedLocationId] }
+                : pkg.locations || {}
+
+            for (const [locName, loc] of Object.entries(locationsToProcess)) {
+                let locPotholes = 0
+                let locSignboards = 0
+
+                for (const detection of loc.detections || []) {
+                    if (detection.type.toLowerCase().includes("pothole")) {
+                        locPotholes++
+                        totalPotholes++
+                    } else {
+                        locSignboards++
+                        totalSignboards++
+                    }
+                }
+
+                if (locPotholes > 0 || locSignboards > 0) {
+                    const shortName = locName.length > 20 ? locName.substring(0, 20) + "..." : locName
+                    locationData.push({
+                        name: shortName,
+                        potholes: locPotholes,
+                        signboards: locSignboards,
+                        total: locPotholes + locSignboards
+                    })
+                }
+            }
+        }
+
+        setStats({
+            totalPotholes,
+            totalSignboards,
+            totalDetections: totalPotholes + totalSignboards,
+            locationData
+        })
+    }, [projectSummary, selectedPackageId, selectedLocationId])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
             {/* Sidebar Navigation */}
             <SidebarNavigation />
 
@@ -206,22 +279,13 @@ export default function DashboardPage() {
                 <div className="p-6 max-w-[1600px] mx-auto">
                     {/* Header */}
                     <div className="mb-6 animate-in fade-in slide-in-from-top duration-500">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
-                                    VisionRoad Analytics Dashboard
-                                </h1>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    A Comprehensive Overview Of Your Road Infrastructure Analysis
-                                </p>
-                            </div>
-                            <Button
-                                onClick={handleNewAnalysis}
-                                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300"
-                            >
-                                <Plus className="h-4 w-4 mr-2" />
-                                New Analysis
-                            </Button>
+                        <div>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
+                                VisionRoad Analytics Dashboard
+                            </h1>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                A Comprehensive Overview Of Your Road Infrastructure Analysis
+                            </p>
                         </div>
                     </div>
 
@@ -261,67 +325,74 @@ export default function DashboardPage() {
                         />
                     </div>
 
-                    {/* Project Selector - Above main content */}
+                    {/* Filter Selector - Above main content */}
                     <div className="mb-6 animate-in fade-in slide-in-from-bottom duration-500 delay-100">
-                        <CompactProjectSelector
+                        <FilterSelector
                             projects={projects}
                             selectedProjectId={selectedProjectId}
+                            selectedPackageId={selectedPackageId}
+                            selectedLocationId={selectedLocationId}
                             onProjectChange={setSelectedProjectId}
-                            selectedProject={selectedProject}
+                            onPackageChange={setSelectedPackageId}
+                            onLocationChange={setSelectedLocationId}
+                            packages={packages}
+                            locations={locations}
                             isLoading={isLoading}
                         />
                     </div>
 
-                    {/* Main Content Grid - Map Left, Charts Right */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom duration-500 delay-200">
-                        {/* Left Side - Map */}
-                        <div>
-                            <DashboardMap className="h-auto" />
-                        </div>
+                    {/* Charts Row - Side by Side */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-in fade-in slide-in-from-bottom duration-500 delay-200">
+                        {/* Left Chart - Detection Distribution */}
+                        <Card className="rounded-xl overflow-hidden">
+                            <CardHeader className="pb-2 border-b border-[var(--border)]">
+                                <CardTitle className="text-base font-bold flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-[#2563eb]/10 shadow-sm">
+                                        <BarChart3 className="h-4 w-4 text-[#2563eb]" />
+                                    </div>
+                                    <span className="text-[#2563eb]">
+                                        Detection Distribution
+                                    </span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <DetectionDonutChart
+                                    potholes={stats.totalPotholes}
+                                    signboards={stats.totalSignboards}
+                                    isLoading={isLoading}
+                                />
+                            </CardContent>
+                        </Card>
 
-                        {/* Right Side - Stacked Charts */}
-                        <div className="space-y-4">
-                            {/* Detection Distribution */}
-                            <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-                                <CardHeader className="pb-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30">
-                                    <CardTitle className="text-base font-bold flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 shadow-md shadow-emerald-500/30">
-                                            <BarChart3 className="h-4 w-4 text-white" />
-                                        </div>
-                                        <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 dark:from-emerald-400 dark:via-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
-                                            Detection Distribution
-                                        </span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-4">
-                                    <DetectionDonutChart
-                                        potholes={stats.totalPotholes}
-                                        signboards={stats.totalSignboards}
-                                        isLoading={isLoading}
-                                    />
-                                </CardContent>
-                            </Card>
+                        {/* Right Chart - Location Bar Chart */}
+                        <Card className="rounded-xl overflow-hidden">
+                            <CardHeader className="pb-2 border-b border-[var(--border)]">
+                                <CardTitle className="text-base font-bold flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-[#2563eb]/10 shadow-sm">
+                                        <MapPinIcon className="h-4 w-4 text-[#2563eb]" />
+                                    </div>
+                                    <span className="text-[#2563eb]">
+                                        Detections by Location
+                                    </span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                <LocationBarChart
+                                    data={stats.locationData}
+                                    isLoading={isLoading}
+                                />
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                            {/* Location Bar Chart */}
-                            <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden">
-                                <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
-                                    <CardTitle className="text-base font-bold flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
-                                            <MapPinIcon className="h-4 w-4 text-white" />
-                                        </div>
-                                        <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400 bg-clip-text text-transparent">
-                                            Detections by Location
-                                        </span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="pt-4">
-                                    <LocationBarChart
-                                        data={stats.locationData}
-                                        isLoading={isLoading}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </div>
+                    {/* Map - Full Width Below Charts */}
+                    <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-300">
+                        <DashboardMap
+                            selectedProjectId={selectedProjectId}
+                            selectedPackageId={selectedPackageId}
+                            selectedLocationId={selectedLocationId}
+                            projectSummary={projectSummary}
+                        />
                     </div>
 
                     {/* Footer */}

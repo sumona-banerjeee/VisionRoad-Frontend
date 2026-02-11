@@ -49,8 +49,8 @@ export function SummarySection({ data }: SummarySectionProps) {
       label: "Resolution",
       value: `${data.video_info.width}×${data.video_info.height}`,
       icon: Monitor,
-      color: "text-cyan-500",
-      bgColor: "bg-cyan-50 dark:bg-cyan-950/30",
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
     },
   ]
 

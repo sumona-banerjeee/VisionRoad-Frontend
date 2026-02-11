@@ -44,7 +44,7 @@ export default function UploadPage() {
     useEffect(() => {
         const storedSession = loadSession()
         if (!isSessionValid(storedSession)) {
-            router.replace("/")
+            router.replace("/new-analysis")
             return
         }
         setSession(storedSession)
@@ -147,7 +147,7 @@ export default function UploadPage() {
 
     const handleBackToSelection = () => {
         clearSession()
-        router.push("/")
+        router.push("/new-analysis")
     }
 
     const getTitle = () => {
@@ -158,7 +158,7 @@ export default function UploadPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center">
+            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
                 <div className="p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                 </div>
@@ -167,17 +167,12 @@ export default function UploadPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
             {/* Sidebar Navigation */}
             <SidebarNavigation />
 
             {/* Main Content */}
             <main className="ml-16 min-h-screen relative overflow-hidden flex flex-col">
-                {/* Decorative background elements */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute -top-40 -left-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-                </div>
 
                 <div className="flex-1 container mx-auto px-4 py-6 max-w-6xl relative z-10 flex flex-col">
                     {/* Compact Header */}
@@ -224,7 +219,7 @@ export default function UploadPage() {
                     )}
 
                     {/* Upload Card */}
-                    <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-700 delay-150 flex-1">
+                    <Card className="rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-700 delay-150 flex-1">
                         <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
                             <CardTitle className="text-xl font-bold">
                                 <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">

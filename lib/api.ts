@@ -42,7 +42,7 @@ export interface Location {
     updated_at: string
 }
 
-// Helper function for API requests
+// Helper function for GET API requests
 async function apiRequest<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
         headers: {
@@ -56,6 +56,74 @@ async function apiRequest<T>(endpoint: string): Promise<T> {
     }
 
     return response.json()
+}
+
+// Helper function for POST API requests
+async function apiPostRequest<T>(endpoint: string, body: unknown): Promise<T> {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+        },
+        body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`API Error: ${response.status} - ${errorText}`)
+    }
+
+    return response.json()
+}
+
+// Create request body types
+export interface ProjectCreate {
+    name: string
+    state?: string | null
+    corridor_name?: string | null
+    start_lat?: number | null
+    start_lng?: number | null
+    end_lat?: number | null
+    end_lng?: number | null
+}
+
+export interface PackageCreate {
+    project_id: string
+    name: string
+    region?: string | null
+}
+
+export interface LocationCreate {
+    package_id: string
+    segment_name: string
+    chainage_start_km?: number | null
+    chainage_end_km?: number | null
+    start_lat: number
+    start_lng: number
+    end_lat: number
+    end_lng: number
+}
+
+/**
+ * Create a new project
+ */
+export async function createProject(data: ProjectCreate): Promise<Project> {
+    return apiPostRequest<Project>("/projects/", data)
+}
+
+/**
+ * Create a new package in a project
+ */
+export async function createPackage(data: PackageCreate): Promise<Package> {
+    return apiPostRequest<Package>("/packages/", data)
+}
+
+/**
+ * Create a new location in a package
+ */
+export async function createLocation(data: LocationCreate): Promise<Location> {
+    return apiPostRequest<Location>("/locations/", data)
 }
 
 // API Functions

@@ -9,13 +9,6 @@ export default function MapPage() {
             {/* Navigation Menu */}
             <NavigationMenu />
 
-            {/* Decorative background elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl float-subtle" />
-                <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-accent/10 rounded-full blur-3xl float-subtle" style={{ animationDelay: '-3s' }} />
-                <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-            </div>
-
             <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
                 {/* Header */}
                 <div className="mb-8 animate-in fade-in slide-in-from-top duration-700">

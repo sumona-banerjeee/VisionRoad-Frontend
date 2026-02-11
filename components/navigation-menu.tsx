@@ -14,7 +14,10 @@ import {
     Menu,
     LayoutDashboard,
     ChevronRight,
-    Home,
+    PlusCircle,
+    FolderPlus,
+    Package,
+    MapPin,
     Map
 } from "lucide-react"
 
@@ -27,16 +30,34 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     {
-        title: "Home",
-        description: "Project selection and analysis setup",
-        href: "/",
-        icon: Home
-    },
-    {
         title: "Dashboard",
         description: "View analytics, statistics, and recent analyses",
         href: "/dashboard",
         icon: LayoutDashboard
+    },
+    {
+        title: "New Analysis",
+        description: "Start a new road analysis project",
+        href: "/new-analysis",
+        icon: PlusCircle
+    },
+    {
+        title: "Create Project",
+        description: "Create a new infrastructure project",
+        href: "/create-project",
+        icon: FolderPlus
+    },
+    {
+        title: "Create Package",
+        description: "Add a package under an existing project",
+        href: "/create-package",
+        icon: Package
+    },
+    {
+        title: "Create Location",
+        description: "Add a location under a project & package",
+        href: "/create-location",
+        icon: MapPin
     },
     {
         title: "Show Map",
@@ -94,8 +115,8 @@ export function NavigationMenu() {
                                     }`}
                             >
                                 <div className={`p-2.5 rounded-lg transition-all duration-300 ${isActive
-                                    ? "bg-gradient-to-br from-primary to-accent text-white"
-                                    : "bg-white/5 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                                    ? "bg-[#60a5fa] text-white"
+                                    : "bg-white/5 text-muted-foreground group-hover:bg-[#60a5fa]/10 group-hover:text-[#60a5fa]"
                                     }`}>
                                     <Icon className="h-5 w-5" />
                                 </div>

@@ -14,9 +14,9 @@ export function DetectionChart({ potholes, signboards, isLoading }: DetectionCha
     const signboardPercent = total > 0 ? (signboards / total) * 100 : 50
 
     return (
-        <Card className="glass-card card-glow border-0 overflow-hidden">
+        <Card className="overflow-hidden">
             <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold">Detection Distribution</CardTitle>
+                <CardTitle className="text-lg font-bold text-blue-600">Detection Distribution</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
                 {isLoading ? (
@@ -73,8 +73,8 @@ export function DetectionChart({ potholes, signboards, isLoading }: DetectionCha
                                         <stop offset="100%" stopColor="#ea580c" />
                                     </linearGradient>
                                     <linearGradient id="signboardGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stopColor="#06b6d4" />
-                                        <stop offset="100%" stopColor="#0891b2" />
+                                        <stop offset="0%" stopColor="#3b82f6" />
+                                        <stop offset="100%" stopColor="#2563eb" />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -98,9 +98,9 @@ export function DetectionChart({ potholes, signboards, isLoading }: DetectionCha
                                     <p className="text-xs text-muted-foreground">{potholePercent.toFixed(0)}%</p>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600" />
+                                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600" />
                                     <span className="text-sm font-medium">Signboards</span>
                                 </div>
                                 <div className="text-right">

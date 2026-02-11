@@ -40,16 +40,16 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
     ]
 
     return (
-        <div className="h-[250px]">
+        <div className="h-[200px] relative">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
                         data={data}
                         cx="50%"
                         cy="50%"
-                        innerRadius={55}
-                        outerRadius={80}
-                        paddingAngle={3}
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={5}
                         dataKey="value"
                         strokeWidth={0}
                     >
@@ -57,7 +57,8 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
                             <Cell
                                 key={`cell-${index}`}
                                 fill={entry.color}
-                                className="transition-opacity hover:opacity-80"
+                                fillOpacity={0.8}
+                                className="transition-all duration-300 hover:fill-opacity-100"
                             />
                         ))}
                     </Pie>
@@ -91,7 +92,7 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
                                             className="w-3 h-3 rounded-full"
                                             style={{ backgroundColor: entry.color }}
                                         />
-                                        <span className="text-xs text-muted-foreground">
+                                        <span className="text-[10px] text-muted-foreground">
                                             {entry.value}: {data[index].value}
                                         </span>
                                     </div>
@@ -104,8 +105,8 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
             {/* Center label */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ marginTop: '-40px' }}>
                 <div className="text-center">
-                    <p className="text-2xl font-bold">{total}</p>
-                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="text-xl font-extrabold text-[#2563eb]">{total}</p>
+                    <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Total</p>
                 </div>
             </div>
         </div>

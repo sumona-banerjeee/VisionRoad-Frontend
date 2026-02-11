@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, usePathname } from "next/navigation"
-import { Home, LayoutDashboard, User } from "lucide-react"
+import { LayoutDashboard, Plus, User, FolderPlus, Package, MapPin } from "lucide-react"
 
 interface NavItem {
     title: string
@@ -13,16 +13,28 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     {
-        title: "Home",
-        href: "/",
-        icon: Home,
-        gradient: "from-emerald-400 to-teal-500"
-    },
-    {
         title: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
         gradient: "from-blue-400 to-indigo-500"
+    },
+    {
+        title: "Create Project",
+        href: "/create-project",
+        icon: FolderPlus,
+        gradient: "from-blue-400 to-blue-600"
+    },
+    {
+        title: "Create Package",
+        href: "/create-package",
+        icon: Package,
+        gradient: "from-violet-400 to-purple-500"
+    },
+    {
+        title: "Create Location",
+        href: "/create-location",
+        icon: MapPin,
+        gradient: "from-amber-400 to-orange-500"
     },
     {
         title: "Account",
@@ -42,54 +54,112 @@ export function SidebarNavigation() {
         router.push(item.href)
     }
 
+    const isNewAnalysisActive = pathname === "/new-analysis"
+
     return (
-        <aside className="fixed left-0 top-0 h-screen w-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 z-50 flex flex-col items-center py-6 shadow-lg">
+        <aside className="fixed left-0 top-0 h-screen w-20 bg-[#2563eb] border-r border-[#2563eb]/20 z-50 flex flex-col items-center py-8 shadow-2xl">
             {/* Logo */}
-            <div className="mb-8">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <span className="text-white font-bold text-lg">V</span>
+            <div className="mb-6">
+                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-lg border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110">
+                    <span className="text-[#2563eb] font-black text-xl">V</span>
                 </div>
             </div>
 
             {/* Navigation Items */}
-            <nav className="flex-1 flex flex-col items-center gap-3">
-                {navItems.map((item) => {
+            <nav className="flex-1 flex flex-col items-center gap-4">
+                {/* Dashboard - first item */}
+                {navItems.slice(0, 1).map((item) => {
                     const isActive = pathname === item.href
                     const Icon = item.icon
-
                     return (
                         <div key={item.href} className="relative group">
                             <button
                                 onClick={() => handleNavigation(item)}
-                                disabled={item.disabled}
                                 className={`
-                                    relative w-11 h-11 rounded-xl flex items-center justify-center
+                                    relative w-12 h-12 rounded-xl flex items-center justify-center
+                                    bg-white text-[#2563eb] shadow-lg border-2
+                                    ${isActive ? 'border-[#2563eb] ring-2 ring-white/30' : 'border-[#1e40af]'}
                                     transition-all duration-300 ease-out
-                                    ${item.disabled
-                                        ? "text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50"
-                                        : isActive
-                                            ? `bg-gradient-to-br ${item.gradient} text-white shadow-lg`
-                                            : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300"
-                                    }
+                                    hover:scale-110 hover:shadow-xl
+                                    active:scale-95
                                 `}
-                                style={isActive && !item.disabled ? { boxShadow: `0 8px 20px -4px rgba(99, 102, 241, 0.4)` } : {}}
                             >
-                                <Icon className="h-5 w-5" />
+                                <Icon className={`h-6 w-6 ${isActive ? 'stroke-[2.5]' : 'stroke-[2]'}`} />
                             </button>
-
-                            {/* Tooltip */}
                             <div className="
                                 absolute left-full ml-3 top-1/2 -translate-y-1/2
                                 px-3 py-1.5 rounded-lg
                                 bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
                                 opacity-0 invisible group-hover:opacity-100 group-hover:visible
                                 transition-all duration-200 ease-out
-                                whitespace-nowrap
-                                shadow-lg
-                                pointer-events-none
+                                whitespace-nowrap shadow-lg pointer-events-none
                             ">
-                                {item.title}{item.disabled && " (Coming Soon)"}
-                                {/* Arrow */}
+                                {item.title}
+                                <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
+                            </div>
+                        </div>
+                    )
+                })}
+
+                {/* New Analysis - Special eye-catchy button */}
+                <div className="relative group">
+                    <button
+                        onClick={() => router.push("/new-analysis")}
+                        className={`
+                            relative w-12 h-12 rounded-xl flex items-center justify-center
+                            bg-white text-[#2563eb] shadow-lg border-2
+                            ${isNewAnalysisActive ? 'border-[#2563eb] ring-2 ring-white/30' : 'border-[#1e40af]'}
+                            transition-all duration-300 ease-out
+                            hover:scale-110 hover:shadow-xl
+                            active:scale-95
+                        `}
+                    >
+                        <Plus className={`h-6 w-6 ${isNewAnalysisActive ? 'stroke-[2.5]' : 'stroke-[2]'}`} />
+                    </button>
+                    <div className="
+                        absolute left-full ml-3 top-1/2 -translate-y-1/2
+                        px-3 py-1.5 rounded-lg
+                        bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
+                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                        transition-all duration-200 ease-out
+                        whitespace-nowrap shadow-lg pointer-events-none
+                    ">
+                        Start New Analysis
+                        <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
+                    </div>
+                </div>
+
+                {/* Divider */}
+                <div className="w-8 h-px bg-white/20 my-1" />
+
+                {/* Create items */}
+                {navItems.slice(1, 4).map((item) => {
+                    const isActive = pathname === item.href
+                    const Icon = item.icon
+                    return (
+                        <div key={item.href} className="relative group">
+                            <button
+                                onClick={() => handleNavigation(item)}
+                                className={`
+                                    relative w-12 h-12 rounded-xl flex items-center justify-center
+                                    bg-white text-[#2563eb] shadow-lg border-2
+                                    ${isActive ? 'border-[#2563eb] ring-2 ring-white/30' : 'border-[#1e40af]'}
+                                    transition-all duration-300 ease-out
+                                    hover:scale-110 hover:shadow-xl
+                                    active:scale-95
+                                `}
+                            >
+                                <Icon className={`h-6 w-6 ${isActive ? 'stroke-[2.5]' : 'stroke-[2]'}`} />
+                            </button>
+                            <div className="
+                                absolute left-full ml-3 top-1/2 -translate-y-1/2
+                                px-3 py-1.5 rounded-lg
+                                bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
+                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                                transition-all duration-200 ease-out
+                                whitespace-nowrap shadow-lg pointer-events-none
+                            ">
+                                {item.title}
                                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
                             </div>
                         </div>
@@ -99,8 +169,25 @@ export function SidebarNavigation() {
 
             {/* Bottom section */}
             <div className="mt-auto">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                    <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <div className="relative group">
+                    <button
+                        onClick={() => { }}
+                        className="w-12 h-12 rounded-full bg-white flex items-center justify-center cursor-not-allowed opacity-80 border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110"
+                        disabled
+                    >
+                        <User className="h-6 w-6 text-[#2563eb]" />
+                    </button>
+                    <div className="
+                        absolute left-full ml-3 top-1/2 -translate-y-1/2
+                        px-3 py-1.5 rounded-lg
+                        bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
+                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                        transition-all duration-200 ease-out
+                        whitespace-nowrap shadow-lg pointer-events-none
+                    ">
+                        Account (Coming Soon)
+                        <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
+                    </div>
                 </div>
             </div>
         </aside>

@@ -95,7 +95,7 @@ export default function ResultsPage() {
         const videoData = loadVideoData()
 
         if (!isSessionValid(storedSession) || !videoData) {
-            router.replace("/")
+            router.replace("/new-analysis")
             return
         }
 
@@ -143,7 +143,7 @@ export default function ResultsPage() {
             }
         }
         clearSession()
-        router.push("/")
+        router.push("/new-analysis")
     }
 
     const handleBackToUpload = () => {
@@ -158,7 +158,7 @@ export default function ResultsPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center">
+            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                     <p className="text-gray-500">Loading detection results...</p>
@@ -169,7 +169,7 @@ export default function ResultsPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center">
+            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
                     <p className="text-red-500">{error}</p>
                     <Button onClick={handleNewAnalysis} className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">Start New Analysis</Button>
@@ -179,7 +179,7 @@ export default function ResultsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
             {/* Sidebar Navigation */}
             <SidebarNavigation />
 
@@ -199,7 +199,7 @@ export default function ResultsPage() {
                     {/* Session Info Bar */}
                     {session && (
                         <div className="mb-6 animate-in fade-in slide-in-from-top duration-500">
-                            <div className="flex items-center justify-between p-4 rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
+                            <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-[var(--border)] shadow-sm">
                                 <div className="flex items-center gap-6 text-sm">
                                     <div className="flex items-center gap-2">
                                         <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 shadow-md shadow-indigo-500/30">
@@ -209,11 +209,11 @@ export default function ResultsPage() {
                                         <span className="font-bold text-gray-900 dark:text-white bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">{session.projectName}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 shadow-md shadow-emerald-500/30">
+                                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 shadow-md shadow-blue-500/30">
                                             <Package className="h-4 w-4 text-white" />
                                         </div>
                                         <span className="text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold tracking-wide">Package:</span>
-                                        <span className="font-bold text-gray-900 dark:text-white bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">{session.packageName}</span>
+                                        <span className="font-bold text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{session.packageName}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 shadow-md shadow-purple-500/30">
