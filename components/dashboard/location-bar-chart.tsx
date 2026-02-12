@@ -24,7 +24,7 @@ export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
     if (isLoading) {
         return (
             <div className="h-[300px] flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+                <Loader2 className="h-8 w-8 text-primary/50" />
             </div>
         )
     }
@@ -123,12 +123,14 @@ export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
                         name="Potholes"
                         fill="url(#barGradientPothole)"
                         radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
                     />
                     <Bar
                         dataKey="signboards"
                         name="Signboards"
                         fill="url(#barGradientSignboard)"
                         radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
                     />
                 </BarChart>
             </ResponsiveContainer>

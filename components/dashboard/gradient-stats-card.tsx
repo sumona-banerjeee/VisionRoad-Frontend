@@ -58,7 +58,7 @@ export function GradientStatsCard({
                     </h3>
                     <div className="flex flex-col">
                         {isLoading ? (
-                            <div className="h-14 w-24 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse mt-2" />
+                            <div className="h-14 w-24 bg-gray-100 dark:bg-gray-800 rounded-xl mt-2" />
                         ) : (
                             <>
                                 <p className="text-3xl md:text-4xl font-black tracking-tighter leading-tight text-[#1e3a8a]">

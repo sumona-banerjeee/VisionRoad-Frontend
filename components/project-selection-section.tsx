@@ -167,20 +167,20 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                                 <div key={step} className="flex items-center">
                                     <div className="flex flex-col items-center">
                                         <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${status === 'completed' ? 'step-completed' :
-                                                status === 'active' ? 'step-active' :
-                                                    'step-pending'
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${status === 'completed' ? 'bg-primary text-primary-foreground' :
+                                                status === 'active' ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' :
+                                                    'bg-muted text-muted-foreground'
                                                 }`}
                                         >
                                             {step}
                                         </div>
-                                        <span className={`text-xs mt-1.5 font-medium transition-colors ${status === 'pending' ? 'text-muted-foreground/60' : 'text-foreground'
+                                        <span className={`text-xs mt-1.5 font-medium ${status === 'pending' ? 'text-muted-foreground/60' : 'text-foreground'
                                             }`}>
                                             {labels[index]}
                                         </span>
                                     </div>
                                     {index < 2 && (
-                                        <div className={`w-12 h-0.5 mx-2 mt-[-16px] rounded-full transition-colors duration-300 ${getStepStatus(step + 1) !== 'pending' ? 'bg-primary' : 'bg-border'
+                                        <div className={`w-12 h-0.5 mx-2 mt-[-16px] rounded-full ${getStepStatus(step + 1) !== 'pending' ? 'bg-primary' : 'bg-border'
                                             }`} />
                                     )}
                                 </div>
@@ -193,7 +193,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
             <CardContent className="pt-6 space-y-6">
                 {/* Error Display */}
                 {error && (
-                    <div className="flex items-start gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive animate-in fade-in slide-in-from-top duration-300">
+                    <div className="flex items-start gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive">
                         <div className="w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <span className="text-xs font-bold">!</span>
                         </div>
@@ -213,7 +213,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                                 onValueChange={handleProjectChange}
                                 disabled={loadingProjects}
                             >
-                                <SelectTrigger id="project" className="h-12 bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
+                                <SelectTrigger id="project" className="h-12 bg-background/50 border-border/50 hover:border-primary/50">
                                     {loadingProjects ? (
                                         <div className="flex items-center gap-2">
                                             <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -245,7 +245,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                                 onValueChange={handlePackageChange}
                                 disabled={!selectedProject || loadingPackages}
                             >
-                                <SelectTrigger id="package" className="h-12 bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
+                                <SelectTrigger id="package" className="h-12 bg-background/50 border-border/50 hover:border-primary/50">
                                     {loadingPackages ? (
                                         <div className="flex items-center gap-2">
                                             <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -277,7 +277,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                                 onValueChange={handleLocationChange}
                                 disabled={!selectedPackage || loadingLocations}
                             >
-                                <SelectTrigger id="location" className="h-12 bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
+                                <SelectTrigger id="location" className="h-12 bg-background/50 border-border/50 hover:border-primary/50">
                                     {loadingLocations ? (
                                         <div className="flex items-center gap-2">
                                             <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -301,7 +301,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
 
                 {/* Selected Summary */}
                 {isComplete && (
-                    <div className="px-4 py-3 rounded-lg bg-primary/5 border border-primary/15 animate-in fade-in slide-in-from-bottom duration-300">
+                    <div className="px-4 py-3 rounded-lg bg-primary/5 border border-primary/15">
                         <p className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
                             <span className="font-medium">Path:</span>
                             <span className="text-foreground">{selectedProject?.name}</span>
@@ -317,7 +317,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                 <Button
                     onClick={handleProceed}
                     disabled={!isComplete}
-                    className={`w-full h-14 text-base font-semibold transition-all rounded-xl ${isComplete ? 'btn-gradient text-white' : ''
+                    className={`w-full h-14 text-base font-semibold rounded-xl ${isComplete ? 'btn-gradient text-white' : ''
                         }`}
                     size="lg"
                 >

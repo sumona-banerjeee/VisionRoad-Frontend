@@ -9,15 +9,19 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, CheckCircle2, FolderPlus, MapPin, Building2, Route, X } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { DataTable } from "@/components/data-table"
-import { createProject, fetchProjects, type ProjectCreate, type Project } from "@/lib/api"
+import { createProject, fetchProjects, updateProject, deleteProject, type ProjectCreate, type Project, type ProjectUpdate } from "@/lib/api"
+import { toast } from "sonner"
 
 export default function CreateProjectPage() {
     const [projects, setProjects] = useState<Project[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [success, setSuccess] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    // Editing state
+    const [isEditing, setIsEditing] = useState(false)
+    const [currentProject, setCurrentProject] = useState<Project | null>(null)
 
     // Form fields
     const [name, setName] = useState("")
@@ -55,6 +59,8 @@ export default function CreateProjectPage() {
         setEndLat("")
         setEndLng("")
         setError(null)
+        setIsEditing(false)
+        setCurrentProject(null)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -68,31 +74,70 @@ export default function CreateProjectPage() {
         setError(null)
 
         try {
-            const data: ProjectCreate = {
-                name: name.trim(),
-                state: state.trim() || null,
-                corridor_name: corridorName.trim() || null,
-                start_lat: startLat ? parseFloat(startLat) : null,
-                start_lng: startLng ? parseFloat(startLng) : null,
-                end_lat: endLat ? parseFloat(endLat) : null,
-                end_lng: endLng ? parseFloat(endLng) : null,
+            if (isEditing && currentProject) {
+                const data: ProjectUpdate = {
+                    name: name.trim(),
+                    state: state.trim() || null,
+                    corridor_name: corridorName.trim() || null,
+                    start_lat: startLat ? parseFloat(startLat) : null,
+                    start_lng: startLng ? parseFloat(startLng) : null,
+                    end_lat: endLat ? parseFloat(endLat) : null,
+                    end_lng: endLng ? parseFloat(endLng) : null,
+                }
+                await updateProject(currentProject.id, data)
+                toast.success("Project updated successfully!")
+            } else {
+                const data: ProjectCreate = {
+                    name: name.trim(),
+                    state: state.trim() || null,
+                    corridor_name: corridorName.trim() || null,
+                    start_lat: startLat ? parseFloat(startLat) : null,
+                    start_lng: startLng ? parseFloat(startLng) : null,
+                    end_lat: endLat ? parseFloat(endLat) : null,
+                    end_lng: endLng ? parseFloat(endLng) : null,
+                }
+                await createProject(data)
+                toast.success("Project created successfully!")
             }
-
-            await createProject(data)
-            setSuccess(true)
 
             // Refresh projects list
             await loadProjects()
 
-            setTimeout(() => {
-                resetForm()
-                setSuccess(false)
-                setIsModalOpen(false)
-            }, 2000)
+            // Close modal and reset form immediately
+            setIsModalOpen(false)
+            resetForm()
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to create project")
+            setError(err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} project`)
         } finally {
             setIsSubmitting(false)
+        }
+    }
+
+    const handleEdit = (project: Project) => {
+        setIsEditing(true)
+        setCurrentProject(project)
+        setName(project.name || "")
+        setState(project.state || "")
+        setCorridorName(project.corridor_name || "")
+        setStartLat(project.start_lat?.toString() || "")
+        setStartLng(project.start_lng?.toString() || "")
+        setEndLat(project.end_lat?.toString() || "")
+        setEndLng(project.end_lng?.toString() || "")
+        setIsModalOpen(true)
+    }
+
+    const handleDelete = async (project: Project) => {
+        if (!confirm(`Are you sure you want to delete project "${project.name}"?`)) return
+
+        try {
+            setIsLoading(true)
+            await deleteProject(project.id)
+            toast.success("Project deleted successfully!")
+            await loadProjects()
+        } catch (err) {
+            setError("Failed to delete project")
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -135,7 +180,7 @@ export default function CreateProjectPage() {
             <main className="ml-16 min-h-screen relative overflow-hidden">
                 <div className="mx-auto px-6 py-8 max-w-7xl relative z-10">
                     {/* Refined Header */}
-                    <div className="mb-8 animate-in fade-in slide-in-from-left duration-700">
+                    <div className="mb-8">
                         <div className="flex items-center gap-5">
                             <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
                                 <FolderPlus className="h-8 w-8 text-white" />
@@ -153,28 +198,30 @@ export default function CreateProjectPage() {
 
                     {/* Error Message */}
                     {error && !isModalOpen && (
-                        <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top duration-300">
+                        <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
                             <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-red-500">!</span>
                             </div>
-                            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 break-all">{error}</p>
                         </div>
                     )}
 
                     {/* Data Table */}
-                    <div className="animate-in fade-in slide-in-from-bottom duration-700 delay-150">
+                    <div>
                         <DataTable
                             title="All Projects"
                             data={projects}
                             columns={columns}
-                            onAddNew={() => setIsModalOpen(true)}
+                            onAddNew={() => { setIsEditing(false); setIsModalOpen(true); }}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
                             addButtonText="Add New Project"
                             isLoading={isLoading}
                         />
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-8 text-center animate-in fade-in duration-700 delay-300">
+                    <div className="mt-8 text-center">
                         <p className="text-xs text-gray-400 dark:text-gray-500">
                             Sentient Geeks Pvt. Ltd.
                         </p>
@@ -191,28 +238,21 @@ export default function CreateProjectPage() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <FolderPlus className="h-5 w-5 text-blue-500" />
-                            Create New Project
+                            {isEditing ? 'Edit Project' : 'Create New Project'}
                         </DialogTitle>
                         <DialogDescription>
-                            Fill in the details for your new road infrastructure project
+                            {isEditing ? 'Update disclosure details for your road infrastructure project' : 'Fill in the details for your new road infrastructure project'}
                         </DialogDescription>
                     </DialogHeader>
 
-                    {/* Success Message in Modal */}
-                    {success && (
-                        <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 animate-in fade-in slide-in-from-top duration-300">
-                            <CheckCircle2 className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                            <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Project created successfully!</p>
-                        </div>
-                    )}
 
                     {/* Error Message in Modal */}
                     {error && (
-                        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top duration-300">
+                        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
                             <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-red-500">!</span>
                             </div>
-                            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 break-all">{error}</p>
                         </div>
                     )}
 
@@ -347,17 +387,17 @@ export default function CreateProjectPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting || !name.trim()}
-                                className="flex-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-700 hover:from-blue-600 hover:via-indigo-600 hover:to-blue-800 text-white"
+                                className="flex-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-700 hover:bg-blue-600 text-white"
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">
                                         <Loader2 className="h-4 w-4 animate-spin" />
-                                        Creating...
+                                        {isEditing ? 'Updating...' : 'Creating...'}
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">
-                                        <FolderPlus className="h-4 w-4" />
-                                        Create Project
+                                        {isEditing ? <CheckCircle2 className="h-4 w-4" /> : <FolderPlus className="h-4 w-4" />}
+                                        {isEditing ? 'Update Project' : 'Create Project'}
                                     </span>
                                 )}
                             </Button>

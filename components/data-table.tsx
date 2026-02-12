@@ -1,7 +1,13 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { Plus, Edit2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface Column<T> {
     key: string
@@ -16,6 +22,8 @@ interface DataTableProps<T> {
     onAddNew: () => void
     addButtonText: string
     isLoading?: boolean
+    onEdit?: (item: T) => void
+    onDelete?: (item: T) => void
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -24,8 +32,13 @@ export function DataTable<T extends Record<string, any>>({
     columns,
     onAddNew,
     addButtonText,
-    isLoading = false
+    isLoading = false,
+    onEdit,
+    onDelete
 }: DataTableProps<T>) {
+    const showActions = !!onEdit || !!onDelete;
+    const totalCols = columns.length + (showActions ? 1 : 0);
+
     return (
         <div>
             {/* Header with Title and Add Button */}
@@ -57,12 +70,17 @@ export function DataTable<T extends Record<string, any>>({
                                         {col.header}
                                     </th>
                                 ))}
+                                {showActions && (
+                                    <th className="px-4 py-3 text-right text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.1em] border-b border-[var(--border)] bg-[#f8fafc] dark:bg-gray-900 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                                        Actions
+                                    </th>
+                                )}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100/30 dark:divide-gray-800/30">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={columns.length} className="px-4 py-12 text-center">
+                                    <td colSpan={totalCols} className="px-4 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center gap-3">
                                             <div className="h-8 w-8 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                                             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Loading records...</span>
@@ -71,7 +89,7 @@ export function DataTable<T extends Record<string, any>>({
                                 </tr>
                             ) : data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={columns.length} className="px-4 py-12 text-center">
+                                    <td colSpan={totalCols} className="px-4 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center gap-2">
                                             <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
                                                 <Plus className="w-6 h-6 text-gray-400" />
@@ -92,6 +110,48 @@ export function DataTable<T extends Record<string, any>>({
                                                 {col.render ? col.render(item) : (item[col.key as keyof T] !== null && item[col.key as keyof T] !== undefined ? String(item[col.key as keyof T]) : "—")}
                                             </td>
                                         ))}
+                                        {showActions && (
+                                            <td className="px-4 py-3 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <TooltipProvider>
+                                                        {onEdit && (
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => onEdit(item)}
+                                                                        className="h-8 w-8 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-600 hover:text-white dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-700"
+                                                                    >
+                                                                        <Edit2 className="h-4 w-4" />
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top">
+                                                                    <p>Edit</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        )}
+                                                        {onDelete && (
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => onDelete(item)}
+                                                                        className="h-8 w-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white dark:bg-rose-900/40 dark:text-rose-400 dark:hover:bg-rose-700"
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top">
+                                                                    <p>Delete</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        )}
+                                                    </TooltipProvider>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}

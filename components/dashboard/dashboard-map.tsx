@@ -13,7 +13,7 @@ const DashboardMapContent = dynamic(
         ssr: false,
         loading: () => (
             <div className="h-full w-full flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 text-primary" />
             </div>
         )
     }
@@ -61,6 +61,7 @@ export function DashboardMap({
                     : (pkg as any).locations || {}
 
                 for (const [locName, loc] of Object.entries(locationsToProcess)) {
+                    if (!loc) continue
                     const locationDetections = (loc as any).detections || []
                     filteredDetections.push(...locationDetections)
                 }
@@ -90,7 +91,7 @@ export function DashboardMap({
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-lg border-2 border-[#1e40af] transition-transform duration-300 hover:scale-110">
+                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-lg border-2 border-[#1e40af]">
                             <MapPin className="h-5 w-5 text-[#2563eb]" />
                         </div>
                         <div>
@@ -120,7 +121,7 @@ export function DashboardMap({
                 <div className="h-[400px] w-full relative">
                     {isLoading ? (
                         <div className="h-full w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
-                            <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                            <Loader2 className="h-8 w-8 text-indigo-500" />
                         </div>
                     ) : error ? (
                         <div className="h-full w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">

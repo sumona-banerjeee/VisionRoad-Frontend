@@ -22,7 +22,7 @@ import {
     type Project
 } from "@/lib/api"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+const API_URL = "http://127.0.0.1:8000/api/v1"
 
 interface ProjectSummary {
     project: {
@@ -236,6 +236,8 @@ export default function DashboardPage() {
                 : pkg.locations || {}
 
             for (const [locName, loc] of Object.entries(locationsToProcess)) {
+                if (!loc) continue
+
                 let locPotholes = 0
                 let locSignboards = 0
 
@@ -278,12 +280,12 @@ export default function DashboardPage() {
             <main className="ml-16 min-h-screen">
                 <div className="p-4 px-8 max-w-full mx-auto">
                     {/* Header */}
-                    <div className="mb-8 flex items-center gap-5 animate-in fade-in slide-in-from-top duration-500">
+                    <div className="mb-8 flex items-center gap-5">
                         <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
-                            {/* Constant orbit animations */}
-                            <div className="absolute inset-0 bg-white/20 animate-logo-spin-slow opacity-50"></div>
-                            <div className="absolute inset-0 border-2 border-white/30 rounded-2xl animate-logo-spin-reverse-slow opacity-30"></div>
-                            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white relative z-10 animate-logo-float">
+                            {/* Constant orbit animations removed */}
+                            <div className="absolute inset-0 bg-white/20 opacity-50"></div>
+                            <div className="absolute inset-0 border-2 border-white/30 rounded-2xl opacity-30"></div>
+                            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white relative z-10">
                                 <path d="M50 20L85 80H15L50 20Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
                                 <path d="M40 80L50 55L60 80" stroke="currentColor" strokeWidth="6" />
                             </svg>
@@ -300,14 +302,14 @@ export default function DashboardPage() {
 
                     {/* Error Display */}
                     {error && (
-                        <div className="mb-4 flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm animate-in fade-in duration-300">
+                        <div className="mb-4 flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
                             <AlertCircle className="h-4 w-4 flex-shrink-0" />
                             <p>{error}</p>
                         </div>
                     )}
 
                     {/* Stats Cards - Top Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 animate-in fade-in slide-in-from-bottom duration-500">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <GradientStatsCard
                             title="Total Detections"
                             subtitle="All detected objects"
@@ -335,7 +337,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Filter Selector - Above main content */}
-                    <div className="mb-6 animate-in fade-in slide-in-from-bottom duration-500 delay-100">
+                    <div className="mb-6">
                         <FilterSelector
                             projects={projects}
                             selectedProjectId={selectedProjectId}
@@ -351,7 +353,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Charts Row - Side by Side */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-in fade-in slide-in-from-bottom duration-500 delay-200">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                         {/* Left Chart - Detection Distribution */}
                         <Card className="rounded-xl overflow-hidden">
                             <CardHeader className="pb-2 border-b border-[var(--border)]">
@@ -395,7 +397,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Map - Full Width Below Charts */}
-                    <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-300">
+                    <div>
                         <DashboardMap
                             selectedProjectId={selectedProjectId}
                             selectedPackageId={selectedPackageId}
@@ -405,7 +407,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-8 text-center animate-in fade-in duration-700 delay-300">
+                    <div className="mt-8 text-center">
                         <p className="text-xs text-gray-400 dark:text-gray-500">
                             Sentient Geeks Pvt. Ltd.
                         </p>

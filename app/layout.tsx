@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   },
 }
 
+import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,7 +42,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased`} suppressHydrationWarning>
-        {children}
+        <TooltipProvider>
+          {children}
+          <Toaster />
+        </TooltipProvider>
         <Analytics />
       </body>
     </html>

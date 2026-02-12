@@ -21,7 +21,7 @@ export function DetectionChart({ potholes, signboards, isLoading }: DetectionCha
             <CardContent className="pt-0">
                 {isLoading ? (
                     <div className="flex items-center justify-center h-48">
-                        <div className="w-32 h-32 rounded-full bg-primary/10 animate-pulse" />
+                        <div className="w-32 h-32 rounded-full bg-primary/10" />
                     </div>
                 ) : total === 0 ? (
                     <div className="flex items-center justify-center h-48 text-muted-foreground">
@@ -52,7 +52,7 @@ export function DetectionChart({ potholes, signboards, isLoading }: DetectionCha
                                     strokeWidth="16"
                                     strokeDasharray={`${potholePercent * 2.51} 251`}
                                     strokeLinecap="round"
-                                    className="transition-all duration-700"
+                                    className=""
                                 />
                                 {/* Signboards arc */}
                                 <circle
@@ -62,10 +62,9 @@ export function DetectionChart({ potholes, signboards, isLoading }: DetectionCha
                                     fill="none"
                                     stroke="url(#signboardGradient)"
                                     strokeWidth="16"
-                                    strokeDasharray={`${signboardPercent * 2.51} 251`}
                                     strokeDashoffset={`-${potholePercent * 2.51}`}
                                     strokeLinecap="round"
-                                    className="transition-all duration-700"
+                                    className=""
                                 />
                                 <defs>
                                     <linearGradient id="potholeGradient" x1="0%" y1="0%" x2="100%" y2="0%">

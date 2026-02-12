@@ -13,7 +13,7 @@ const MapModal = dynamic(() => import("@/components/map-modal"), { ssr: false })
 
 import { DetectionData, DetectionType } from "@/lib/types"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+const API_URL = "http://127.0.0.1:8000/api/v1"
 
 
 
@@ -144,9 +144,9 @@ function DetailedSummarySection({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-white/20 animate-logo-spin-slow opacity-50"></div>
-                <div className="absolute inset-0 border-2 border-white/30 rounded-xl animate-logo-spin-reverse-slow opacity-30"></div>
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10 animate-logo-float">
+                <div className="absolute inset-0 bg-white/20 opacity-50"></div>
+                <div className="absolute inset-0 border-2 border-white/30 rounded-xl opacity-30"></div>
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10">
                   <path d="M50 20L85 80H15L50 20Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
                   <path d="M40 80L50 55L60 80" stroke="currentColor" strokeWidth="6" />
                 </svg>
@@ -217,8 +217,8 @@ function DetailedSummarySection({
         <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-white/10 animate-logo-spin-slow opacity-40"></div>
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10 animate-logo-float">
+              <div className="absolute inset-0 bg-white/10 opacity-40"></div>
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10">
                 <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M15 7H21V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -335,12 +335,12 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   ]
 
   return (
-    <Card className="animate-in fade-in slide-in-from-bottom duration-500 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden">
+    <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden">
       <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-white/10 animate-logo-spin-slow opacity-40"></div>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10 animate-logo-float">
+            <div className="absolute inset-0 bg-white/10 opacity-40"></div>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10">
               <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M15 7H21V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -362,8 +362,7 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center justify-center p-3 rounded-xl transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500 border border-gray-100 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md"
               >
                 <div className={`${stat.bgColor} p-3 rounded-lg mb-2 transition-all shadow-inner`}>
                   <Icon className={`h-6 w-6 ${stat.color}`} />

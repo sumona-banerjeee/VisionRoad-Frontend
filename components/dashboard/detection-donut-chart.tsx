@@ -18,7 +18,7 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
     if (isLoading) {
         return (
             <div className="h-[250px] flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+                <Loader2 className="h-8 w-8 text-primary/50" />
             </div>
         )
     }
@@ -52,13 +52,14 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
                         paddingAngle={5}
                         dataKey="value"
                         strokeWidth={0}
+                        isAnimationActive={false}
                     >
                         {data.map((entry, index) => (
                             <Cell
                                 key={`cell-${index}`}
                                 fill={entry.color}
-                                fillOpacity={0.8}
-                                className="transition-all duration-300 hover:fill-opacity-100"
+                                fillOpacity={1}
+                                className="hover:fill-opacity-80"
                             />
                         ))}
                     </Pie>

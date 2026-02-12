@@ -16,11 +16,15 @@ import {
     fetchAllLocations,
     fetchAllPackages,
     createLocation,
+    updateLocation,
+    deleteLocation,
     type Project,
     type Package as PackageType,
     type Location,
-    type LocationCreate
+    type LocationCreate,
+    type LocationUpdate
 } from "@/lib/api"
+import { toast } from "sonner"
 
 export default function CreateLocationPage() {
     const [locations, setLocations] = useState<Location[]>([])
@@ -30,10 +34,13 @@ export default function CreateLocationPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [success, setSuccess] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [loadingProjects, setLoadingProjects] = useState(false)
     const [loadingPackages, setLoadingPackages] = useState(false)
+
+    // Editing state
+    const [isEditing, setIsEditing] = useState(false)
+    const [currentLocation, setCurrentLocation] = useState<Location | null>(null)
 
     // Form fields
     const [selectedProjectId, setSelectedProjectId] = useState("")
@@ -91,14 +98,14 @@ export default function CreateLocationPage() {
     useEffect(() => {
         if (!selectedProjectId) {
             setPackages([])
-            setSelectedPackageId("")
+            if (!isEditing) setSelectedPackageId("")
             return
         }
 
-        const loadPackages = async () => {
+        const loadPackagesForProject = async () => {
             try {
                 setLoadingPackages(true)
-                setSelectedPackageId("")
+                if (!isEditing) setSelectedPackageId("")
                 const data = await fetchPackagesByProject(selectedProjectId)
                 setPackages(data)
             } catch (err) {
@@ -107,8 +114,8 @@ export default function CreateLocationPage() {
                 setLoadingPackages(false)
             }
         }
-        loadPackages()
-    }, [selectedProjectId])
+        loadPackagesForProject()
+    }, [selectedProjectId, isEditing])
 
     const resetForm = () => {
         setSelectedProjectId("")
@@ -121,11 +128,13 @@ export default function CreateLocationPage() {
         setEndLat("")
         setEndLng("")
         setError(null)
+        setIsEditing(false)
+        setCurrentLocation(null)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!selectedPackageId) {
+        if (!selectedPackageId && !isEditing) {
             setError("Please select a project and package first")
             return
         }
@@ -142,32 +151,79 @@ export default function CreateLocationPage() {
         setError(null)
 
         try {
-            const data: LocationCreate = {
-                package_id: selectedPackageId,
-                segment_name: segmentName.trim(),
-                chainage_start_km: chainageStartKm ? parseFloat(chainageStartKm) : null,
-                chainage_end_km: chainageEndKm ? parseFloat(chainageEndKm) : null,
-                start_lat: parseFloat(startLat),
-                start_lng: parseFloat(startLng),
-                end_lat: parseFloat(endLat),
-                end_lng: parseFloat(endLng),
+            if (isEditing && currentLocation) {
+                const data: LocationUpdate = {
+                    segment_name: segmentName.trim(),
+                    chainage_start_km: chainageStartKm ? parseFloat(chainageStartKm) : null,
+                    chainage_end_km: chainageEndKm ? parseFloat(chainageEndKm) : null,
+                    start_lat: parseFloat(startLat),
+                    start_lng: parseFloat(startLng),
+                    end_lat: parseFloat(endLat),
+                    end_lng: parseFloat(endLng),
+                }
+                await updateLocation(currentLocation.id, data)
+                toast.success("Location updated successfully!")
+            } else {
+                const data: LocationCreate = {
+                    package_id: selectedPackageId,
+                    segment_name: segmentName.trim(),
+                    chainage_start_km: chainageStartKm ? parseFloat(chainageStartKm) : null,
+                    chainage_end_km: chainageEndKm ? parseFloat(chainageEndKm) : null,
+                    start_lat: parseFloat(startLat),
+                    start_lng: parseFloat(startLng),
+                    end_lat: parseFloat(endLat),
+                    end_lng: parseFloat(endLng),
+                }
+                await createLocation(data)
+                toast.success("Location created successfully!")
             }
-
-            await createLocation(data)
-            setSuccess(true)
 
             // Refresh locations list
             await loadLocations()
 
-            setTimeout(() => {
-                resetForm()
-                setSuccess(false)
-                setIsModalOpen(false)
-            }, 2000)
+            // Close modal and reset form immediately
+            setIsModalOpen(false)
+            resetForm()
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to create location")
+            setError(err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} location`)
         } finally {
             setIsSubmitting(false)
+        }
+    }
+
+    const handleEdit = (location: Location) => {
+        setIsEditing(true)
+        setCurrentLocation(location)
+
+        // Find project for this package
+        const pkg = allPackages.find(p => p.id === location.package_id)
+        if (pkg) {
+            setSelectedProjectId(pkg.project_id)
+            setSelectedPackageId(location.package_id)
+        }
+
+        setSegmentName(location.segment_name || "")
+        setChainageStartKm(location.chainage_start_km?.toString() || "")
+        setChainageEndKm(location.chainage_end_km?.toString() || "")
+        setStartLat(location.start_lat.toString())
+        setStartLng(location.start_lng.toString())
+        setEndLat(location.end_lat.toString())
+        setEndLng(location.end_lng.toString())
+        setIsModalOpen(true)
+    }
+
+    const handleDelete = async (location: Location) => {
+        if (!confirm(`Are you sure you want to delete location "${location.segment_name}"?`)) return
+
+        try {
+            setIsLoading(true)
+            await deleteLocation(location.id)
+            toast.success("Location deleted successfully!")
+            await loadLocations()
+        } catch (err) {
+            setError("Failed to delete location")
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -175,8 +231,6 @@ export default function CreateLocationPage() {
         return allPackages.find(p => p.id === packageId)?.name || packageId
     }
 
-    const selectedProject = projects.find(p => p.id === selectedProjectId)
-    const selectedPackage = packages.find(p => p.id === selectedPackageId)
     const isFormComplete = selectedPackageId && segmentName.trim() && startLat && startLng && endLat && endLng
 
     const columns = [
@@ -241,7 +295,7 @@ export default function CreateLocationPage() {
             <main className="ml-16 min-h-screen relative overflow-hidden">
                 <div className="mx-auto px-6 py-8 max-w-7xl relative z-10">
                     {/* Refined Header */}
-                    <div className="mb-8 animate-in fade-in slide-in-from-left duration-700">
+                    <div className="mb-8">
                         <div className="flex items-center gap-5">
                             <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
                                 <MapPin className="h-8 w-8 text-white" />
@@ -259,28 +313,30 @@ export default function CreateLocationPage() {
 
                     {/* Error Message */}
                     {error && !isModalOpen && (
-                        <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top duration-300">
+                        <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
                             <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-red-500">!</span>
                             </div>
-                            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 break-all">{error}</p>
                         </div>
                     )}
 
                     {/* Data Table */}
-                    <div className="animate-in fade-in slide-in-from-bottom duration-700 delay-150">
+                    <div>
                         <DataTable
                             title="All Locations"
                             data={locations}
                             columns={columns}
-                            onAddNew={() => setIsModalOpen(true)}
+                            onAddNew={() => { setIsEditing(false); setIsModalOpen(true); }}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
                             addButtonText="Add New Location"
                             isLoading={isLoading}
                         />
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-8 text-center animate-in fade-in duration-700 delay-300">
+                    <div className="mt-8 text-center">
                         <p className="text-xs text-gray-400 dark:text-gray-500">
                             Sentient Geeks Pvt. Ltd.
                         </p>
@@ -289,7 +345,7 @@ export default function CreateLocationPage() {
             </main>
 
             {/* Modal Dialog */}
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) { setIsModalOpen(false); resetForm(); } else { setIsModalOpen(true); } }}>
                 <DialogContent
                     className="max-w-2xl"
                     onOpenAutoFocus={(e) => e.preventDefault()}
@@ -297,98 +353,97 @@ export default function CreateLocationPage() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <MapPin className="h-5 w-5 text-blue-500" />
-                            Create New Location
+                            {isEditing ? 'Edit Location' : 'Create New Location'}
                         </DialogTitle>
                         <DialogDescription>
-                            Select project & package, then fill in the location details
+                            {isEditing ? 'Update disclosure details for your road infrastructure segment' : 'Select project & package, then fill in the location details'}
                         </DialogDescription>
                     </DialogHeader>
 
-                    {/* Success Message in Modal */}
-                    {success && (
-                        <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 animate-in fade-in slide-in-from-top duration-300">
-                            <CheckCircle2 className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                            <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Location created successfully!</p>
-                        </div>
-                    )}
 
                     {/* Error Message in Modal */}
                     {error && (
-                        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top duration-300">
+                        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
                             <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-red-500">!</span>
                             </div>
-                            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 break-all">{error}</p>
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Step 1: Select Project */}
-                        <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm">
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
-                                    <span className="text-white text-[10px] font-bold">1</span>
+                        {!isEditing && (
+                            <div className="p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                                        <span className="text-white text-[10px] font-bold">1</span>
+                                    </div>
+                                    <p className="text-xs font-bold text-blue-700 dark:text-blue-400">Select Project</p>
                                 </div>
-                                <p className="text-xs font-bold text-blue-700 dark:text-blue-400">Select Project</p>
+                                <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                                    <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
+                                        {loadingProjects ? (
+                                            <div className="flex items-center gap-2">
+                                                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                                                <span className="text-gray-400">Loading projects...</span>
+                                            </div>
+                                        ) : (
+                                            <SelectValue placeholder="Choose a project" />
+                                        )}
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {projects.map(project => (
+                                            <SelectItem key={project.id} value={project.id}>
+                                                <span className="font-medium">{project.name}</span>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
-                            <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                                <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
-                                    {loadingProjects ? (
-                                        <div className="flex items-center gap-2">
-                                            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                                            <span className="text-gray-400">Loading projects...</span>
-                                        </div>
-                                    ) : (
-                                        <SelectValue placeholder="Choose a project" />
-                                    )}
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {projects.map(project => (
-                                        <SelectItem key={project.id} value={project.id}>
-                                            <span className="font-medium">{project.name}</span>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        )}
 
                         {/* Step 2: Select Package */}
-                        <div className={`p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm transition-opacity duration-300 ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                    <span className="text-white text-[10px] font-bold">2</span>
+                        {!isEditing && (
+                            <div className={`p-3 rounded-xl bg-blue-50/80 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 shadow-sm ${selectedProjectId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedProjectId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                        <span className="text-white text-[10px] font-bold">2</span>
+                                    </div>
+                                    <p className="text-xs font-bold text-blue-700 dark:text-blue-400">Select Package</p>
                                 </div>
-                                <p className="text-xs font-bold text-blue-700 dark:text-blue-400">Select Package</p>
+                                <Select value={selectedPackageId} onValueChange={setSelectedPackageId} disabled={!selectedProjectId}>
+                                    <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
+                                        {loadingPackages ? (
+                                            <div className="flex items-center gap-2">
+                                                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                                                <span className="text-gray-400">Loading packages...</span>
+                                            </div>
+                                        ) : (
+                                            <SelectValue placeholder={selectedProjectId ? "Choose a package" : "Select project first"} />
+                                        )}
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {packages.map(pkg => (
+                                            <SelectItem key={pkg.id} value={pkg.id}>
+                                                <span className="font-medium">{pkg.name}</span>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
-                            <Select value={selectedPackageId} onValueChange={setSelectedPackageId} disabled={!selectedProjectId}>
-                                <SelectTrigger className="h-11 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-800 focus:border-blue-400">
-                                    {loadingPackages ? (
-                                        <div className="flex items-center gap-2">
-                                            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                                            <span className="text-gray-400">Loading packages...</span>
-                                        </div>
-                                    ) : (
-                                        <SelectValue placeholder={selectedProjectId ? "Choose a package" : "Select project first"} />
-                                    )}
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {packages.map(pkg => (
-                                        <SelectItem key={pkg.id} value={pkg.id}>
-                                            <span className="font-medium">{pkg.name}</span>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        )}
 
                         {/* Step 3: Location Details */}
-                        <div className={`space-y-4 transition-opacity duration-300 ${selectedPackageId ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-                            <div className="flex items-center gap-2">
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedPackageId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                    <span className="text-white text-[10px] font-bold">3</span>
+                        <div className={`space-y-4 ${selectedPackageId || isEditing ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                            {!isEditing && (
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedPackageId ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                        <span className="text-white text-[10px] font-bold">3</span>
+                                    </div>
+                                    <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Location Information</p>
                                 </div>
-                                <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Location Information</p>
-                            </div>
+                            )}
 
                             {/* Segment Name & Chainage Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -535,12 +590,12 @@ export default function CreateLocationPage() {
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">
                                         <Loader2 className="h-4 w-4 animate-spin" />
-                                        Creating...
+                                        {isEditing ? 'Updating...' : 'Creating...'}
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">
-                                        <MapPin className="h-4 w-4" />
-                                        Create Location
+                                        {isEditing ? <CheckCircle2 className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                                        {isEditing ? 'Update Location' : 'Create Location'}
                                     </span>
                                 )}
                             </Button>

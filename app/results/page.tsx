@@ -16,7 +16,7 @@ import {
 import { getVideoFile, clearVideoFile } from "@/lib/video-storage"
 import { DetectionData, DetectionType } from "@/lib/types"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+const API_URL = "http://127.0.0.1:8000/api/v1"
 
 export default function ResultsPage() {
     const router = useRouter()
@@ -126,7 +126,7 @@ export default function ResultsPage() {
             <main className="ml-16 min-h-screen">
                 <div className="container mx-auto px-6 py-8 max-w-full">
                     {/* Refined Header */}
-                    <div className="mb-8 flex items-center gap-5 animate-in fade-in slide-in-from-top duration-700">
+                    <div className="mb-8 flex items-center gap-5">
                         <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
                             <TrendingUp className="h-8 w-8 text-white" />
                         </div>
@@ -142,7 +142,7 @@ export default function ResultsPage() {
 
                     {/* Session Info Bar */}
                     {session && (
-                        <div className="mb-6 animate-in fade-in slide-in-from-top duration-500">
+                        <div className="mb-6">
                             <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-[var(--border)] shadow-sm">
                                 <div className="flex items-center gap-12">
                                     <div className="flex flex-col">
@@ -170,7 +170,7 @@ export default function ResultsPage() {
 
                     {/* Video Player Section */}
                     {detectionData && videoId && (
-                        <div className="animate-in fade-in slide-in-from-bottom duration-700">
+                        <div>
                             <VideoPlayerSection
                                 data={detectionData}
                                 videoId={videoId}

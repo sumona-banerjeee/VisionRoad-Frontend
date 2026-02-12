@@ -67,10 +67,9 @@ export function SummarySection({ data }: SummarySectionProps) {
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center justify-center p-4 rounded-lg transition-all hover:scale-105 animate-in fade-in slide-in-from-bottom duration-500"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="flex flex-col items-center justify-center p-4 rounded-lg"
               >
-                <div className={`${stat.bgColor} p-3 rounded-full mb-3 transition-all`}>
+                <div className={`${stat.bgColor} p-3 rounded-full mb-3`}>
                   <Icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
                 <div className={`text-3xl font-bold ${stat.color} mb-1`}>{stat.value}</div>

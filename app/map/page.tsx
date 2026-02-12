@@ -11,7 +11,7 @@ export default function MapPage() {
 
             <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
                 {/* Header */}
-                <div className="mb-8 animate-in fade-in slide-in-from-top duration-700">
+                <div className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold text-gradient leading-tight">
@@ -25,12 +25,12 @@ export default function MapPage() {
                 </div>
 
                 {/* Map */}
-                <div className="animate-in fade-in slide-in-from-bottom duration-700 delay-100">
+                <div className="">
                     <DashboardMap className="h-[calc(100vh-200px)] min-h-[500px]" />
                 </div>
 
                 {/* Legend */}
-                <div className="mt-6 flex flex-wrap gap-6 animate-in fade-in duration-700 delay-200">
+                <div className="mt-6 flex flex-wrap gap-6">
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-red-500 border-2 border-red-600" />
                         <span className="text-sm text-muted-foreground">Pothole</span>
@@ -42,7 +42,7 @@ export default function MapPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-8 text-center animate-in fade-in duration-700 delay-300">
+                <div className="mt-8 text-center">
                     <p className="text-sm text-muted-foreground">
                         Sentient Geeks Pvt. Ltd.
                     </p>

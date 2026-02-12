@@ -13,7 +13,7 @@ interface StatsCardProps {
 
 export function StatsCard({ title, value, icon: Icon, gradient, isLoading }: StatsCardProps) {
     return (
-        <Card className="glass-card card-glow border-0 overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+        <Card className="glass-card card-glow border-0 overflow-hidden group">
             <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -21,14 +21,14 @@ export function StatsCard({ title, value, icon: Icon, gradient, isLoading }: Sta
                             {title}
                         </p>
                         {isLoading ? (
-                            <div className="h-8 w-16 bg-primary/10 rounded animate-pulse" />
+                            <div className="h-8 w-16 bg-primary/10 rounded" />
                         ) : (
                             <p className="text-3xl font-bold text-foreground">
                                 {value}
                             </p>
                         )}
                     </div>
-                    <div className={`p-3 rounded-xl ${gradient} group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`p-3 rounded-xl ${gradient}`}>
                         <Icon className="h-6 w-6 text-white" />
                     </div>
                 </div>

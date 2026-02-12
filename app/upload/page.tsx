@@ -18,8 +18,8 @@ import {
 } from "@/lib/api"
 import { storeVideoFile } from "@/lib/video-storage"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000/api/v1"
+const API_URL = "http://127.0.0.1:8000/api/v1"
+const WS_URL = "ws://127.0.0.1:8000/api/v1"
 
 type DetectionType = "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
 
@@ -176,7 +176,7 @@ export default function UploadPage() {
 
                 <div className="flex-1 container mx-auto px-6 py-6 max-w-7xl relative z-10 flex flex-col">
                     {/* Refined Header */}
-                    <div className="mb-6 flex items-center gap-5 animate-in fade-in slide-in-from-top duration-700">
+                    <div className="mb-6 flex items-center gap-5">
                         <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
                             <TrendingUp className="h-8 w-8 text-white" />
                         </div>
@@ -189,7 +189,7 @@ export default function UploadPage() {
 
                     {/* Compact Session Info Bar */}
                     {session && (
-                        <div className="mb-4 animate-in fade-in slide-in-from-top duration-500 delay-100">
+                        <div className="mb-4">
                             <div className="rounded-xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex items-center gap-12">
@@ -226,7 +226,7 @@ export default function UploadPage() {
                     )}
 
                     {/* Upload Card */}
-                    <Card className="rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-700 delay-150 flex-1">
+                    <Card className="rounded-xl overflow-hidden flex-1">
                         <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
                             <CardTitle className="text-xl font-bold">
                                 <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-blue-400 dark:via-blue-300 dark:to-blue-400  bg-clip-text text-transparent">
@@ -322,7 +322,7 @@ export default function UploadPage() {
 
                             {/* Error Display */}
                             {error && (
-                                <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-top duration-300">
+                                <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
                                     <div className="w-4 h-4 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
                                         <span className="text-[10px] font-bold text-red-500">!</span>
                                     </div>
@@ -352,7 +352,7 @@ export default function UploadPage() {
 
                             {/* Progress Section */}
                             {uploading && (
-                                <div className="space-y-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 animate-in fade-in slide-in-from-top duration-500">
+                                <div className="space-y-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="font-medium text-gray-700 dark:text-gray-300 text-xs">Processing Progress</span>
@@ -374,7 +374,7 @@ export default function UploadPage() {
                     </Card>
 
                     {/* Footer */}
-                    <div className="mt-4 text-center animate-in fade-in duration-700 delay-300">
+                    <div className="mt-4 text-center">
                         <p className="text-xs text-gray-400 dark:text-gray-500">
                             Sentient Geeks Pvt. Ltd.
                         </p>

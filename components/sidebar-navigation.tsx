@@ -71,13 +71,12 @@ export function SidebarNavigation() {
                                 className={`
                                     relative w-12 h-12 rounded-xl flex items-center justify-center
                                     ${isActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
-                                    transition-all duration-300 ease-out
-                                    hover:scale-110 hover:shadow-lg hover:bg-[#2563eb] hover:border-[#2563eb]
-                                    active:scale-95 border
+                                    hover:bg-[#2563eb] hover:border-[#2563eb]
+                                    border
                                 `}
                             >
                                 <Icon
-                                    className={`h-6 w-6 transition-all duration-300 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
+                                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
                                 />
                             </button>
                             <div className="
@@ -85,7 +84,6 @@ export function SidebarNavigation() {
                                 px-3 py-1.5 rounded-lg
                                 bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
                                 opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                transition-all duration-200 ease-out
                                 whitespace-nowrap shadow-lg pointer-events-none
                             ">
                                 {item.title}
@@ -102,13 +100,12 @@ export function SidebarNavigation() {
                         className={`
                             relative w-12 h-12 rounded-xl flex items-center justify-center
                             ${isNewAnalysisActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
-                            transition-all duration-300 ease-out
-                            hover:scale-110 hover:shadow-lg hover:bg-[#2563eb] hover:border-[#2563eb]
-                            active:scale-95 border
+                            hover:bg-[#2563eb] hover:border-[#2563eb]
+                            border
                         `}
                     >
                         <Plus
-                            className={`h-6 w-6 transition-all duration-300 ${isNewAnalysisActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
+                            className={`h-6 w-6 ${isNewAnalysisActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
                         />
                     </button>
                     <div className="
@@ -116,7 +113,6 @@ export function SidebarNavigation() {
                         px-3 py-1.5 rounded-lg
                         bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                        transition-all duration-200 ease-out
                         whitespace-nowrap shadow-lg pointer-events-none
                     ">
                         Start New Analysis
@@ -138,13 +134,12 @@ export function SidebarNavigation() {
                                 className={`
                                     relative w-12 h-12 rounded-xl flex items-center justify-center
                                     ${isActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
-                                    transition-all duration-300 ease-out
-                                    hover:scale-110 hover:shadow-lg hover:bg-[#2563eb] hover:border-[#2563eb]
-                                    active:scale-95 border
+                                    hover:bg-[#2563eb] hover:border-[#2563eb]
+                                    border
                                 `}
                             >
                                 <Icon
-                                    className={`h-6 w-6 transition-all duration-300 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
+                                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
                                 />
                             </button>
                             <div className="
@@ -152,7 +147,6 @@ export function SidebarNavigation() {
                                 px-3 py-1.5 rounded-lg
                                 bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
                                 opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                transition-all duration-200 ease-out
                                 whitespace-nowrap shadow-lg pointer-events-none
                             ">
                                 {item.title}
@@ -168,17 +162,16 @@ export function SidebarNavigation() {
                 <div className="relative group">
                     <button
                         onClick={() => { }}
-                        className="w-12 h-12 rounded-full bg-[#f0fafd] flex items-center justify-center cursor-not-allowed opacity-80 border border-slate-100 transition-all duration-300 hover:scale-110 hover:bg-[#2563eb] hover:border-[#2563eb]"
+                        className="w-12 h-12 rounded-full bg-[#f0fafd] flex items-center justify-center cursor-not-allowed opacity-80 border border-slate-100 hover:bg-[#2563eb] hover:border-[#2563eb]"
                         disabled
                     >
-                        <User className="h-6 w-6 text-slate-900 transition-colors duration-300 group-hover:text-white" />
+                        <User className="h-6 w-6 text-slate-900 group-hover:text-white" />
                     </button>
                     <div className="
                         absolute left-full ml-3 top-1/2 -translate-y-1/2
                         px-3 py-1.5 rounded-lg
                         bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
                         opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                        transition-all duration-200 ease-out
                         whitespace-nowrap shadow-lg pointer-events-none
                     ">
                         Account (Coming Soon)

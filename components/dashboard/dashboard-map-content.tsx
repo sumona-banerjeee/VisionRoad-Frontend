@@ -73,6 +73,7 @@ export default function DashboardMapContent({ detections }: DashboardMapContentP
             zoom={13}
             className="h-full w-full"
             scrollWheelZoom={true}
+            zoomAnimation={false}
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

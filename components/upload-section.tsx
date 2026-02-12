@@ -10,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, Loader2, AlertCircle } from "lucide-react"
 import type { DetectionData, DetectionType } from "@/lib/types"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000/api/v1"
+const API_URL = "http://127.0.0.1:8000/api/v1"
+const WS_URL = "ws://127.0.0.1:8000/api/v1"
 
 
 type UploadSectionProps = {
@@ -198,7 +198,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
   }
 
   return (
-    <Card className="transition-all hover:shadow-lg">
+    <Card className="">
       <CardHeader>
         <CardTitle>Upload Video</CardTitle>
         <CardDescription>
@@ -303,7 +303,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
 
         {/* Error Display */}
         {error && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive animate-in fade-in slide-in-from-top duration-300">
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
             <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
             <p className="text-sm whitespace-pre-line">{error}</p>
           </div>
@@ -313,7 +313,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
         <Button
           onClick={handleUpload}
           disabled={!file || uploading}
-          className="w-full transition-all bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25"
 
           size="lg"
         >
@@ -332,8 +332,8 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
 
         {/* Progress Section */}
         {uploading && (
-          <div className="space-y-3 animate-in fade-in slide-in-from-top duration-500">
-            <Progress value={progress} className="h-3 transition-all duration-300" />
+          <div className="space-y-3">
+            <Progress value={progress} className="h-3" />
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{statusMessage}</span>
               <span className="font-semibold">{progress}%</span>

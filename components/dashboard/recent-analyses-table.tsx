@@ -58,7 +58,7 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
                 {isLoading ? (
                     <div className="p-6 space-y-3">
                         {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="h-14 bg-primary/5 rounded-lg animate-pulse" />
+                            <div key={i} className="h-14 bg-primary/5 rounded-lg" />
                         ))}
                     </div>
                 ) : videos.length === 0 ? (
@@ -72,7 +72,7 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
                         {videos.slice(0, 8).map((video) => (
                             <div
                                 key={video.id}
-                                className="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors"
+                                className="flex items-center justify-between p-4 hover:bg-primary/5"
                             >
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                     <div className="flex-1 min-w-0">

@@ -3,7 +3,7 @@
  * Provides typed functions for interacting with the backend API
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+const API_URL = "http://127.0.0.1:8000/api/v1"
 
 // Type definitions
 export interface Project {
@@ -105,6 +105,73 @@ export interface LocationCreate {
     end_lng: number
 }
 
+// Update request body types
+export interface ProjectUpdate {
+    name?: string
+    state?: string | null
+    corridor_name?: string | null
+    start_lat?: number | null
+    start_lng?: number | null
+    end_lat?: number | null
+    end_lng?: number | null
+}
+
+export interface PackageUpdate {
+    name?: string
+    region?: string | null
+}
+
+export interface LocationUpdate {
+    segment_name?: string
+    chainage_start_km?: number | null
+    chainage_end_km?: number | null
+    start_lat?: number
+    start_lng?: number
+    end_lat?: number
+    end_lng?: number
+}
+
+// Helper function for PUT API requests
+async function apiPutRequest<T>(endpoint: string, body: unknown): Promise<T> {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+        },
+        body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`API Error: ${response.status} - ${errorText}`)
+    }
+
+    return response.json()
+}
+
+// Helper function for DELETE API requests
+async function apiDeleteRequest<T>(endpoint: string): Promise<T> {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+        }
+    })
+
+    if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`API Error: ${response.status} - ${errorText}`)
+    }
+
+    if (response.status === 204) {
+        return { message: "Deleted successfully" } as unknown as T
+    }
+
+    return response.json()
+}
+
 /**
  * Create a new project
  */
@@ -124,6 +191,48 @@ export async function createPackage(data: PackageCreate): Promise<Package> {
  */
 export async function createLocation(data: LocationCreate): Promise<Location> {
     return apiPostRequest<Location>("/locations/", data)
+}
+
+/**
+ * Update an existing project
+ */
+export async function updateProject(projectId: string, data: ProjectUpdate): Promise<Project> {
+    return apiPutRequest<Project>(`/projects/${projectId}`, data)
+}
+
+/**
+ * Delete a project
+ */
+export async function deleteProject(projectId: string): Promise<{ message: string }> {
+    return apiDeleteRequest<{ message: string }>(`/projects/${projectId}`)
+}
+
+/**
+ * Update an existing package
+ */
+export async function updatePackage(packageId: string, data: PackageUpdate): Promise<Package> {
+    return apiPutRequest<Package>(`/packages/${packageId}`, data)
+}
+
+/**
+ * Delete a package
+ */
+export async function deletePackage(packageId: string): Promise<{ message: string }> {
+    return apiDeleteRequest<{ message: string }>(`/packages/${packageId}`)
+}
+
+/**
+ * Update an existing location
+ */
+export async function updateLocation(locationId: string, data: LocationUpdate): Promise<Location> {
+    return apiPutRequest<Location>(`/locations/${locationId}`, data)
+}
+
+/**
+ * Delete a location
+ */
+export async function deleteLocation(locationId: string): Promise<{ message: string }> {
+    return apiDeleteRequest<{ message: string }>(`/locations/${locationId}`)
 }
 
 // API Functions

@@ -154,6 +154,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Base styles */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -164,213 +165,31 @@
   }
 }
 
-/* Premium Background with Animated Mesh Gradient */
-@layer utilities {
-  .bg-mesh-gradient {
-    background: #f8fafc;
-  }
-
-  .dark .bg-mesh-gradient {
-    background: hsla(210, 30%, 15%, 1);
-  }
-
-  /* Glassmorphism Card */
-  .glass-card {
-    background: oklch(1 0 0 / 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid oklch(1 0 0 / 0.2);
-    box-shadow:
-      0 4px 6px -1px oklch(0 0 0 / 0.05),
-      0 10px 15px -3px oklch(0 0 0 / 0.08),
-      0 20px 25px -5px oklch(0 0 0 / 0.05),
-      inset 0 1px 0 oklch(1 0 0 / 0.5);
-  }
-
-  .dark .glass-card {
-    background: oklch(0.18 0.02 280 / 0.7);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    box-shadow:
-      0 4px 6px -1px oklch(0 0 0 / 0.15),
-      0 10px 15px -3px oklch(0 0 0 / 0.20),
-      0 20px 25px -5px oklch(0 0 0 / 0.15),
-      inset 0 1px 0 oklch(1 0 0 / 0.05);
-  }
-
-  /* Gradient Text */
-  .text-gradient {
-    background: linear-gradient(135deg, oklch(0.55 0.24 264), oklch(0.60 0.20 200));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .dark .text-gradient {
-    background: linear-gradient(135deg, oklch(0.75 0.20 264), oklch(0.70 0.18 200));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Gradient Button */
-  .btn-gradient {
-    background: linear-gradient(135deg, oklch(0.55 0.24 264), oklch(0.50 0.22 280));
-    box-shadow:
-      0 4px 14px 0 oklch(0.55 0.24 264 / 0.35),
-      inset 0 1px 0 oklch(1 0 0 / 0.15);
-    transition: all 0.3s ease;
-  }
-
-  .btn-gradient:hover {
-    box-shadow:
-      0 6px 20px 0 oklch(0.55 0.24 264 / 0.45),
-      inset 0 1px 0 oklch(1 0 0 / 0.2);
-    transform: translateY(-1px);
-  }
-
-  .btn-gradient:active {
-    transform: translateY(0);
-    box-shadow:
-      0 2px 8px 0 oklch(0.55 0.24 264 / 0.30),
-      inset 0 1px 0 oklch(1 0 0 / 0.15);
-  }
-
-  /* Card Glow Border */
-  .card-glow {
-    position: relative;
-  }
-
-  .card-glow::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    background: linear-gradient(135deg, oklch(0.55 0.24 264 / 0.3), oklch(0.60 0.20 200 / 0.3));
-    border-radius: inherit;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .card-glow:hover::before {
-    opacity: 1;
-  }
-
-  /* Progress Bar Gradient */
-  .progress-gradient {
-    background: linear-gradient(90deg, oklch(0.55 0.24 264), oklch(0.60 0.20 200), oklch(0.65 0.18 160));
-    background-size: 200% 100%;
-    animation: progress-shimmer 2s ease infinite;
-  }
-
-  @keyframes progress-shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
-  /* Subtle Float Animation */
-  .float-subtle {
-    animation: float-subtle 6s ease-in-out infinite;
-  }
-
-  @keyframes float-subtle {
-
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-
-    50% {
-      transform: translateY(-5px);
-    }
-  }
-
-  /* Input Focus Glow */
-  .input-glow:focus-within {
-    box-shadow: 0 0 0 3px oklch(0.55 0.24 264 / 0.15);
-  }
-
-  /* Step Indicator */
-  .step-active {
-    background: linear-gradient(135deg, oklch(0.55 0.24 264), oklch(0.50 0.22 280));
-    color: white;
-    box-shadow: 0 2px 8px oklch(0.55 0.24 264 / 0.3);
-  }
-
-  .step-completed {
-    background: oklch(0.65 0.18 160);
-    color: white;
-  }
-
-  .step-pending {
-    background: oklch(0.90 0.02 280);
-    color: oklch(0.50 0.02 280);
-  }
-
-  .dark .step-pending {
-    background: oklch(0.25 0.02 280);
-    color: oklch(0.60 0.02 280);
-  }
+/* 
+  Definitive Layout Stability Reset 
+  Prevents Radix UI / Shadcn from "sliding" content when scroll-locking occurs
+*/
+:root {
+  --removed-body-scroll-bar-size: 0px;
 }
 
-@layer utilities {
-  @keyframes logo-float {
-
-    0%,
-    100% {
-      transform: translateY(0) scale(1);
-    }
-
-    50% {
-      transform: translateY(-3px) scale(1.02);
-    }
-  }
-
-  @keyframes logo-spin-slow {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes logo-spin-reverse-slow {
-    from {
-      transform: rotate(360deg);
-    }
-
-    to {
-      transform: rotate(0deg);
-    }
-  }
-
-  .animate-logo-float {
-    animation: logo-float 3s ease-in-out infinite;
-  }
-
-  .animate-logo-spin-slow {
-    animation: logo-spin-slow 12s linear infinite;
-  }
-
-  .animate-logo-spin-reverse-slow {
-    animation: logo-spin-reverse-slow 8s linear infinite;
-  }
-
-}
-
-/* Prevent layout shift when Dialog locks body scroll */
 html {
-  overflow-y: scroll;
-  /* always show scrollbar to prevent width jump */
+  scrollbar-gutter: stable;
 }
 
 body[data-scroll-locked] {
-  overflow: hidden;
-  padding-right: var(--removed-body-scroll-bar-size, 0px) !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Fix for fixed position elements like sidebars/headers */
+[data-radix-scroll-area-viewport] {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.static-immediate {
+  transition: none !important;
+  animation: none !important;
 }
