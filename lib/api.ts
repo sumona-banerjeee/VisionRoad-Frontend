@@ -3,7 +3,7 @@
  * Provides typed functions for interacting with the backend API
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://moved-wma-satisfy-sciences.trycloudflare.com/api/v1"
 
 // Type definitions
 export interface Project {
