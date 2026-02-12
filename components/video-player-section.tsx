@@ -11,69 +11,11 @@ import { Target, AlertTriangle, Film, Activity, Gauge, Monitor, SignpostBig, Map
 // Dynamically import MapModal with SSR disabled (Leaflet requires window object)
 const MapModal = dynamic(() => import("@/components/map-modal"), { ssr: false })
 
+import { DetectionData, DetectionType } from "@/lib/types"
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
 
-type DetectionType = "pothole-detection" | "sign-board-detection"
 
-type DetectionData = {
-  video_id: string
-  detection_type?: string
-  output_video_path?: string
-  video_info: {
-    fps: number
-    width: number
-    height: number
-    total_frames: number
-  }
-  summary: {
-    unique_potholes?: number
-    unique_signboards?: number
-    total_detections: number
-    total_frames: number
-    detection_rate: number
-  }
-  pothole_list?: Array<{
-    pothole_id: number
-    first_detected_frame: number
-    first_detected_time: number
-    confidence: number
-    lat?: number
-    lng?: number
-  }>
-  signboard_list?: Array<{
-    signboard_id: number
-    type: string
-    first_detected_frame: number
-    first_detected_time: number
-    confidence: number
-    lat?: number
-    lng?: number
-  }>
-  frames: Array<{
-    frame_id: number
-    potholes?: Array<{
-      pothole_id: number
-      bbox: {
-        x1: number
-        y1: number
-        x2: number
-        y2: number
-      }
-      confidence: number
-    }>
-    signboards?: Array<{
-      signboard_id: number
-      type: string
-      bbox: {
-        x1: number
-        y1: number
-        x2: number
-        y2: number
-      }
-      confidence: number
-    }>
-  }>
-}
 
 type VideoPlayerSectionProps = {
   data: DetectionData
@@ -177,7 +119,8 @@ function DetailedSummarySection({
 
   if (!show || loading || !summaryData) return null
 
-  const isPothole = detectionType === "pothole-detection"
+  const isCombined = detectionType === "pot-sign-detection"
+  const isPothole = detectionType === "pothole-detection" || isCombined
 
   // Flatten all detections for the scrollable list
   const allDetections: Array<{
@@ -213,7 +156,7 @@ function DetailedSummarySection({
                   Detection Locations
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  {isPothole ? "Potholes" : "Signboards"} detected across project locations
+                  {isCombined ? "Potholes & Signboards" : isPothole ? "Potholes" : "Signboards"} detected across project locations
                 </CardDescription>
               </div>
             </div>
@@ -258,7 +201,7 @@ function DetailedSummarySection({
                       <div key={locationData.location_id} className="text-xs p-2 rounded bg-muted/30 flex items-center justify-between gap-4">
                         <div className="font-medium truncate">{locationName}</div>
                         <div className="text-[10px] text-muted-foreground whitespace-nowrap">
-                          {locationData.detection_count} {isPothole ? "pothole" : "signboard"}{locationData.detection_count !== 1 ? "s" : ""} detected
+                          {locationData.detection_count} detection{locationData.detection_count !== 1 ? "s" : ""} found
                         </div>
                       </div>
                     ))}
@@ -285,7 +228,7 @@ function DetailedSummarySection({
                 All Detections
               </CardTitle>
               <CardDescription className="text-xs">
-                Complete list of {isPothole ? "potholes" : "signboards"} with GPS coordinates
+                Complete list of {isCombined ? "potholes & signboards" : isPothole ? "potholes" : "signboards"} with GPS coordinates
               </CardDescription>
             </div>
           </div>
@@ -301,7 +244,7 @@ function DetailedSummarySection({
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-semibold">
-                      {isPothole ? "Pothole" : detection.class.replace(/_/g, " ")} #{detection.id}
+                      {detection.type === "pothole" ? "Pothole" : (detection.class || detection.type || "").replace(/_/g, " ")} #{detection.id}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
                       Frame {detection.frame_number}
@@ -335,17 +278,25 @@ function DetailedSummarySection({
 function SummarySection({ data, show, detectionType }: { data: DetectionData; show: boolean; detectionType: DetectionType }) {
   if (!show) return null
 
-  const isPothole = detectionType === "pothole-detection"
-  const isSignboard = detectionType === "sign-board-detection"
+  const isCombined = detectionType === "pot-sign-detection"
+  const isPothole = detectionType === "pothole-detection" || isCombined
+  const isSignboard = detectionType === "sign-board-detection" || isCombined
 
   const stats = [
-    {
-      label: isPothole ? "Unique Potholes" : "Unique Signboards",
-      value: (isPothole ? data.summary.unique_potholes : data.summary.unique_signboards) || 0,
-      icon: isPothole ? AlertTriangle : SignpostBig,
-      color: isPothole ? "text-red-500" : "text-blue-500",
-      bgColor: isPothole ? "bg-red-50 dark:bg-red-950/30" : "bg-blue-50 dark:bg-blue-950/30",
-    },
+    ...(isPothole ? [{
+      label: "Unique Potholes",
+      value: data.summary.unique_potholes || 0,
+      icon: AlertTriangle,
+      color: "text-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950/30",
+    }] : []),
+    ...(isSignboard ? [{
+      label: "Unique Signboards",
+      value: data.summary.unique_signboards || 0,
+      icon: SignpostBig,
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
+    }] : []),
     {
       label: "Total Detections",
       value: data.summary.total_detections || 0,
@@ -399,13 +350,13 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
               Quick Stats
             </CardTitle>
             <CardDescription className="text-xs">
-              Overview of {isPothole ? "pothole" : "signboard"} detection results
+              Overview of {isCombined ? "pothole & signboard" : isPothole ? "pothole" : "signboard"} detection results
             </CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        <div className={`grid gap-3 ${isCombined ? 'grid-cols-3 md:grid-cols-7' : 'grid-cols-3 md:grid-cols-6'}`}>
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
@@ -445,8 +396,9 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   const loggedFrames = useRef<Set<number>>(new Set())
   const MAX_LOGS = 50
 
-  const isPothole = detectionType === "pothole-detection"
-  const isSignboard = detectionType === "sign-board-detection"
+  const isCombined = detectionType === "pot-sign-detection"
+  const isPothole = detectionType === "pothole-detection" || isCombined
+  const isSignboard = detectionType === "sign-board-detection" || isCombined
 
   // Create GPS coordinate map from signboard_list or pothole_list
   const gpsMap = useRef<Map<number, { lat: number; lng: number }>>(new Map())
@@ -457,14 +409,17 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
     if (isPothole && data.pothole_list) {
       data.pothole_list.forEach(item => {
-        if (item.lat !== undefined && item.lng !== undefined) {
-          map.set(item.pothole_id, { lat: item.lat, lng: item.lng })
+        const id = (item as any).pothole_id ?? (item as any).detection_id
+        if (item.lat !== undefined && item.lng !== undefined && id !== undefined) {
+          map.set(id, { lat: item.lat, lng: item.lng })
         }
       })
-    } else if (isSignboard && data.signboard_list) {
+    }
+    if (isSignboard && data.signboard_list) {
       data.signboard_list.forEach(item => {
-        if (item.lat !== undefined && item.lng !== undefined) {
-          map.set(item.signboard_id, { lat: item.lat, lng: item.lng })
+        const id = (item as any).signboard_id ?? (item as any).detection_id
+        if (item.lat !== undefined && item.lng !== undefined && id !== undefined) {
+          map.set(id, { lat: item.lat, lng: item.lng })
         }
       })
     }
@@ -509,18 +464,37 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       data.frames.forEach((frameData) => {
         const frameId = frameData.frame_id
 
-        // Handle both pothole and signboard detections
-        const detections = isPothole ? (frameData.potholes || []) : (frameData.signboards || [])
-
-        if (detections.length > 0) {
-          map.set(frameId, detections)
+        // Handle flat detections array format (used by pot-sign-detection API)
+        const flatDetections = (frameData as any).detections
+        if (flatDetections && Array.isArray(flatDetections)) {
+          const tagged = flatDetections.map((d: any) => ({
+            ...d,
+            _detType: d.type === 'pothole' ? 'pothole' : 'signboard',
+            pothole_id: d.type === 'pothole' ? d.detection_id : undefined,
+            signboard_id: d.type !== 'pothole' ? d.detection_id : undefined,
+          }))
+          if (tagged.length > 0) {
+            map.set(frameId, tagged)
+          }
+        } else {
+          // Handle separate potholes/signboards arrays format
+          let detections: any[] = []
+          if (isPothole && frameData.potholes) {
+            detections = [...detections, ...frameData.potholes.map((p: any) => ({ ...p, _detType: 'pothole' }))]
+          }
+          if (isSignboard && frameData.signboards) {
+            detections = [...detections, ...frameData.signboards.map((s: any) => ({ ...s, _detType: 'signboard' }))]
+          }
+          if (detections.length > 0) {
+            map.set(frameId, detections)
+          }
         }
       })
       console.log(`[VideoPlayer] Frame map built: ${map.size} frames with detections`)
     }
 
     frameDetectionMap.current = map
-  }, [data, isPothole])
+  }, [data, isPothole, isSignboard])
 
   // Function to draw bounding boxes on canvas
   const drawBoundingBoxes = useCallback((detections: any[]) => {
@@ -553,9 +527,12 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       const width = x2 - x1
       const height = y2 - y1
 
-      // Set colors based on detection type
-      const boxColor = isPothole ? '#ef4444' : '#3b82f6' // red for potholes, blue for signboards
-      const textBgColor = isPothole ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'
+      // Determine if this specific detection is a pothole or signboard
+      const isDetPothole = detection._detType === 'pothole' || detection.type === 'pothole' || (detection.pothole_id !== undefined && !detection.signboard_id)
+
+      // Set colors based on individual detection type
+      const boxColor = isDetPothole ? '#ef4444' : '#3b82f6' // red for potholes, blue for signboards
+      const textBgColor = isDetPothole ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'
 
       // Draw bounding box
       ctx.strokeStyle = boxColor
@@ -563,15 +540,15 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       ctx.strokeRect(x1, y1, width, height)
 
       // Draw semi-transparent fill
-      ctx.fillStyle = isPothole ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)'
+      ctx.fillStyle = isDetPothole ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)'
       ctx.fillRect(x1, y1, width, height)
 
       // Prepare label text
-      const id = isPothole ? detection.pothole_id : detection.signboard_id
+      const id = detection.pothole_id ?? detection.signboard_id ?? detection.detection_id
       const confidence = (detection.confidence * 100).toFixed(1)
-      let labelText = isPothole
+      let labelText = isDetPothole
         ? `Pothole #${id}`
-        : `${detection.type || 'Sign'} #${id}`
+        : `${(detection.type || 'Sign').replace(/_/g, ' ')} #${id}`
       labelText += ` ${confidence}%`
 
       // Draw label background
@@ -587,7 +564,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       ctx.fillStyle = '#ffffff'
       ctx.fillText(labelText, x1 + 8, y1 - 8)
     })
-  }, [data.video_info.width, data.video_info.height, isPothole])
+  }, [data.video_info.width, data.video_info.height])
 
   // Resize canvas to match video display size
   const resizeCanvas = useCallback(() => {
@@ -683,7 +660,9 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
     // Update last detected GPS coordinates if available
     if (detections.length > 0) {
-      const detectionId = isPothole ? detections[0].pothole_id : detections[0].signboard_id
+      const det0 = detections[0]
+      const isDetPothole = det0._detType === 'pothole' || det0.type === 'pothole' || (det0.pothole_id !== undefined && !det0.signboard_id)
+      const detectionId = det0.pothole_id ?? det0.signboard_id ?? det0.detection_id
       const gpsCoords = gpsMap.current.get(detectionId)
 
       if (gpsCoords) {
@@ -696,12 +675,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       const newLog: DetectionLog = {
         frame,
         detections: detections.map((det) => {
-          const detectionId = isPothole ? det.pothole_id : det.signboard_id
+          const isDetPothole = det._detType === 'pothole' || det.type === 'pothole' || (det.pothole_id !== undefined && !det.signboard_id)
+          const detectionId = det.pothole_id ?? det.signboard_id ?? det.detection_id
           const gpsCoords = gpsMap.current.get(detectionId)
 
           return {
             id: detectionId,
-            type: isSignboard ? det.type : undefined,
+            type: isDetPothole ? 'pothole' : (det.type || 'signboard'),
             bbox: det.bbox,
             confidence: det.confidence,
             latitude: gpsCoords?.lat,
@@ -806,7 +786,9 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
       // Update GPS coordinates immediately on seek
       if (detections && detections.length > 0) {
-        const detectionId = isPothole ? detections[0].pothole_id : detections[0].signboard_id
+        const det0 = detections[0]
+        const isDetPothole = det0._detType === 'pothole' || det0.type === 'pothole' || (det0.pothole_id !== undefined && !det0.signboard_id)
+        const detectionId = det0.pothole_id ?? det0.signboard_id ?? det0.detection_id
         const gpsCoords = gpsMap.current.get(detectionId)
 
         if (gpsCoords) {
@@ -855,7 +837,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                 Video Playback with Detection
               </CardTitle>
               <CardDescription>
-                Watch the video with real-time {isPothole ? "pothole" : "signboard"} detection overlays
+                Watch the video with real-time {isCombined ? "pothole & signboard" : isPothole ? "pothole" : "signboard"} detection overlays
               </CardDescription>
             </div>
           </div>
@@ -927,7 +909,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
               <div>
                 <h4 className="text-sm font-semibold mb-2">Detection Logs</h4>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Real-time frame-by-frame {isPothole ? "pothole" : "signboard"} tracking (last {MAX_LOGS})
+                  Real-time frame-by-frame {isCombined ? "pothole & signboard" : isPothole ? "pothole" : "signboard"} tracking (last {MAX_LOGS})
                 </p>
               </div>
               <ScrollArea className="h-[400px] rounded-md border bg-muted/30 p-4">
@@ -956,7 +938,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                             {log.detections.map((det, idx) => (
                               <div key={idx} className="space-y-1">
                                 <div className="font-medium text-foreground">
-                                  {isPothole ? (
+                                  {det.type === 'pothole' ? (
                                     <>Pothole ID: {det.id}</>
                                   ) : (
                                     <>{det.type || 'Signboard'} ID: {det.id}</>

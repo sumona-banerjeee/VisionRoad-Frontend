@@ -363,3 +363,14 @@
   }
 
 }
+
+/* Prevent layout shift when Dialog locks body scroll */
+html {
+  overflow-y: scroll;
+  /* always show scrollbar to prevent width jump */
+}
+
+body[data-scroll-locked] {
+  overflow: hidden;
+  padding-right: var(--removed-body-scroll-bar-size, 0px) !important;
+}

@@ -55,7 +55,7 @@ export default function ResultsPage() {
                 }
 
                 const data = await response.json()
-                setDetectionData(data)
+                setDetectionData(data as any)
 
                 // Retrieve video file from IndexedDB
                 const storedVideoFile = await getVideoFile(videoData.videoId)
@@ -90,9 +90,9 @@ export default function ResultsPage() {
     }
 
     const getTitle = () => {
-        return detectionType === "pothole-detection"
-            ? "Pothole Detection Results"
-            : "Signboard Detection Results"
+        if (detectionType === "pothole-detection") return "Pothole Detection Results"
+        if (detectionType === "sign-board-detection") return "Signboard Detection Results"
+        return "Pothole & Signboard Detection Results"
     }
 
     if (isLoading) {

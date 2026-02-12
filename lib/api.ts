@@ -167,7 +167,7 @@ export async function fetchAllLocations(): Promise<Location[]> {
 export interface Video {
     id: string
     filename: string
-    detection_type: "pothole-detection" | "sign-board-detection"
+    detection_type: "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
     status: "pending" | "processing" | "completed" | "failed"
     unique_potholes?: number
     unique_signboards?: number
@@ -186,7 +186,7 @@ export async function fetchVideos(): Promise<Video[]> {
     return response.videos.map(v => ({
         id: v.video_id,
         filename: v.video_id, // Using video_id as filename since backend doesn't provide it
-        detection_type: v.summary?.unique_potholes !== undefined ? "pothole-detection" : "sign-board-detection" as const,
+        detection_type: (v.summary?.unique_potholes !== undefined && v.summary?.unique_signboards !== undefined) ? "pot-sign-detection" as const : v.summary?.unique_potholes !== undefined ? "pothole-detection" as const : "sign-board-detection" as const,
         status: v.status as Video["status"],
         unique_potholes: v.summary?.unique_potholes,
         unique_signboards: v.summary?.unique_signboards,

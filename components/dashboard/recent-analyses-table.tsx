@@ -43,6 +43,9 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
         if (type === "pothole-detection") {
             return <Badge className="bg-orange-500/20 text-orange-600 border-orange-500/30">Pothole</Badge>
         }
+        if (type === "pot-sign-detection") {
+            return <Badge className="bg-purple-500/20 text-purple-600 border-purple-500/30">Pothole & Sign</Badge>
+        }
         return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">Signboard</Badge>
     }
 
@@ -88,7 +91,9 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
                                         <p className="text-sm font-bold text-foreground">
                                             {video.detection_type === "pothole-detection"
                                                 ? video.unique_potholes ?? 0
-                                                : video.unique_signboards ?? 0}
+                                                : video.detection_type === "pot-sign-detection"
+                                                    ? (video.unique_potholes ?? 0) + (video.unique_signboards ?? 0)
+                                                    : video.unique_signboards ?? 0}
                                         </p>
                                         <p className="text-[10px] text-muted-foreground uppercase">Detections</p>
                                     </div>

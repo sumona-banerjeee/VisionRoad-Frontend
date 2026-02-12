@@ -20,7 +20,7 @@ type MapModalProps = {
     open: boolean
     onClose: () => void
     detections: Detection[]
-    detectionType: "pothole-detection" | "sign-board-detection"
+    detectionType: "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
 }
 
 // Component to auto-fit map bounds to show all markers
@@ -81,6 +81,7 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
         (bounds.getEast() + bounds.getWest()) / 2
     ]
 
+    const isCombined = detectionType === "pot-sign-detection"
     const isPothole = detectionType === "pothole-detection"
 
     return (
@@ -88,7 +89,7 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
             <DialogContent className="max-w-6xl h-[80vh] p-0 flex flex-col overflow-hidden border-none shadow-2xl">
                 <DialogHeader className="px-6 pt-6 pb-4 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
                     <DialogTitle className="text-xl font-bold">
-                        {isPothole ? "Pothole" : "Signboard"} Detection Map
+                        {isCombined ? "Pothole & Signboard" : isPothole ? "Pothole" : "Signboard"} Detection Map
                     </DialogTitle>
                     <p className="text-sm text-muted-foreground">
                         {validDetections.length} detection{validDetections.length !== 1 ? "s" : ""} with GPS coordinates
@@ -116,31 +117,37 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
                         />
 
                         {/* Detection markers */}
-                        {validDetections.map((detection, idx) => (
-                            <CircleMarker
-                                key={`${detection.id}-${idx}`}
-                                center={[detection.latitude, detection.longitude]}
-                                radius={8}
-                                fillColor="#10b981"
-                                color="#065f46"
-                                weight={2}
-                                opacity={1}
-                                fillOpacity={0.8}
-                            >
-                                <Popup>
-                                    <div className="text-xs space-y-1">
-                                        <div className="font-semibold">
-                                            {isPothole ? "Pothole" : detection.class.replace(/_/g, " ")} #{detection.id}
+                        {validDetections.map((detection, idx) => {
+                            const isDetPothole = detection.type === "pothole"
+                            const markerColor = isDetPothole ? "#ef4444" : "#3b82f6"
+                            const strokeColor = isDetPothole ? "#991b1b" : "#1e40af"
+
+                            return (
+                                <CircleMarker
+                                    key={`${detection.id}-${idx}`}
+                                    center={[detection.latitude, detection.longitude]}
+                                    radius={8}
+                                    fillColor={markerColor}
+                                    color={strokeColor}
+                                    weight={2}
+                                    opacity={1}
+                                    fillOpacity={0.8}
+                                >
+                                    <Popup>
+                                        <div className="text-xs space-y-1">
+                                            <div className="font-semibold">
+                                                {isDetPothole ? "Pothole" : (detection.class || detection.type || "").replace(/_/g, " ")} #{detection.id}
+                                            </div>
+                                            <div>Frame: {detection.frame_number}</div>
+                                            <div>Confidence: {(detection.confidence * 100).toFixed(1)}%</div>
+                                            <div className="font-mono text-[10px]">
+                                                {detection.latitude.toFixed(6)}, {detection.longitude.toFixed(6)}
+                                            </div>
                                         </div>
-                                        <div>Frame: {detection.frame_number}</div>
-                                        <div>Confidence: {(detection.confidence * 100).toFixed(1)}%</div>
-                                        <div className="font-mono text-[10px]">
-                                            {detection.latitude.toFixed(6)}, {detection.longitude.toFixed(6)}
-                                        </div>
-                                    </div>
-                                </Popup>
-                            </CircleMarker>
-                        ))}
+                                    </Popup>
+                                </CircleMarker>
+                            )
+                        })}
 
                         {/* Auto-fit bounds */}
                         <FitBounds bounds={bounds} />

@@ -21,7 +21,7 @@ import { storeVideoFile } from "@/lib/video-storage"
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000/api/v1"
 
-type DetectionType = "pothole-detection" | "sign-board-detection"
+type DetectionType = "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
 
 export default function UploadPage() {
     const router = useRouter()
@@ -151,9 +151,9 @@ export default function UploadPage() {
     }
 
     const getTitle = () => {
-        return detectionType === "pothole-detection"
-            ? "Pothole Detection"
-            : "Signboard Detection"
+        if (detectionType === "pothole-detection") return "Pothole Detection"
+        if (detectionType === "sign-board-detection") return "Signboard Detection"
+        return "Pothole & Signboard Detection"
     }
 
     if (isLoading) {
@@ -294,6 +294,9 @@ export default function UploadPage() {
                                             </SelectItem>
                                             <SelectItem value="sign-board-detection">
                                                 <span className="font-medium">Signboard Detection</span>
+                                            </SelectItem>
+                                            <SelectItem value="pot-sign-detection">
+                                                <span className="font-medium">Pothole & Signboard Detection</span>
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>

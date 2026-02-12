@@ -277,6 +277,11 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
                     <span>Signboard Detection</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="pot-sign-detection">
+                  <div className="flex items-center gap-2">
+                    <span>Pothole & Signboard Detection</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
