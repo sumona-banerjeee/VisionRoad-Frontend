@@ -278,8 +278,12 @@ export interface Video {
     filename: string
     detection_type: "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
     status: "pending" | "processing" | "completed" | "failed"
-    unique_potholes?: number
-    unique_signboards?: number
+    unique_defected_sign_board?: number
+    unique_pothole?: number
+    unique_road_crack?: number
+    unique_damaged_road_marking?: number
+    unique_good_sign_board?: number
+    total_road_damage?: number
     total_detections?: number
     created_at: string
     updated_at: string
@@ -289,16 +293,35 @@ export interface Video {
  * Fetch all videos (for dashboard)
  */
 export async function fetchVideos(): Promise<Video[]> {
-    const response = await apiRequest<{ videos: Array<{ video_id: string; status: string; progress: number; summary?: { unique_potholes?: number; unique_signboards?: number; total_detections?: number } }> }>("/videos")
+    const response = await apiRequest<{
+        videos: Array<{
+            video_id: string;
+            status: string;
+            progress: number;
+            summary?: {
+                unique_defected_sign_board?: number;
+                unique_pothole?: number;
+                unique_road_crack?: number;
+                unique_damaged_road_marking?: number;
+                unique_good_sign_board?: number;
+                total_road_damage?: number;
+                total_detections?: number;
+            }
+        }>
+    }>("/videos")
 
     // Transform the response to match our Video interface
     return response.videos.map(v => ({
         id: v.video_id,
-        filename: v.video_id, // Using video_id as filename since backend doesn't provide it
-        detection_type: (v.summary?.unique_potholes !== undefined && v.summary?.unique_signboards !== undefined) ? "pot-sign-detection" as const : v.summary?.unique_potholes !== undefined ? "pothole-detection" as const : "sign-board-detection" as const,
+        filename: v.video_id,
+        detection_type: "pot-sign-detection" as const,
         status: v.status as Video["status"],
-        unique_potholes: v.summary?.unique_potholes,
-        unique_signboards: v.summary?.unique_signboards,
+        unique_defected_sign_board: v.summary?.unique_defected_sign_board,
+        unique_pothole: v.summary?.unique_pothole,
+        unique_road_crack: v.summary?.unique_road_crack,
+        unique_damaged_road_marking: v.summary?.unique_damaged_road_marking,
+        unique_good_sign_board: v.summary?.unique_good_sign_board,
+        total_road_damage: v.summary?.total_road_damage,
         total_detections: v.summary?.total_detections,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()

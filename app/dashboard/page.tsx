@@ -55,57 +55,102 @@ interface ProjectSummary {
 }
 
 interface DetectionStats {
-    totalPotholes: number
-    totalSignboards: number
-    totalDetections: number
+    totalDefectedSignboard: number
+    totalPothole: number
+    totalRoadCrack: number
+    totalDamagedRoadMarking: number
+    totalGoodSignboard: number
+    totalRoadDamage: number
     locationData: Array<{
         name: string
-        potholes: number
-        signboards: number
+        defected_sign_board: number
+        pothole: number
+        road_crack: number
+        damaged_road_marking: number
+        good_sign_board: number
         total: number
     }>
 }
 
 function calculateStats(summary: ProjectSummary | null): DetectionStats {
     if (!summary) {
-        return { totalPotholes: 0, totalSignboards: 0, totalDetections: 0, locationData: [] }
+        return {
+            totalDefectedSignboard: 0,
+            totalPothole: 0,
+            totalRoadCrack: 0,
+            totalDamagedRoadMarking: 0,
+            totalGoodSignboard: 0,
+            totalRoadDamage: 0,
+            locationData: []
+        }
     }
 
-    let totalPotholes = 0
-    let totalSignboards = 0
+    let totalDefectedSignboard = 0
+    let totalPothole = 0
+    let totalRoadCrack = 0
+    let totalDamagedRoadMarking = 0
+    let totalGoodSignboard = 0
+    let totalRoadDamage = 0
     const locationData: DetectionStats["locationData"] = []
 
     for (const pkg of Object.values(summary.packages || {})) {
         for (const [locName, loc] of Object.entries(pkg.locations || {})) {
-            let locPotholes = 0
-            let locSignboards = 0
+            let locDefectedSignboard = 0
+            let locPothole = 0
+            let locRoadCrack = 0
+            let locDamagedRoadMarking = 0
+            let locGoodSignboard = 0
 
             for (const detection of loc.detections || []) {
-                if (detection.type.toLowerCase().includes("pothole")) {
-                    locPotholes++
-                    totalPotholes++
-                } else {
-                    locSignboards++
-                    totalSignboards++
+                const type = detection.type.toLowerCase()
+                if (type === "defected_sign_board") {
+                    locDefectedSignboard++
+                    totalDefectedSignboard++
+                } else if (type === "pothole") {
+                    locPothole++
+                    totalPothole++
+                } else if (type === "road_crack") {
+                    locRoadCrack++
+                    totalRoadCrack++
+                } else if (type === "damaged_road_marking") {
+                    locDamagedRoadMarking++
+                    totalDamagedRoadMarking++
+                } else if (type === "good_sign_board") {
+                    locGoodSignboard++
+                    totalGoodSignboard++
                 }
             }
 
-            if (locPotholes > 0 || locSignboards > 0) {
+            const locTotalDamage = locDefectedSignboard + locPothole + locRoadCrack + locDamagedRoadMarking
+            totalRoadDamage += (locDefectedSignboard > 0 || locPothole > 0 || locRoadCrack > 0 || locDamagedRoadMarking > 0) ? 1 : 0 // This logic might need refinement based on "total_road_damage" definition
+
+            if (locDefectedSignboard > 0 || locPothole > 0 || locRoadCrack > 0 || locDamagedRoadMarking > 0 || locGoodSignboard > 0) {
                 const shortName = locName.length > 20 ? locName.substring(0, 20) + "..." : locName
                 locationData.push({
                     name: shortName,
-                    potholes: locPotholes,
-                    signboards: locSignboards,
-                    total: locPotholes + locSignboards
+                    defected_sign_board: locDefectedSignboard,
+                    pothole: locPothole,
+                    road_crack: locRoadCrack,
+                    damaged_road_marking: locDamagedRoadMarking,
+                    good_sign_board: locGoodSignboard,
+                    total: locDefectedSignboard + locPothole + locRoadCrack + locDamagedRoadMarking + locGoodSignboard
                 })
             }
         }
     }
 
+    // Recalculate totalRoadDamage based on backends unique count
+    // But since we are aggregating from locations, we just sum them up or use a simpler metric
+    // The user's JSON shows "total_road_damage": 9 which is sum of 2+6+0+1
+    totalRoadDamage = totalDefectedSignboard + totalPothole + totalRoadCrack + totalDamagedRoadMarking
+
     return {
-        totalPotholes,
-        totalSignboards,
-        totalDetections: totalPotholes + totalSignboards,
+        totalDefectedSignboard,
+        totalPothole,
+        totalRoadCrack,
+        totalDamagedRoadMarking,
+        totalGoodSignboard,
+        totalRoadDamage,
         locationData
     }
 }
@@ -116,9 +161,12 @@ export default function DashboardPage() {
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
     const [projectSummary, setProjectSummary] = useState<ProjectSummary | null>(null)
     const [stats, setStats] = useState<DetectionStats>({
-        totalPotholes: 0,
-        totalSignboards: 0,
-        totalDetections: 0,
+        totalDefectedSignboard: 0,
+        totalPothole: 0,
+        totalRoadCrack: 0,
+        totalDamagedRoadMarking: 0,
+        totalGoodSignboard: 0,
+        totalRoadDamage: 0,
         locationData: []
     })
     const [error, setError] = useState<string | null>(null)
@@ -218,12 +266,23 @@ export default function DashboardPage() {
     // Filter stats based on selections
     useEffect(() => {
         if (!projectSummary) {
-            setStats({ totalPotholes: 0, totalSignboards: 0, totalDetections: 0, locationData: [] })
+            setStats({
+                totalDefectedSignboard: 0,
+                totalPothole: 0,
+                totalRoadCrack: 0,
+                totalDamagedRoadMarking: 0,
+                totalGoodSignboard: 0,
+                totalRoadDamage: 0,
+                locationData: []
+            })
             return
         }
 
-        let totalPotholes = 0
-        let totalSignboards = 0
+        let totalDefectedSignboard = 0
+        let totalPothole = 0
+        let totalRoadCrack = 0
+        let totalDamagedRoadMarking = 0
+        let totalGoodSignboard = 0
         const locationData: DetectionStats["locationData"] = []
 
         const packagesToProcess = selectedPackageId && selectedPackageId !== "all"
@@ -238,35 +297,54 @@ export default function DashboardPage() {
             for (const [locName, loc] of Object.entries(locationsToProcess)) {
                 if (!loc) continue
 
-                let locPotholes = 0
-                let locSignboards = 0
+                let locDefectedSignboard = 0
+                let locPothole = 0
+                let locRoadCrack = 0
+                let locDamagedRoadMarking = 0
+                let locGoodSignboard = 0
 
                 for (const detection of loc.detections || []) {
-                    if (detection.type.toLowerCase().includes("pothole")) {
-                        locPotholes++
-                        totalPotholes++
-                    } else {
-                        locSignboards++
-                        totalSignboards++
+                    const type = detection.type.toLowerCase()
+                    if (type === "defected_sign_board") {
+                        locDefectedSignboard++
+                        totalDefectedSignboard++
+                    } else if (type === "pothole") {
+                        locPothole++
+                        totalPothole++
+                    } else if (type === "road_crack") {
+                        locRoadCrack++
+                        totalRoadCrack++
+                    } else if (type === "damaged_road_marking") {
+                        locDamagedRoadMarking++
+                        totalDamagedRoadMarking++
+                    } else if (type === "good_sign_board") {
+                        locGoodSignboard++
+                        totalGoodSignboard++
                     }
                 }
 
-                if (locPotholes > 0 || locSignboards > 0) {
+                if (locDefectedSignboard > 0 || locPothole > 0 || locRoadCrack > 0 || locDamagedRoadMarking > 0 || locGoodSignboard > 0) {
                     const shortName = locName.length > 20 ? locName.substring(0, 20) + "..." : locName
                     locationData.push({
                         name: shortName,
-                        potholes: locPotholes,
-                        signboards: locSignboards,
-                        total: locPotholes + locSignboards
+                        defected_sign_board: locDefectedSignboard,
+                        pothole: locPothole,
+                        road_crack: locRoadCrack,
+                        damaged_road_marking: locDamagedRoadMarking,
+                        good_sign_board: locGoodSignboard,
+                        total: locDefectedSignboard + locPothole + locRoadCrack + locDamagedRoadMarking + locGoodSignboard
                     })
                 }
             }
         }
 
         setStats({
-            totalPotholes,
-            totalSignboards,
-            totalDetections: totalPotholes + totalSignboards,
+            totalDefectedSignboard,
+            totalPothole,
+            totalRoadCrack,
+            totalDamagedRoadMarking,
+            totalGoodSignboard,
+            totalRoadDamage: totalDefectedSignboard + totalPothole + totalRoadCrack + totalDamagedRoadMarking,
             locationData
         })
     }, [projectSummary, selectedPackageId, selectedLocationId])
@@ -311,27 +389,51 @@ export default function DashboardPage() {
                     {/* Stats Cards - Top Row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <GradientStatsCard
-                            title="Total Detections"
-                            subtitle="All detected objects"
-                            value={stats.totalDetections}
+                            title="Total Road Damage"
+                            subtitle="Combined damage detections"
+                            value={stats.totalRoadDamage}
                             icon={TrendingUp}
                             gradient="purple"
                             isLoading={isLoading}
                         />
                         <GradientStatsCard
                             title="Potholes"
-                            subtitle="Road surface damage"
-                            value={stats.totalPotholes}
+                            subtitle="Surface depressions"
+                            value={stats.totalPothole}
                             icon={AlertTriangle}
                             gradient="green"
                             isLoading={isLoading}
                         />
                         <GradientStatsCard
-                            title="Signboards"
-                            subtitle="Traffic signs detected"
-                            value={stats.totalSignboards}
+                            title="Defected Signboards"
+                            subtitle="Damaged traffic signs"
+                            value={stats.totalDefectedSignboard}
                             icon={RectangleHorizontal}
                             gradient="blue"
+                            isLoading={isLoading}
+                        />
+                        <GradientStatsCard
+                            title="Road Cracks"
+                            subtitle="Surface fissures"
+                            value={stats.totalRoadCrack}
+                            icon={AlertTriangle}
+                            gradient="orange"
+                            isLoading={isLoading}
+                        />
+                        <GradientStatsCard
+                            title="Damaged Markings"
+                            subtitle="Worn road lines"
+                            value={stats.totalDamagedRoadMarking}
+                            icon={TrendingUp}
+                            gradient="indigo"
+                            isLoading={isLoading}
+                        />
+                        <GradientStatsCard
+                            title="Good Signboards"
+                            subtitle="Informational markers"
+                            value={stats.totalGoodSignboard}
+                            icon={RectangleHorizontal}
+                            gradient="emerald"
                             isLoading={isLoading}
                         />
                     </div>
@@ -368,8 +470,11 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent className="pt-4">
                                 <DetectionDonutChart
-                                    potholes={stats.totalPotholes}
-                                    signboards={stats.totalSignboards}
+                                    defectedSignboard={stats.totalDefectedSignboard}
+                                    pothole={stats.totalPothole}
+                                    roadCrack={stats.totalRoadCrack}
+                                    damagedRoadMarking={stats.totalDamagedRoadMarking}
+                                    goodSignboard={stats.totalGoodSignboard}
                                     isLoading={isLoading}
                                 />
                             </CardContent>
@@ -389,7 +494,15 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent className="pt-4">
                                 <LocationBarChart
-                                    data={stats.locationData}
+                                    data={stats.locationData.map(loc => ({
+                                        name: loc.name,
+                                        defected_sign_board: loc.defected_sign_board,
+                                        pothole: loc.pothole,
+                                        road_crack: loc.road_crack,
+                                        damaged_road_marking: loc.damaged_road_marking,
+                                        good_sign_board: loc.good_sign_board,
+                                        total: loc.total
+                                    }))}
                                     isLoading={isLoading}
                                 />
                             </CardContent>

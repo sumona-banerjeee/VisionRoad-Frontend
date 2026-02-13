@@ -4,17 +4,30 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { Loader2 } from "lucide-react"
 
 interface DetectionDonutChartProps {
-    potholes: number
-    signboards: number
+    defectedSignboard: number
+    pothole: number
+    roadCrack: number
+    damagedRoadMarking: number
+    goodSignboard: number
     isLoading: boolean
 }
 
 const COLORS = {
-    pothole: "#10b981",
-    signboard: "#3b82f6"
+    defectedSignboard: "#3b82f6", // Blue
+    pothole: "#ef4444",           // Red
+    roadCrack: "#f59e0b",         // Amber/Orange
+    damagedRoadMarking: "#6366f1", // Indigo
+    goodSignboard: "#10b981"      // Emerald
 }
 
-export function DetectionDonutChart({ potholes, signboards, isLoading }: DetectionDonutChartProps) {
+export function DetectionDonutChart({
+    defectedSignboard,
+    pothole,
+    roadCrack,
+    damagedRoadMarking,
+    goodSignboard,
+    isLoading
+}: DetectionDonutChartProps) {
     if (isLoading) {
         return (
             <div className="h-[250px] flex items-center justify-center">
@@ -23,7 +36,7 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
         )
     }
 
-    const total = potholes + signboards
+    const total = defectedSignboard + pothole + roadCrack + damagedRoadMarking + goodSignboard
 
     if (total === 0) {
         return (
@@ -35,18 +48,43 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
     }
 
     const data = [
-        { name: "Potholes", value: potholes, color: COLORS.pothole },
-        { name: "Signboards", value: signboards, color: COLORS.signboard }
-    ]
+        { name: "Defected Signboards", value: defectedSignboard, color: COLORS.defectedSignboard },
+        { name: "Potholes", value: pothole, color: COLORS.pothole },
+        { name: "Road Cracks", value: roadCrack, color: COLORS.roadCrack },
+        { name: "Damaged Markings", value: damagedRoadMarking, color: COLORS.damagedRoadMarking },
+        { name: "Good Signboards", value: goodSignboard, color: COLORS.goodSignboard }
+    ].filter(item => item.value > 0)
 
     return (
-        <div className="h-[200px] relative">
+        <div className="h-[220px] relative">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
+                    <defs>
+                        <linearGradient id="gradPothole" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#ff8a8a" />
+                            <stop offset="100%" stopColor="#ef4444" />
+                        </linearGradient>
+                        <linearGradient id="gradDefectedSign" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#60a5fa" />
+                            <stop offset="100%" stopColor="#3b82f6" />
+                        </linearGradient>
+                        <linearGradient id="gradCrack" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#fbbf24" />
+                            <stop offset="100%" stopColor="#f59e0b" />
+                        </linearGradient>
+                        <linearGradient id="gradMarking" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#818cf8" />
+                            <stop offset="100%" stopColor="#6366f1" />
+                        </linearGradient>
+                        <linearGradient id="gradGoodSign" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#34d399" />
+                            <stop offset="100%" stopColor="#10b981" />
+                        </linearGradient>
+                    </defs>
                     <Pie
                         data={data}
                         cx="50%"
-                        cy="50%"
+                        cy="45%"
                         innerRadius={50}
                         outerRadius={70}
                         paddingAngle={5}
@@ -54,14 +92,20 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
                         strokeWidth={0}
                         isAnimationActive={false}
                     >
-                        {data.map((entry, index) => (
-                            <Cell
-                                key={`cell-${index}`}
-                                fill={entry.color}
-                                fillOpacity={1}
-                                className="hover:fill-opacity-80"
-                            />
-                        ))}
+                        {data.map((entry, index) => {
+                            const gradId = entry.name === "Potholes" ? "gradPothole" :
+                                entry.name === "Defected Signboards" ? "gradDefectedSign" :
+                                    entry.name === "Road Cracks" ? "gradCrack" :
+                                        entry.name === "Damaged Markings" ? "gradMarking" : "gradGoodSign"
+                            return (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={`url(#${gradId})`}
+                                    fillOpacity={1}
+                                    className="hover:fill-opacity-80"
+                                />
+                            )
+                        })}
                     </Pie>
                     <Tooltip
                         content={({ active, payload }) => {
@@ -84,16 +128,16 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
                     />
                     <Legend
                         verticalAlign="bottom"
-                        height={36}
+                        height={40}
                         content={({ payload }) => (
-                            <div className="flex items-center justify-center gap-6 mt-2">
+                            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2">
                                 {payload?.map((entry, index) => (
-                                    <div key={`legend-${index}`} className="flex items-center gap-2">
+                                    <div key={`legend-${index}`} className="flex items-center gap-1.5">
                                         <div
-                                            className="w-3 h-3 rounded-full"
+                                            className="w-2.5 h-2.5 rounded-full"
                                             style={{ backgroundColor: entry.color }}
                                         />
-                                        <span className="text-[10px] text-muted-foreground">
+                                        <span className="text-[9px] text-muted-foreground whitespace-nowrap">
                                             {entry.value}: {data[index].value}
                                         </span>
                                     </div>
@@ -104,7 +148,7 @@ export function DetectionDonutChart({ potholes, signboards, isLoading }: Detecti
                 </PieChart>
             </ResponsiveContainer>
             {/* Center label */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ marginTop: '-40px' }}>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ marginTop: '-55px' }}>
                 <div className="text-center">
                     <p className="text-xl font-extrabold text-[#2563eb]">{total}</p>
                     <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Total</p>

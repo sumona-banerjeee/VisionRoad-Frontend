@@ -8,7 +8,7 @@ interface GradientStatsCardProps {
     subtitle?: string
     value: number | string
     icon: LucideIcon
-    gradient: "green" | "coral" | "blue" | "purple"
+    gradient: "green" | "coral" | "blue" | "purple" | "orange" | "indigo" | "emerald"
     isLoading?: boolean
 }
 
@@ -32,6 +32,24 @@ const gradientStyles = {
         iconShadow: "shadow-lg shadow-blue-500/20"
     },
     purple: {
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-gradient-to-br from-blue-400 to-blue-600",
+        iconShadow: "shadow-lg shadow-blue-500/20"
+    },
+    orange: {
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-gradient-to-br from-blue-400 to-blue-600",
+        iconShadow: "shadow-lg shadow-blue-500/20"
+    },
+    indigo: {
+        background: "bg-card",
+        border: "border-l-4 border-l-[var(--border)]",
+        iconBg: "bg-gradient-to-br from-blue-400 to-blue-600",
+        iconShadow: "shadow-lg shadow-blue-500/20"
+    },
+    emerald: {
         background: "bg-card",
         border: "border-l-4 border-l-[var(--border)]",
         iconBg: "bg-gradient-to-br from-blue-400 to-blue-600",

@@ -5,8 +5,11 @@ import { Loader2 } from "lucide-react"
 
 interface LocationData {
     name: string
-    potholes: number
-    signboards: number
+    defected_sign_board: number
+    pothole: number
+    road_crack: number
+    damaged_road_marking: number
+    good_sign_board: number
     total: number
 }
 
@@ -16,8 +19,11 @@ interface LocationBarChartProps {
 }
 
 const COLORS = {
-    pothole: "#10b981",
-    signboard: "#3b82f6"
+    defected_sign_board: "#60a5fa", // Lighter Blue
+    pothole: "#ff8a8a",           // Lighter Red
+    road_crack: "#fbbf24",         // Lighter Orange
+    damaged_road_marking: "#818cf8", // Lighter Indigo
+    good_sign_board: "#34d399"      // Lighter Emerald
 }
 
 export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
@@ -44,16 +50,29 @@ export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
                 <BarChart
                     data={data}
                     margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
-                    barCategoryGap="25%"
+                    barCategoryGap="10%"
+                    barGap={2}
                 >
                     <defs>
-                        <linearGradient id="barGradientPothole" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#10b981" stopOpacity={0.8} />
-                            <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+                        <linearGradient id="barPothole" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#ff8a8a" />
+                            <stop offset="100%" stopColor="#ef4444" />
                         </linearGradient>
-                        <linearGradient id="barGradientSignboard" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
-                            <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.4} />
+                        <linearGradient id="barDefectedSign" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#60a5fa" />
+                            <stop offset="100%" stopColor="#3b82f6" />
+                        </linearGradient>
+                        <linearGradient id="barCrack" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#fbbf24" />
+                            <stop offset="100%" stopColor="#f59e0b" />
+                        </linearGradient>
+                        <linearGradient id="barMarking" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#818cf8" />
+                            <stop offset="100%" stopColor="#6366f1" />
+                        </linearGradient>
+                        <linearGradient id="barGoodSign" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#34d399" />
+                            <stop offset="100%" stopColor="#10b981" />
                         </linearGradient>
                     </defs>
                     <CartesianGrid
@@ -89,7 +108,7 @@ export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
                                                     className="w-2 h-2 rounded-full"
                                                     style={{ backgroundColor: entry.color }}
                                                 />
-                                                <span className="text-muted-foreground">{entry.name}:</span>
+                                                <span className="text-muted-foreground">{(entry.name as string).replace(/_/g, ' ')}:</span>
                                                 <span className="font-semibold">{entry.value}</span>
                                             </div>
                                         ))}
@@ -103,15 +122,15 @@ export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
                         verticalAlign="top"
                         height={30}
                         content={({ payload }) => (
-                            <div className="flex items-center justify-center gap-6 mb-2">
+                            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-2">
                                 {payload?.map((entry, index) => (
-                                    <div key={`legend-${index}`} className="flex items-center gap-2">
+                                    <div key={`legend-${index}`} className="flex items-center gap-1.5">
                                         <div
-                                            className="w-3 h-3 rounded-sm"
+                                            className="w-2.5 h-2.5 rounded-sm"
                                             style={{ backgroundColor: entry.color }}
                                         />
-                                        <span className="text-[10px] text-muted-foreground">
-                                            {entry.value}
+                                        <span className="text-[9px] text-muted-foreground whitespace-nowrap">
+                                            {(entry.value as string).replace(/_/g, ' ')}
                                         </span>
                                     </div>
                                 ))}
@@ -119,16 +138,37 @@ export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
                         )}
                     />
                     <Bar
-                        dataKey="potholes"
-                        name="Potholes"
-                        fill="url(#barGradientPothole)"
+                        dataKey="pothole"
+                        name="Pothole"
+                        fill="url(#barPothole)"
                         radius={[4, 4, 0, 0]}
                         isAnimationActive={false}
                     />
                     <Bar
-                        dataKey="signboards"
-                        name="Signboards"
-                        fill="url(#barGradientSignboard)"
+                        dataKey="defected_sign_board"
+                        name="Defected Signboard"
+                        fill="url(#barDefectedSign)"
+                        radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
+                    />
+                    <Bar
+                        dataKey="road_crack"
+                        name="Road Crack"
+                        fill="url(#barCrack)"
+                        radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
+                    />
+                    <Bar
+                        dataKey="damaged_road_marking"
+                        name="Damaged Marking"
+                        fill="url(#barMarking)"
+                        radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
+                    />
+                    <Bar
+                        dataKey="good_sign_board"
+                        name="Good Signboard"
+                        fill="url(#barGoodSign)"
                         radius={[4, 4, 0, 0]}
                         isAnimationActive={false}
                     />

@@ -283,33 +283,47 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   const isSignboard = detectionType === "sign-board-detection" || isCombined
 
   const stats = [
-    ...(isPothole ? [{
-      label: "Unique Potholes",
-      value: data.summary.unique_potholes || 0,
-      icon: AlertTriangle,
-      color: "text-red-500",
-      bgColor: "bg-red-50 dark:bg-red-950/30",
-    }] : []),
-    ...(isSignboard ? [{
-      label: "Unique Signboards",
-      value: data.summary.unique_signboards || 0,
-      icon: SignpostBig,
-      color: "text-blue-500",
-      bgColor: "bg-blue-50 dark:bg-blue-950/30",
-    }] : []),
     {
-      label: "Total Detections",
-      value: data.summary.total_detections || 0,
+      label: "Total Road Damage",
+      value: data.summary.total_road_damage || 0,
       icon: Target,
+      color: "text-purple-500",
+      bgColor: "bg-purple-50 dark:bg-purple-950/30",
+    },
+    {
+      label: "Defected Signboards",
+      value: data.summary.unique_defected_sign_board || 0,
+      icon: SignpostBig,
       color: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-950/30",
     },
     {
-      label: "Total Frames",
-      value: data.summary.total_frames || data.video_info.total_frames,
-      icon: Film,
-      color: "text-purple-500",
-      bgColor: "bg-purple-50 dark:bg-purple-950/30",
+      label: "Unique Potholes",
+      value: data.summary.unique_pothole || 0,
+      icon: AlertTriangle,
+      color: "text-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950/30",
+    },
+    {
+      label: "Road Cracks",
+      value: data.summary.unique_road_crack || 0,
+      icon: AlertTriangle,
+      color: "text-orange-500",
+      bgColor: "bg-orange-50 dark:bg-orange-950/30",
+    },
+    {
+      label: "Damaged Markings",
+      value: data.summary.unique_damaged_road_marking || 0,
+      icon: Activity,
+      color: "text-indigo-500",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
+    },
+    {
+      label: "Good Signboards",
+      value: data.summary.unique_good_sign_board || 0,
+      icon: SignpostBig,
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
     },
     {
       label: "Detection Rate",
@@ -331,6 +345,13 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
       icon: Monitor,
       color: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-950/30",
+    },
+    {
+      label: "Total Frames",
+      value: data.summary.total_frames || data.video_info.total_frames,
+      icon: Film,
+      color: "text-purple-500",
+      bgColor: "bg-purple-50 dark:bg-purple-950/30",
     },
   ]
 
@@ -356,7 +377,7 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
         </div>
       </CardHeader>
       <CardContent>
-        <div className={`grid gap-3 ${isCombined ? 'grid-cols-3 md:grid-cols-7' : 'grid-cols-3 md:grid-cols-6'}`}>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
@@ -526,12 +547,19 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       const width = x2 - x1
       const height = y2 - y1
 
-      // Determine if this specific detection is a pothole or signboard
-      const isDetPothole = detection._detType === 'pothole' || detection.type === 'pothole' || (detection.pothole_id !== undefined && !detection.signboard_id)
+      // Map individual detection types to colors
+      const type = (detection.type || detection._detType || '').toLowerCase()
+      const detectionColors: Record<string, string> = {
+        'pothole': '#ef4444',
+        'defected_sign_board': '#3b82f6',
+        'road_crack': '#f59e0b',
+        'damaged_road_marking': '#6366f1',
+        'good_sign_board': '#10b981',
+        'signboard': '#3b82f6' // fallback
+      }
 
-      // Set colors based on individual detection type
-      const boxColor = isDetPothole ? '#ef4444' : '#3b82f6' // red for potholes, blue for signboards
-      const textBgColor = isDetPothole ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'
+      const boxColor = detectionColors[type] || '#3b82f6'
+      const textBgColor = boxColor + 'e6' // Adding alpha
 
       // Draw bounding box
       ctx.strokeStyle = boxColor
@@ -539,13 +567,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       ctx.strokeRect(x1, y1, width, height)
 
       // Draw semi-transparent fill
-      ctx.fillStyle = isDetPothole ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)'
+      ctx.fillStyle = type === 'pothole' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)'
       ctx.fillRect(x1, y1, width, height)
 
       // Prepare label text
       const id = detection.pothole_id ?? detection.signboard_id ?? detection.detection_id
       const confidence = (detection.confidence * 100).toFixed(1)
-      let labelText = isDetPothole
+      let labelText = type === 'pothole'
         ? `Pothole #${id}`
         : `${(detection.type || 'Sign').replace(/_/g, ' ')} #${id}`
       labelText += ` ${confidence}%`

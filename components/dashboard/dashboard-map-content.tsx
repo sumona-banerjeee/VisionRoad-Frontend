@@ -53,18 +53,24 @@ export default function DashboardMapContent({ detections }: DashboardMapContentP
 
     // Get marker color based on detection type
     const getMarkerColor = (type: string) => {
-        if (type.toLowerCase().includes("pothole")) {
-            return { fill: "#10b981", stroke: "#065f46" } // Green for potholes
+        const t = type.toLowerCase()
+        if (t === "pothole") {
+            return { fill: "#ef4444", stroke: "#b91c1c" } // Red
+        } else if (t === "defected_sign_board") {
+            return { fill: "#3b82f6", stroke: "#1d4ed8" } // Blue
+        } else if (t === "road_crack") {
+            return { fill: "#f59e0b", stroke: "#b45309" } // Orange
+        } else if (t === "damaged_road_marking") {
+            return { fill: "#6366f1", stroke: "#4338ca" } // Indigo
+        } else if (t === "good_sign_board") {
+            return { fill: "#10b981", stroke: "#047857" } // Emerald
         }
-        return { fill: "#3b82f6", stroke: "#2563eb" } // Blue for signboards
+        return { fill: "#64748b", stroke: "#475569" } // Default Slate
     }
 
     // Get display name for detection type
     const getTypeName = (type: string) => {
-        if (type.toLowerCase().includes("pothole")) {
-            return "Pothole"
-        }
-        return "Signboard"
+        return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
     }
 
     return (

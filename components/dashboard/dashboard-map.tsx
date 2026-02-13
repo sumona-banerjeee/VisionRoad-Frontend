@@ -79,12 +79,14 @@ export function DashboardMap({
     // Filter detections with valid GPS coordinates
     const validDetections = detections.filter(d => d.latitude && d.longitude)
 
-    // Count potholes and signboards
-    const potholeCount = validDetections.filter(d =>
-        d.type?.toLowerCase().includes("pothole") ||
-        d.class?.toLowerCase().includes("pothole")
-    ).length
-    const signboardCount = validDetections.length - potholeCount
+    // Count detections by category
+    const counts = {
+        defected_sign_board: validDetections.filter(d => d.type?.toLowerCase() === "defected_sign_board").length,
+        pothole: validDetections.filter(d => d.type?.toLowerCase() === "pothole").length,
+        road_crack: validDetections.filter(d => d.type?.toLowerCase() === "road_crack").length,
+        damaged_road_marking: validDetections.filter(d => d.type?.toLowerCase() === "damaged_road_marking").length,
+        good_sign_board: validDetections.filter(d => d.type?.toLowerCase() === "good_sign_board").length
+    }
 
     return (
         <Card className={`overflow-hidden ${className}`}>
@@ -105,14 +107,26 @@ export function DashboardMap({
                     </div>
 
                     {/* Compact Color Legend */}
-                    <div className="flex items-center gap-4 text-xs">
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
-                            <span className="text-gray-600 dark:text-gray-400 font-medium">Potholes ({potholeCount})</span>
+                    <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-[10px] max-w-[60%]">
+                        <div className="flex items-center gap-1">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444] shadow-sm shadow-[#ef4444]/30" />
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">Potholes ({counts.pothole})</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
-                            <span className="text-gray-600 dark:text-gray-400 font-medium">Signboards ({signboardCount})</span>
+                        <div className="flex items-center gap-1">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6] shadow-sm shadow-[#3b82f6]/30" />
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">Defected Signs ({counts.defected_sign_board})</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-sm shadow-[#f59e0b]/30" />
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">Cracks ({counts.road_crack})</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#6366f1] shadow-sm shadow-[#6366f1]/30" />
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">Markings ({counts.damaged_road_marking})</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-sm shadow-[#10b981]/30" />
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">Good Signs ({counts.good_sign_board})</span>
                         </div>
                     </div>
                 </div>

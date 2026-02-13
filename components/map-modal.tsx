@@ -118,9 +118,26 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
 
                         {/* Detection markers */}
                         {validDetections.map((detection, idx) => {
-                            const isDetPothole = detection.type === "pothole"
-                            const markerColor = isDetPothole ? "#ef4444" : "#3b82f6"
-                            const strokeColor = isDetPothole ? "#991b1b" : "#1e40af"
+                            const type = (detection.type || "").toLowerCase()
+                            let markerColor = "#64748b" // Default Slate
+                            let strokeColor = "#475569"
+
+                            if (type === "pothole") {
+                                markerColor = "#ef4444"
+                                strokeColor = "#b91c1c"
+                            } else if (type === "defected_sign_board") {
+                                markerColor = "#3b82f6"
+                                strokeColor = "#1d4ed8"
+                            } else if (type === "road_crack") {
+                                markerColor = "#f59e0b"
+                                strokeColor = "#b45309"
+                            } else if (type === "damaged_road_marking") {
+                                markerColor = "#6366f1"
+                                strokeColor = "#4338ca"
+                            } else if (type === "good_sign_board") {
+                                markerColor = "#10b981"
+                                strokeColor = "#047857"
+                            }
 
                             return (
                                 <CircleMarker
@@ -135,8 +152,8 @@ export default function MapModal({ open, onClose, detections, detectionType }: M
                                 >
                                     <Popup>
                                         <div className="text-xs space-y-1">
-                                            <div className="font-semibold">
-                                                {isDetPothole ? "Pothole" : (detection.class || detection.type || "").replace(/_/g, " ")} #{detection.id}
+                                            <div className="font-semibold capitalize">
+                                                {(detection.type || "").replace(/_/g, " ")} #{detection.id}
                                             </div>
                                             <div>Frame: {detection.frame_number}</div>
                                             <div>Confidence: {(detection.confidence * 100).toFixed(1)}%</div>
