@@ -411,9 +411,18 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   const [videoError, setVideoError] = useState<string | null>(null)
   const [lastDetectedLat, setLastDetectedLat] = useState<number | null>(null)
   const [lastDetectedLng, setLastDetectedLng] = useState<number | null>(null)
+  const [currentFrameCounts, setCurrentFrameCounts] = useState<Record<string, number>>({
+    defected_sign_board: 0,
+    pothole: 0,
+    road_crack: 0,
+    damaged_road_marking: 0,
+    good_sign_board: 0
+  })
   const frameDetectionMap = useRef<Map<number, any[]>>(new Map())
   const lastProcessedFrame = useRef(-1)
   const loggedFrames = useRef<Set<number>>(new Set())
+  const cumulativeCountsMap = useRef<Map<number, Record<string, number>>>(new Map())
+  const sortedFrameIndices = useRef<number[]>([])
   const MAX_LOGS = 50
 
   const isCombined = detectionType === "pot-sign-detection"
@@ -423,30 +432,30 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   // Create GPS coordinate map from signboard_list or pothole_list
   const gpsMap = useRef<Map<number, { lat: number; lng: number }>>(new Map())
 
-  // Build GPS map from signboard_list or pothole_list
+  // Build GPS map from all available detection lists
   useEffect(() => {
     const map = new Map()
 
-    if (isPothole && data.pothole_list) {
-      data.pothole_list.forEach(item => {
-        const id = (item as any).pothole_id ?? (item as any).detection_id
-        if (item.lat !== undefined && item.lng !== undefined && id !== undefined) {
-          map.set(id, { lat: item.lat, lng: item.lng })
-        }
-      })
-    }
-    if (isSignboard && data.signboard_list) {
-      data.signboard_list.forEach(item => {
-        const id = (item as any).signboard_id ?? (item as any).detection_id
+    const addItemsToMap = (list?: any[]) => {
+      if (!list || !Array.isArray(list)) return
+      list.forEach(item => {
+        const id = (item as any).pothole_id ?? (item as any).signboard_id ?? (item as any).detection_id
         if (item.lat !== undefined && item.lng !== undefined && id !== undefined) {
           map.set(id, { lat: item.lat, lng: item.lng })
         }
       })
     }
 
+    addItemsToMap(data.pothole_list)
+    addItemsToMap(data.signboard_list)
+    addItemsToMap(data.defected_sign_board_list)
+    addItemsToMap(data.road_crack_list)
+    addItemsToMap(data.damaged_road_marking_list)
+    addItemsToMap(data.good_sign_board_list)
+
     gpsMap.current = map
-    console.log(`[VideoPlayer] GPS map built with ${map.size} entries`)
-  }, [data, isPothole, isSignboard])
+    console.log(`[VideoPlayer] GPS map built with ${map.size} entries mapping to IDs`)
+  }, [data])
 
   // Helper function to format video time from frame number
   const formatVideoTime = useCallback((frame: number, fps: number): string => {
@@ -514,7 +523,112 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     }
 
     frameDetectionMap.current = map
+    console.log(`[VideoPlayer] Frame map built: ${map.size} frames with detections`)
   }, [data, isPothole, isSignboard])
+
+  // Build cumulative counts map (Sticky Counts)
+  useEffect(() => {
+    const map = new Map<number, Record<string, number>>()
+    let lastCounts = {
+      defected_sign_board: 0,
+      pothole: 0,
+      road_crack: 0,
+      damaged_road_marking: 0,
+      good_sign_board: 0
+    }
+
+    if (data.frames && Array.isArray(data.frames)) {
+      // Sort frames by ID to ensure we process them in order
+      const sortedFrames = [...data.frames].sort((a, b) => (a.frame_id || 0) - (b.frame_id || 0))
+      const indices: number[] = []
+
+      sortedFrames.forEach((frameData) => {
+        const frameId = frameData.frame_id
+        indices.push(frameId)
+        const detections = (frameData as any).detections
+
+        if (detections && detections.length > 0) {
+          const det0 = detections[0]
+          let frameCounts: Record<string, number>
+
+          if (det0.count) {
+            frameCounts = { ...det0.count }
+          } else {
+            // Manual count if missing
+            frameCounts = {
+              defected_sign_board: 0,
+              pothole: 0,
+              road_crack: 0,
+              damaged_road_marking: 0,
+              good_sign_board: 0
+            }
+            detections.forEach((d: any) => {
+              const type = (d.type || '').split(' ')[0].toLowerCase() // Handle potential spaces
+              if (frameCounts.hasOwnProperty(type)) {
+                frameCounts[type]++
+              } else if (type === 'pothole') {
+                frameCounts.pothole++
+              } else if (type.includes('defected')) {
+                frameCounts.defected_sign_board++
+              }
+            })
+          }
+
+          // Carry over and update max (Sticky logic)
+          lastCounts = {
+            defected_sign_board: Math.max(lastCounts.defected_sign_board, frameCounts.defected_sign_board || 0),
+            pothole: Math.max(lastCounts.pothole, frameCounts.pothole || 0),
+            road_crack: Math.max(lastCounts.road_crack, frameCounts.road_crack || 0),
+            damaged_road_marking: Math.max(lastCounts.damaged_road_marking, frameCounts.damaged_road_marking || 0),
+            good_sign_board: Math.max(lastCounts.good_sign_board, frameCounts.good_sign_board || 0),
+          }
+        }
+
+        map.set(frameId, { ...lastCounts })
+      })
+      sortedFrameIndices.current = indices
+    }
+
+    cumulativeCountsMap.current = map
+    console.log(`[VideoPlayer] Sticky cumulative counts map built for ${map.size} frames`)
+  }, [data.frames])
+
+  // Helper to get sticky counts for any frame
+  const getStickyCounts = useCallback((frame: number) => {
+    // Find the largest frame index in our map that is <= current frame
+    const indices = sortedFrameIndices.current
+    let targetIndex = -1
+
+    // Quick binary search for the latest frame with detection data
+    let low = 0, high = indices.length - 1
+    while (low <= high) {
+      let mid = Math.floor((low + high) / 2)
+      if (indices[mid] <= frame) {
+        targetIndex = indices[mid]
+        low = mid + 1
+      } else {
+        high = mid - 1
+      }
+    }
+
+    if (targetIndex !== -1) {
+      return cumulativeCountsMap.current.get(targetIndex) || {
+        defected_sign_board: 0,
+        pothole: 0,
+        road_crack: 0,
+        damaged_road_marking: 0,
+        good_sign_board: 0
+      }
+    }
+
+    return {
+      defected_sign_board: 0,
+      pothole: 0,
+      road_crack: 0,
+      damaged_road_marking: 0,
+      good_sign_board: 0
+    }
+  }, [])
 
   // Function to draw bounding boxes on canvas
   const drawBoundingBoxes = useCallback((detections: any[]) => {
@@ -740,6 +854,9 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       // Draw bounding boxes for current frame
       drawBoundingBoxes(detections || [])
 
+      // Update counts using sticky logic
+      setCurrentFrameCounts(getStickyCounts(frame))
+
       if (detections && detections.length > 0) {
         addDetectionLog(frame, detections)
       }
@@ -811,7 +928,9 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       const detections = frameDetectionMap.current.get(frame)
       setDetectionsCount(detections?.length || 0)
 
-      // Update GPS coordinates immediately on seek
+      // Update sticky counts immediately on seek
+      setCurrentFrameCounts(getStickyCounts(frame))
+
       if (detections && detections.length > 0) {
         const det0 = detections[0]
         const isDetPothole = det0._detType === 'pothole' || det0.type === 'pothole' || (det0.pothole_id !== undefined && !det0.signboard_id)
@@ -902,32 +1021,55 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                 />
               </div>
 
-              {/* Video Info */}
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Current Frame:</span>
-                  <Badge variant="secondary">{currentFrame}</Badge>
+              <div className="flex items-center gap-x-4 gap-y-2 text-[10px] font-medium overflow-hidden">
+                {/* Detection Counts - Single line Flexbox */}
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-red-500 uppercase tracking-tight">Pothole:</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-1 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border-none">{currentFrameCounts.pothole}</Badge>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-blue-500 uppercase tracking-tight whitespace-nowrap">Defect Sign Board:</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-none">{currentFrameCounts.defected_sign_board}</Badge>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-indigo-500 uppercase tracking-tight whitespace-nowrap">Damage Road Mark:</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 border-none">{currentFrameCounts.damaged_road_marking}</Badge>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-yellow-500 uppercase tracking-tight whitespace-nowrap">RoadCrack:</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-1 bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border-none">{currentFrameCounts.road_crack}</Badge>
+                  </div>
+                  {/* <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-emerald-500 uppercase tracking-tight whitespace-nowrap">Good Sign Board:</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border-none">{currentFrameCounts.good_sign_board}</Badge>
+                  </div> */}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">FPS:</span>
-                  <Badge variant="outline">{data.video_info.fps.toFixed(1)}</Badge>
+
+                <div className="h-4 w-px bg-gray-200 dark:bg-gray-800 shrink-0" />
+
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground whitespace-nowrap">FRAME:</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-1.5 py-0">{currentFrame}</Badge>
+                  </div>
+                  {lastDetectedLat !== null && lastDetectedLng !== null && (
+                    <>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground uppercase font-semibold">LAT:</span>
+                        <Badge variant="outline" className="font-mono text-[10px] h-5 px-1.5 py-0 border-blue-200 dark:border-blue-800">
+                          {lastDetectedLat}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground uppercase font-semibold">LNG:</span>
+                        <Badge variant="outline" className="font-mono text-[10px] h-5 px-1.5 py-0 border-blue-200 dark:border-blue-800">
+                          {lastDetectedLng}
+                        </Badge>
+                      </div>
+                    </>
+                  )}
                 </div>
-                {lastDetectedLat !== null && lastDetectedLng !== null && (
-                  <>
-                    <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground text-xs">Lat:</span>
-                      <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
-                        {lastDetectedLat}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground text-xs">Lng:</span>
-                      <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
-                        {lastDetectedLng}
-                      </Badge>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
 
@@ -975,9 +1117,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                                 <div className="text-muted-foreground font-mono text-[10px]">
                                   Coordinates: ({Math.round(det.bbox.x1)}, {Math.round(det.bbox.y1)}) → ({Math.round(det.bbox.x2)}, {Math.round(det.bbox.y2)})
                                 </div>
-                                {det.latitude !== undefined && det.longitude !== undefined && (
+                                {det.latitude !== undefined && det.longitude !== undefined ? (
                                   <div className="text-muted-foreground font-mono text-[10px]">
                                     GPS: {det.latitude}, {det.longitude}
+                                  </div>
+                                ) : (
+                                  <div className="text-destructive/70 font-mono text-[10px]">
+                                    GPS: Data Unavail.
                                   </div>
                                 )}
                               </div>

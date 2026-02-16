@@ -63,6 +63,13 @@ export type DetectionData = {
             bbox: { x1: number; y1: number; x2: number; y2: number }
             center?: { x: number; y: number }
             area?: number
+            count?: {
+                defected_sign_board: number
+                pothole: number
+                road_crack: number
+                damaged_road_marking: number
+                good_sign_board: number
+            }
         }>
     }>
 }
