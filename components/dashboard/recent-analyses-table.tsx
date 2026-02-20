@@ -90,10 +90,10 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
                                     <div className="text-right flex-shrink-0 w-20">
                                         <p className="text-sm font-bold text-foreground">
                                             {video.detection_type === "pothole-detection"
-                                                ? video.unique_potholes ?? 0
+                                                ? video.unique_pothole ?? 0
                                                 : video.detection_type === "pot-sign-detection"
-                                                    ? (video.unique_potholes ?? 0) + (video.unique_signboards ?? 0)
-                                                    : video.unique_signboards ?? 0}
+                                                    ? (video.unique_pothole ?? 0) + (video.unique_defected_sign_board ?? 0) + (video.unique_good_sign_board ?? 0)
+                                                    : (video.unique_defected_sign_board ?? 0) + (video.unique_good_sign_board ?? 0)}
                                         </p>
                                         <p className="text-[10px] text-muted-foreground uppercase">Detections</p>
                                     </div>

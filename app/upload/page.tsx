@@ -18,8 +18,8 @@ import {
 } from "@/lib/api"
 import { storeVideoFile } from "@/lib/video-storage"
 
-const API_URL = "http://127.0.0.1:8000/api/v1"
-const WS_URL = "ws://127.0.0.1:8000/api/v1"
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+const WS_URL = API_URL?.replace(/^https?:\/\//, "wss://")
 
 type DetectionType = "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
 
