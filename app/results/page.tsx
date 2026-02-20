@@ -18,6 +18,7 @@ import { DetectionData, DetectionType } from "@/lib/types"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
+
 export default function ResultsPage() {
     const router = useRouter()
     const [session, setSession] = useState<SessionContext | null>(null)

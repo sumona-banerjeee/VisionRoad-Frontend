@@ -5,6 +5,7 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
+
 // Type definitions
 export interface Project {
     id: string

@@ -14,6 +14,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 const WS_URL = API_URL?.replace(/^https?:\/\//, "wss://")
 
 
+
 type UploadSectionProps = {
   onDetectionComplete: (data: DetectionData, videoId: string, file: File) => void
   onDetectionTypeChange: (type: DetectionType) => void
