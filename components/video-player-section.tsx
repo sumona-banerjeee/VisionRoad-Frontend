@@ -423,6 +423,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
   const loggedFrames = useRef<Set<number>>(new Set())
   const cumulativeCountsMap = useRef<Map<number, Record<string, number>>>(new Map())
   const sortedFrameIndices = useRef<number[]>([])
+  const detectedFrameSkip = useRef<number>(3) // Computed from data, fallback to 3
   const MAX_LOGS = 50
 
   const isCombined = detectionType === "pot-sign-detection"
@@ -587,6 +588,18 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
         map.set(frameId, { ...lastCounts })
       })
       sortedFrameIndices.current = indices
+
+      // Compute the frame skip gap from the data (minimum gap between consecutive detection frames)
+      // This tells us how far apart processed frames are, so we only carry forward within that gap
+      if (indices.length >= 2) {
+        let minGap = Infinity
+        for (let i = 1; i < indices.length; i++) {
+          const gap = indices[i] - indices[i - 1]
+          if (gap > 0 && gap < minGap) minGap = gap
+        }
+        detectedFrameSkip.current = minGap === Infinity ? 3 : minGap
+        console.log(`[VideoPlayer] Detected frame skip gap: ${detectedFrameSkip.current}`)
+      }
     }
 
     cumulativeCountsMap.current = map
@@ -628,6 +641,43 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       damaged_road_marking: 0,
       good_sign_board: 0
     }
+  }, [])
+
+  // Helper to get nearest detections for any frame (handles frame skipping)
+  // Uses binary search to find the closest processed frame <= current frame,
+  // but only carries forward within the frame-skip gap to avoid stale bounding boxes
+  const getNearestDetections = useCallback((frame: number): any[] | undefined => {
+    // First try exact match (fastest path)
+    const exact = frameDetectionMap.current.get(frame)
+    if (exact) return exact
+
+    // Binary search for the nearest processed frame <= current frame
+    const indices = sortedFrameIndices.current
+    if (indices.length === 0) return undefined
+
+    let low = 0, high = indices.length - 1
+    let targetIndex = -1
+
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2)
+      if (indices[mid] <= frame) {
+        targetIndex = indices[mid]
+        low = mid + 1
+      } else {
+        high = mid - 1
+      }
+    }
+
+    if (targetIndex !== -1) {
+      // Only carry forward if we're within the frame-skip gap
+      // This prevents bounding boxes from persisting after the detection has ended
+      const gap = frame - targetIndex
+      if (gap <= detectedFrameSkip.current) {
+        return frameDetectionMap.current.get(targetIndex)
+      }
+    }
+
+    return undefined
   }, [])
 
   // Function to draw bounding boxes on canvas
@@ -720,13 +770,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     canvas.width = rect.width
     canvas.height = rect.height
 
-    // Redraw current frame's detections
+    // Redraw current frame's detections (using nearest frame for skipped frames)
     const frame = Math.round(video.currentTime * data.video_info.fps)
-    const detections = frameDetectionMap.current.get(frame)
+    const detections = getNearestDetections(frame)
     if (detections) {
       drawBoundingBoxes(detections)
     }
-  }, [data.video_info.fps, drawBoundingBoxes])
+  }, [data.video_info.fps, drawBoundingBoxes, getNearestDetections])
 
   // Handle window resize
   useEffect(() => {
@@ -848,10 +898,11 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       lastProcessedFrame.current = frame
       setCurrentFrame(frame)
 
-      const detections = frameDetectionMap.current.get(frame)
+      // Use nearest processed frame's detections to avoid flickering from frame skipping
+      const detections = getNearestDetections(frame)
       setDetectionsCount(detections?.length || 0)
 
-      // Draw bounding boxes for current frame
+      // Draw bounding boxes for current frame (carried forward from nearest processed frame)
       drawBoundingBoxes(detections || [])
 
       // Update counts using sticky logic
@@ -861,7 +912,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
         addDetectionLog(frame, detections)
       }
     }
-  }, [data.video_info.fps, addDetectionLog, drawBoundingBoxes])
+  }, [data.video_info.fps, addDetectionLog, drawBoundingBoxes, getNearestDetections])
 
   // Video playback monitoring
   useEffect(() => {
