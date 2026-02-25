@@ -16,6 +16,7 @@ import { DetectionData, DetectionType } from "@/lib/types"
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 
+
 type VideoPlayerSectionProps = {
   data: DetectionData
   videoId: string
