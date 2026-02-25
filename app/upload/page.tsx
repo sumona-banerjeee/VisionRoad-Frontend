@@ -24,6 +24,7 @@ const WS_URL = API_URL?.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "
 type DetectionType = "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
 
 
+
 export default function UploadPage() {
     const router = useRouter()
     const [session, setSession] = useState<SessionContext | null>(null)
