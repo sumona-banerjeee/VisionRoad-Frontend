@@ -11,7 +11,7 @@ import { Upload, Loader2, AlertCircle } from "lucide-react"
 import type { DetectionData, DetectionType } from "@/lib/types"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
-const WS_URL = API_URL?.replace(/^https?:\/\//, "wss://")
+const WS_URL = API_URL?.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "ws://")
 
 
 

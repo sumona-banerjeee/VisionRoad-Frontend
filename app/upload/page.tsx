@@ -19,7 +19,7 @@ import {
 import { storeVideoFile } from "@/lib/video-storage"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
-const WS_URL = API_URL?.replace(/^https?:\/\//, "wss://")
+const WS_URL = API_URL?.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "ws://")
 
 type DetectionType = "pothole-detection" | "sign-board-detection" | "pot-sign-detection"
 
