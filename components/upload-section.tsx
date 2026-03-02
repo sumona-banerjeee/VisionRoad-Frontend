@@ -24,6 +24,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
   const [jsonFile, setJsonFile] = useState<File | null>(null)
   const [speed, setSpeed] = useState(30)
   const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
+  const [selectMethod, setSelectMethod] = useState("yolo")
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [statusMessage, setStatusMessage] = useState("")
@@ -135,6 +136,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
     formData.append("file", file)
     formData.append("detection_type", detectionType)
     formData.append("speed_kmh", speed.toString())
+    formData.append("select_method", selectMethod)
 
     // Add JSON file if provided
     if (jsonFile) {
@@ -202,11 +204,12 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
       <CardHeader>
         <CardTitle>Upload Video</CardTitle>
         <CardDescription>
-          Select a video file, detection type, and vehicle speed to start AI-powered analysis
+          Select video file, detection type, vehicle speed, and method for analysis
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          {/* Video File Input kept in 2-col row */}
           {/* File Input */}
           <div className="space-y-2">
             <Label htmlFor="video-file">Video File</Label>
@@ -255,6 +258,10 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
             )}
           </div>
 
+        </div>
+
+        {/* Detection Type, Speed, and Method - 3 column row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Detection Type Selector */}
           <div className="space-y-2">
             <Label htmlFor="detection-type">Detection Type</Label>
@@ -288,7 +295,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
 
           {/* Speed Input */}
           <div className="space-y-2">
-            <Label htmlFor="speed">Speed (km/h)</Label>
+            <Label htmlFor="speed">Vehicle Speed (km/h)</Label>
             <Input
               id="speed"
               type="number"
@@ -298,6 +305,37 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
               onChange={(e) => setSpeed(Number(e.target.value))}
               disabled={uploading}
             />
+          </div>
+
+          {/* Select Method */}
+          <div className="space-y-2">
+            <Label htmlFor="select-method">Select Method</Label>
+            <Select
+              value={selectMethod}
+              onValueChange={setSelectMethod}
+              disabled={uploading}
+            >
+              <SelectTrigger id="select-method">
+                <SelectValue placeholder="Select method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yolo">
+                  <div className="flex items-center gap-2">
+                    <span>YOLO</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="yolo-vl">
+                  <div className="flex items-center gap-2">
+                    <span>YOLO with VL</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="sam3">
+                  <div className="flex items-center gap-2">
+                    <span>SAM 3</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

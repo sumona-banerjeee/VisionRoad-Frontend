@@ -35,6 +35,7 @@ export default function UploadPage() {
     const [jsonFile, setJsonFile] = useState<File | null>(null)
     const [speed, setSpeed] = useState(30)
     const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
+    const [selectMethod, setSelectMethod] = useState("yolo")
 
     // Upload states
     const [uploading, setUploading] = useState(false)
@@ -108,6 +109,7 @@ export default function UploadPage() {
         formData.append("file", file)
         formData.append("detection_type", detectionType)
         formData.append("speed_kmh", speed.toString())
+        formData.append("select_method", selectMethod)
         if (jsonFile) {
             formData.append("json_file", jsonFile)
         }
@@ -236,11 +238,11 @@ export default function UploadPage() {
                                 </span>
                             </CardTitle>
                             <CardDescription className="text-sm">
-                                Select video file, detection type, and vehicle speed for analysis
+                                Select video file, detection type, vehicle speed, and method for analysis
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-4 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 {/* Video File Input */}
                                 <div className="space-y-2">
                                     <Label htmlFor="video-file" className="text-sm font-semibold">
@@ -262,7 +264,7 @@ export default function UploadPage() {
                                 {/* JSON File Input */}
                                 <div className="space-y-2">
                                     <Label htmlFor="json-file" className="text-sm font-semibold">
-                                        GPS JSON File <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+                                        GPS JSON File
                                     </Label>
                                     <Input
                                         id="json-file"
@@ -276,7 +278,10 @@ export default function UploadPage() {
                                         className="h-10 bg-gray-50 dark:bg-gray-800 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-100 dark:file:bg-blue-900/50 file:text-blue-600 dark:file:text-blue-400 file:font-medium file:text-xs hover:file:bg-blue-200"
                                     />
                                 </div>
+                            </div>
 
+                            {/* Detection, Speed, and Method Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Detection Type */}
                                 <div className="space-y-2">
                                     <Label htmlFor="detection-type" className="text-sm font-semibold">
@@ -319,6 +324,33 @@ export default function UploadPage() {
                                         disabled={uploading}
                                         className="h-10 bg-gray-50 dark:bg-gray-800"
                                     />
+                                </div>
+
+                                {/* Select Method */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="select-method" className="text-sm font-semibold">
+                                        Select Method
+                                    </Label>
+                                    <Select
+                                        value={selectMethod}
+                                        onValueChange={setSelectMethod}
+                                        disabled={uploading}
+                                    >
+                                        <SelectTrigger id="select-method" className="h-10 bg-gray-50 dark:bg-gray-800">
+                                            <SelectValue placeholder="Select method" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="yolo">
+                                                <span className="font-medium">YOLO Detection Model</span>
+                                            </SelectItem>
+                                            <SelectItem value="yolo-vl">
+                                                <span className="font-medium">YOLO with Vision-Language Model</span>
+                                            </SelectItem>
+                                            <SelectItem value="sam3">
+                                                <span className="font-medium">OpenAI SAM 3 Segmentation Model</span>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
 
