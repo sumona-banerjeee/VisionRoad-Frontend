@@ -24,7 +24,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
   const [jsonFile, setJsonFile] = useState<File | null>(null)
   const [speed, setSpeed] = useState(30)
   const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
-  const [selectMethod, setSelectMethod] = useState("yolo")
+  const [selectMethod, setSelectMethod] = useState("yolo_vl")
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [statusMessage, setStatusMessage] = useState("")
@@ -136,7 +136,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
     formData.append("file", file)
     formData.append("detection_type", detectionType)
     formData.append("speed_kmh", speed.toString())
-    formData.append("select_method", selectMethod)
+    formData.append("detection_mode", selectMethod)
 
     // Add JSON file if provided
     if (jsonFile) {
@@ -324,7 +324,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
                     <span>YOLO</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="yolo-vl">
+                <SelectItem value="yolo_vl">
                   <div className="flex items-center gap-2">
                     <span>YOLO with VL</span>
                   </div>

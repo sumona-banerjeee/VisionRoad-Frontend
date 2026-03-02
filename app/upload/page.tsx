@@ -35,7 +35,7 @@ export default function UploadPage() {
     const [jsonFile, setJsonFile] = useState<File | null>(null)
     const [speed, setSpeed] = useState(30)
     const [detectionType, setDetectionType] = useState<DetectionType>("pothole-detection")
-    const [selectMethod, setSelectMethod] = useState("yolo")
+    const [selectMethod, setSelectMethod] = useState("yolo_vl")
 
     // Upload states
     const [uploading, setUploading] = useState(false)
@@ -109,7 +109,7 @@ export default function UploadPage() {
         formData.append("file", file)
         formData.append("detection_type", detectionType)
         formData.append("speed_kmh", speed.toString())
-        formData.append("select_method", selectMethod)
+        formData.append("detection_mode", selectMethod)
         if (jsonFile) {
             formData.append("json_file", jsonFile)
         }
@@ -343,7 +343,7 @@ export default function UploadPage() {
                                             <SelectItem value="yolo">
                                                 <span className="font-medium">YOLO Detection Model</span>
                                             </SelectItem>
-                                            <SelectItem value="yolo-vl">
+                                            <SelectItem value="yolo_vl">
                                                 <span className="font-medium">YOLO with Vision-Language Model</span>
                                             </SelectItem>
                                             <SelectItem value="sam3">
