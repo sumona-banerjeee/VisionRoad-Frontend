@@ -418,7 +418,7 @@ const DETECTION_TYPE_KEY = "visionroad_detection_type"
  */
 export function saveSession(session: SessionContext): void {
     if (typeof window !== "undefined") {
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session))
     }
 }
 
@@ -427,7 +427,7 @@ export function saveSession(session: SessionContext): void {
  */
 export function loadSession(): SessionContext {
     if (typeof window !== "undefined") {
-        const stored = sessionStorage.getItem(SESSION_KEY)
+        const stored = localStorage.getItem(SESSION_KEY)
         if (stored) {
             return JSON.parse(stored)
         }
@@ -440,9 +440,9 @@ export function loadSession(): SessionContext {
  */
 export function clearSession(): void {
     if (typeof window !== "undefined") {
-        sessionStorage.removeItem(SESSION_KEY)
-        sessionStorage.removeItem(VIDEO_DATA_KEY)
-        sessionStorage.removeItem(DETECTION_TYPE_KEY)
+        localStorage.removeItem(SESSION_KEY)
+        localStorage.removeItem(VIDEO_DATA_KEY)
+        localStorage.removeItem(DETECTION_TYPE_KEY)
     }
 }
 
@@ -459,7 +459,7 @@ export interface VideoResultData {
  */
 export function saveVideoData(data: VideoResultData): void {
     if (typeof window !== "undefined") {
-        sessionStorage.setItem(VIDEO_DATA_KEY, JSON.stringify(data))
+        localStorage.setItem(VIDEO_DATA_KEY, JSON.stringify(data))
     }
 }
 
@@ -468,7 +468,7 @@ export function saveVideoData(data: VideoResultData): void {
  */
 export function loadVideoData(): VideoResultData | null {
     if (typeof window !== "undefined") {
-        const stored = sessionStorage.getItem(VIDEO_DATA_KEY)
+        const stored = localStorage.getItem(VIDEO_DATA_KEY)
         if (stored) {
             return JSON.parse(stored)
         }

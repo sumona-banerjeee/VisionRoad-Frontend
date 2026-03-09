@@ -54,50 +54,7 @@ export default function UploadPage() {
         setIsLoading(false)
     }, [router])
 
-    const connectWebSocket = (videoId: string) => {
-        const ws = new WebSocket(`${WS_URL}/ws/${videoId}`)
 
-        ws.onmessage = async (event) => {
-            const data = JSON.parse(event.data)
-
-            if (data.type === "progress" || data.progress !== undefined) {
-                setProgress(data.progress || 0)
-                let message = data.message || "Processing..."
-                if (data.unique_potholes !== undefined) {
-                    message += ` | Unique: ${data.unique_potholes} | Total: ${data.total_detections || 0}`
-                } else if (data.unique_signboards !== undefined) {
-                    message += ` | Unique: ${data.unique_signboards} | Total: ${data.total_detections || 0}`
-                }
-                setStatusMessage(message)
-            }
-
-            if (data.type === "complete" || data.status === "completed") {
-                setStatusMessage("Processing completed! Saving video...")
-                ws.close()
-                if (file) {
-                    try {
-                        await storeVideoFile(videoId, file)
-                    } catch (err) {
-                        console.error("Failed to store video file:", err)
-                    }
-                }
-                saveVideoData({ videoId, detectionType })
-                setStatusMessage("Redirecting to results...")
-                setTimeout(() => router.push("/results"), 500)
-            }
-
-            if (data.type === "error") {
-                setError("Error: " + data.message)
-                setStatusMessage("")
-                setUploading(false)
-                ws.close()
-            }
-        }
-
-        ws.onerror = () => {
-            setStatusMessage("Connection error. Retrying...")
-        }
-    }
 
     const handleUpload = async () => {
         if (!file) {
@@ -132,9 +89,21 @@ export default function UploadPage() {
             }
 
             const result = await response.json()
-            setStatusMessage("Uploaded! Starting processing...")
-            setProgress(10)
-            connectWebSocket(result.video_id)
+
+            // Store file locally for potential recovery/results display
+            if (file) {
+                try {
+                    await storeVideoFile(result.video_id, file)
+                } catch (err) {
+                    console.error("Failed to store video file:", err)
+                }
+            }
+
+            saveVideoData({ videoId: result.video_id, detectionType })
+
+            // Redirect to the dynamic processing page
+            router.push(`/upload/${result.video_id}`)
+
         } catch (err) {
             let errorMessage = "Upload failed"
             if (err instanceof TypeError && err.message === "Failed to fetch") {
@@ -384,26 +353,7 @@ export default function UploadPage() {
                                 )}
                             </Button>
 
-                            {/* Progress Section */}
-                            {uploading && (
-                                <div className="space-y-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="font-medium text-gray-700 dark:text-gray-300 text-xs">Processing Progress</span>
-                                            <span className="font-bold text-blue-600 dark:text-blue-400 text-xs">{progress}%</span>
-                                        </div>
-                                        <div className="h-2 rounded-full bg-blue-100 dark:bg-blue-900/50 overflow-hidden">
-                                            <div
-                                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300"
-                                                style={{ width: `${progress}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                    {statusMessage && (
-                                        <p className="text-xs text-gray-500">{statusMessage}</p>
-                                    )}
-                                </div>
-                            )}
+
                         </CardContent>
                     </Card>
 
