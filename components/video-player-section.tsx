@@ -453,6 +453,42 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
     addItemsToMap(data.damaged_road_marking_list)
     addItemsToMap(data.good_sign_board_list)
 
+    // Also extract GPS from frame-level detection data (some detections have lat/lng inline)
+    if (data.frames && Array.isArray(data.frames)) {
+      data.frames.forEach((frameData: any) => {
+        const detections = frameData.detections
+        if (detections && Array.isArray(detections)) {
+          detections.forEach((d: any) => {
+            const id = d.pothole_id ?? d.signboard_id ?? d.detection_id
+            if (id !== undefined && !map.has(id)) {
+              // Check for lat/lng directly on detection
+              if (d.lat !== undefined && d.lng !== undefined) {
+                map.set(id, { lat: d.lat, lng: d.lng })
+              } else if (d.latitude !== undefined && d.longitude !== undefined) {
+                map.set(id, { lat: d.latitude, lng: d.longitude })
+              }
+            }
+          })
+        }
+        // Also check potholes/signboards sub-arrays
+        const subArrays = [frameData.potholes, frameData.signboards]
+        subArrays.forEach((arr: any) => {
+          if (arr && Array.isArray(arr)) {
+            arr.forEach((d: any) => {
+              const id = d.pothole_id ?? d.signboard_id ?? d.detection_id
+              if (id !== undefined && !map.has(id)) {
+                if (d.lat !== undefined && d.lng !== undefined) {
+                  map.set(id, { lat: d.lat, lng: d.lng })
+                } else if (d.latitude !== undefined && d.longitude !== undefined) {
+                  map.set(id, { lat: d.latitude, lng: d.longitude })
+                }
+              }
+            })
+          }
+        })
+      })
+    }
+
     gpsMap.current = map
     console.log(`[VideoPlayer] GPS map built with ${map.size} entries mapping to IDs`)
   }, [data])
@@ -854,10 +890,12 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
       const isDetPothole = det0._detType === 'pothole' || det0.type === 'pothole' || (det0.pothole_id !== undefined && !det0.signboard_id)
       const detectionId = det0.pothole_id ?? det0.signboard_id ?? det0.detection_id
       const gpsCoords = gpsMap.current.get(detectionId)
+      const logLat = gpsCoords?.lat ?? det0.lat ?? det0.latitude
+      const logLng = gpsCoords?.lng ?? det0.lng ?? det0.longitude
 
-      if (gpsCoords) {
-        setLastDetectedLat(gpsCoords.lat)
-        setLastDetectedLng(gpsCoords.lng)
+      if (logLat !== undefined && logLng !== undefined) {
+        setLastDetectedLat(logLat)
+        setLastDetectedLng(logLng)
       }
     }
 
@@ -869,13 +907,17 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
           const detectionId = det.pothole_id ?? det.signboard_id ?? det.detection_id
           const gpsCoords = gpsMap.current.get(detectionId)
 
+          // Resolve GPS: prefer gpsMap lookup, then inline lat/lng on the detection object
+          const resolvedLat = gpsCoords?.lat ?? det.lat ?? det.latitude
+          const resolvedLng = gpsCoords?.lng ?? det.lng ?? det.longitude
+
           return {
             id: detectionId,
             type: isDetPothole ? 'pothole' : (det.type || 'signboard'),
             bbox: det.bbox,
             confidence: det.confidence,
-            latitude: gpsCoords?.lat,
-            longitude: gpsCoords?.lng,
+            latitude: resolvedLat,
+            longitude: resolvedLng,
           }
         }),
         videoTime: formatVideoTime(frame, data.video_info.fps),
@@ -986,11 +1028,13 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
         const isDetPothole = det0._detType === 'pothole' || det0.type === 'pothole' || (det0.pothole_id !== undefined && !det0.signboard_id)
         const detectionId = det0.pothole_id ?? det0.signboard_id ?? det0.detection_id
         const gpsCoords = gpsMap.current.get(detectionId)
+        const seekLat = gpsCoords?.lat ?? det0.lat ?? det0.latitude
+        const seekLng = gpsCoords?.lng ?? det0.lng ?? det0.longitude
 
-        if (gpsCoords) {
-          setLastDetectedLat(gpsCoords.lat)
-          setLastDetectedLng(gpsCoords.lng)
-          console.log(`[Seek] Updated GPS: ${gpsCoords.lat}, ${gpsCoords.lng} at frame ${frame}`)
+        if (seekLat !== undefined && seekLng !== undefined) {
+          setLastDetectedLat(seekLat)
+          setLastDetectedLng(seekLng)
+          console.log(`[Seek] Updated GPS: ${seekLat}, ${seekLng} at frame ${frame}`)
         }
 
         // Add detection log for the seeked frame

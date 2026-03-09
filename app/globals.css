@@ -194,3 +194,20 @@ body[data-scroll-locked] {
   transition: none !important;
   animation: none !important;
 }
+
+/* Mesh gradient background */
+.bg-mesh-gradient {
+  background: linear-gradient(135deg, #e8ecf8 0%, #f0f0fb 25%, #f8fafc 50%, #eef1fa 75%, #e8ecf8 100%);
+}
+
+/* Primary action button gradient */
+.btn-gradient {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 40%, #7c5ce0 100%);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+  transform: translateY(-1px);
+}

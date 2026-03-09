@@ -148,18 +148,18 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
     }
 
     return (
-        <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 overflow-hidden">
-            <CardHeader className="pb-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-                <div className="flex flex-col gap-4">
+        <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/60 dark:border-gray-700/50 shadow-xl shadow-indigo-500/5 rounded-2xl overflow-hidden">
+            <CardHeader className="pb-3 pt-4 border-b border-gray-100/60 dark:border-gray-800/60">
+                <div className="flex flex-col gap-2">
                     <div>
                         <CardTitle className="text-2xl font-semibold">Select Project Location</CardTitle>
-                        <CardDescription className="mt-2 text-base">
+                        <CardDescription className="mt-1 text-sm">
                             Select Project, Package & Location to begin intelligent road analysis with advanced computer vision.
                         </CardDescription>
                     </div>
 
                     {/* Step Progress Indicator */}
-                    <div className="flex items-center justify-center gap-2 pt-2">
+                    <div className="flex items-center justify-center gap-2">
                         {[1, 2, 3].map((step, index) => {
                             const status = getStepStatus(step)
                             const labels = ['Project', 'Package', 'Location']
@@ -190,7 +190,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                 </div>
             </CardHeader>
 
-            <CardContent className="pt-6 space-y-6">
+            <CardContent className="pt-4 space-y-4">
                 {/* Error Display */}
                 {error && (
                     <div className="flex items-start gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive">
@@ -201,9 +201,9 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Project Dropdown */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <Label htmlFor="project" className="text-sm font-semibold text-foreground">
                             Project
                         </Label>
@@ -235,7 +235,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                     </div>
 
                     {/* Package Dropdown */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <Label htmlFor="package" className="text-sm font-semibold text-foreground">
                             Package
                         </Label>
@@ -267,7 +267,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                     </div>
 
                     {/* Location Dropdown */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <Label htmlFor="location" className="text-sm font-semibold text-foreground">
                             Location
                         </Label>
@@ -314,19 +314,17 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                 )}
 
                 {/* Proceed Button */}
-                <Button
-                    onClick={handleProceed}
-                    disabled={!isComplete}
-                    className={`w-full h-14 text-base font-semibold rounded-xl ${isComplete ? 'btn-gradient text-white' : ''
-                        }`}
-                    size="lg"
-                >
-                    {isComplete ? (
-                        "Proceed to Upload"
-                    ) : (
-                        "Complete all selections to proceed"
-                    )}
-                </Button>
+                <div className="flex justify-center">
+                    <Button
+                        onClick={handleProceed}
+                        disabled={!isComplete}
+                        className={`px-16 h-14 text-base font-semibold rounded-full ${isComplete ? 'btn-gradient text-white' : ''
+                            }`}
+                        size="lg"
+                    >
+                        Start Road Analysis
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     )
