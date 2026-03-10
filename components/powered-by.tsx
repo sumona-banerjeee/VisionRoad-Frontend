@@ -2,7 +2,7 @@ import Image from "next/image"
 
 export function PoweredBy() {
     return (
-        <div className="mt-8 flex items-center justify-center gap-2  transition-opacity duration-300">
+        <div className=" flex items-center justify-center gap-2  transition-opacity duration-300">
             <span className="font-medium powered-blue-gradient">
                 Powered by
             </span>
