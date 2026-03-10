@@ -11,6 +11,7 @@ import { Loader2, CheckCircle2, MapPin, Navigation, Milestone } from "lucide-rea
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { DataTable } from "@/components/data-table"
 import { PageHeader } from "@/components/page-header"
+import { PoweredBy } from "@/components/powered-by"
 import {
     fetchProjects,
     fetchPackagesByProject,
@@ -341,12 +342,7 @@ export default function CreateLocationPage() {
                         />
                     </div>
 
-                    {/* Footer */}
-                    <div className="mt-8 text-center">
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                            Sentient Geeks Pvt. Ltd.
-                        </p>
-                    </div>
+                    <PoweredBy />
                 </div>
             </main>
 

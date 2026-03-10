@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton"
+import { PoweredBy } from "@/components/powered-by";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -609,12 +610,7 @@ export default function DashboardPage() {
             </>
           )}
 
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Sentient Geeks Pvt. Ltd.
-            </p>
-          </div>
+          <PoweredBy />
         </div>
       </main>
     </div>

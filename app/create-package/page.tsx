@@ -23,6 +23,7 @@ import {
     type PackageUpdate
 } from "@/lib/api"
 import { toast } from "sonner"
+import { PoweredBy } from "@/components/powered-by"
 
 export default function CreatePackagePage() {
     const [packages, setPackages] = useState<PackageType[]>([])
@@ -245,12 +246,7 @@ export default function CreatePackagePage() {
                         />
                     </div>
 
-                    {/* Footer */}
-                    <div className="mt-8 text-center">
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                            Sentient Geeks Pvt. Ltd.
-                        </p>
-                    </div>
+                    <PoweredBy />
                 </div>
             </main>
 

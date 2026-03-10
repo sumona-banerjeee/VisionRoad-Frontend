@@ -211,6 +211,9 @@ body[data-scroll-locked] {
 .heading-blue-gradient {
   @apply bg-linear-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent;
 }
+.powered-blue-gradient {
+  @apply bg-linear-to-b from-[#225999] to-[#56A5FF] bg-clip-text text-transparent;
+}
 
 .btn-blue-gradient {
   @apply text-white bg-linear-to-r from-blue-400 to-blue-600 hover:bg-linear-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium transition-all duration-200;

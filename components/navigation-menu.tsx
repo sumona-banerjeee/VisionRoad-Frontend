@@ -20,6 +20,7 @@ import {
     MapPin,
     Map
 } from "lucide-react"
+import { PoweredBy } from "@/components/powered-by"
 
 interface NavItem {
     title: string
@@ -140,11 +141,8 @@ export function NavigationMenu() {
                     })}
                 </nav>
 
-                {/* Footer */}
-                <div className="absolute bottom-4 left-4 right-4 text-center">
-                    <p className="text-xs text-gray-400">
-                        Sentient Geeks Pvt. Ltd.
-                    </p>
+                <div className="absolute bottom-4 left-4 right-4">
+                    <PoweredBy />
                 </div>
             </SheetContent>
         </Sheet>

@@ -6,6 +6,7 @@ import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { type SessionContext, saveSession } from "@/lib/api"
 import { TrendingUp } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
+import { PoweredBy } from "@/components/powered-by"
 
 const ProjectSelectionSection = dynamic(
     () => import("@/components/project-selection-section").then(mod => mod.ProjectSelectionSection),
@@ -44,12 +45,7 @@ export default function NewAnalysisPage() {
                         <ProjectSelectionSection onSelectionComplete={handleSelectionComplete} />
                     </div>
 
-                    {/* Footer */}
-                    <div className="mt-12 text-center">
-                        <p className="text-sm text-gray-400 dark:text-gray-500">
-                            Sentient Geeks Pvt. Ltd.
-                        </p>
-                    </div>
+                    <PoweredBy />
                 </div>
             </main>
         </div>

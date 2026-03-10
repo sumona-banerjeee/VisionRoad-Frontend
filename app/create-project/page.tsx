@@ -12,6 +12,7 @@ import { DataTable } from "@/components/data-table"
 import { PageHeader } from "@/components/page-header"
 import { createProject, fetchProjects, updateProject, deleteProject, type ProjectCreate, type Project, type ProjectUpdate } from "@/lib/api"
 import { toast } from "sonner"
+import { PoweredBy } from "@/components/powered-by"
 
 export default function CreateProjectPage() {
     const [projects, setProjects] = useState<Project[]>([])
@@ -226,12 +227,7 @@ export default function CreateProjectPage() {
                         />
                     </div>
 
-                    {/* Footer */}
-                    <div className="mt-8 text-center">
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                            Sentient Geeks Pvt. Ltd.
-                        </p>
-                    </div>
+                    <PoweredBy />
                 </div>
             </main>
 
@@ -393,7 +389,7 @@ export default function CreateProjectPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting || !name.trim()}
-                                className="flex-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-700 hover:bg-blue-600 text-white"
+                                className="flex-1 bg-linear-to-r from-blue-500 via-indigo-500 to-blue-700 hover:bg-blue-600 text-white"
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">

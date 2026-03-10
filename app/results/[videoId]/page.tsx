@@ -7,6 +7,7 @@ import { Loader2, TrendingUp } from "lucide-react"
 import VideoPlayerSection from "@/components/video-player-section"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
+import { PoweredBy } from "@/components/powered-by"
 import {
     type SessionContext,
     loadSession,
@@ -167,6 +168,7 @@ export default function VideoResultsPage() {
                             projectId={session?.projectId || undefined}
                         />
                     )}
+                    <PoweredBy />
                 </div>
             </main>
         </div>

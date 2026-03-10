@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, TrendingUp } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { PageHeader } from "@/components/page-header"
+import { PoweredBy } from "@/components/powered-by"
 import {
     type SessionContext,
     loadSession,
@@ -358,12 +359,7 @@ export default function UploadPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Footer */}
-                    <div className="mt-4 text-center">
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                            Sentient Geeks Pvt. Ltd.
-                        </p>
-                    </div>
+                    <PoweredBy />
                 </div>
             </main>
         </div>

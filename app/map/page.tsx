@@ -2,6 +2,7 @@
 
 import { NavigationMenu } from "@/components/navigation-menu"
 import { DashboardMap } from "@/components/dashboard/dashboard-map"
+import { PoweredBy } from "@/components/powered-by"
 
 export default function MapPage() {
     return (
@@ -41,12 +42,7 @@ export default function MapPage() {
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="mt-8 text-center">
-                    <p className="text-sm text-muted-foreground">
-                        Sentient Geeks Pvt. Ltd.
-                    </p>
-                </div>
+                <PoweredBy />
             </div>
         </div>
     )
