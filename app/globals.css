@@ -175,7 +175,6 @@
 
 html {
   scrollbar-gutter: stable;
-  scroll-behavior: smooth;
 }
 
 body[data-scroll-locked] {

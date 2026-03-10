@@ -334,6 +334,11 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
                     <span>SAM 3</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="yoloe">
+                  <div className="flex items-center gap-2">
+                    <span>YOLOE</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
