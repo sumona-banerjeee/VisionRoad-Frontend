@@ -116,7 +116,7 @@ export default function VideoResultsPage() {
     }
 
     return (
-        <div className="min-h-screen text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen max-w-340 mx-auto text-gray-900 dark:text-gray-100">
             <SidebarNavigation />
             <main className="ml-20 min-h-screen">
                 <div className="container mx-auto px-6 py-8 max-w-full">
@@ -130,7 +130,7 @@ export default function VideoResultsPage() {
 
                     {session && (
                         <div className="mb-6">
-                            <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-[var(--border)] shadow-sm backdrop-blur-sm bg-white/60 dark:bg-gray-800/60">
+                            <div className="flex items-center justify-between  rounded-md px-4 py-3 bg-white/60 backdrop-blur-sm">
                                 <div className="flex items-center gap-12">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Project</span>
@@ -151,7 +151,7 @@ export default function VideoResultsPage() {
                                         </span>
                                     </div>
                                 </div>
-                                <Button onClick={handleNewAnalysis} variant="outline" size="sm" className="text-xs">
+                                <Button onClick={handleNewAnalysis} variant="outline" size="sm" className="btn-blue-gradient">
                                     Start New
                                 </Button>
                             </div>

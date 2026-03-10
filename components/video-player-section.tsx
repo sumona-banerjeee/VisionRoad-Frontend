@@ -137,15 +137,13 @@ function DetailedSummarySection({
   })
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-      <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden flex flex-col lg:col-span-2">
-        <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-2">
+      <Card className="bg-white/60 backdrop-blur-md border border-gray-100 rounded-xl overflow-hidden flex flex-col lg:col-span-2">
+        <CardHeader className="pb-3 ">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-white/20 opacity-50"></div>
-                <div className="absolute inset-0 border-2 border-white/30 rounded-xl opacity-30"></div>
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10">
+              <div className="p-2 rounded-xl bg-linear-to-b from-[#225999] to-[#56A5FF] flex items-center justify-center relative overflow-hidden group">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="min-h-8 min-w-8 text-white relative z-10">
                   <path d="M50 20L85 80H15L50 20Z" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
                   <path d="M40 80L50 55L60 80" stroke="currentColor" strokeWidth="6" />
                 </svg>
@@ -163,9 +161,9 @@ function DetailedSummarySection({
               variant="outline"
               size="sm"
               onClick={() => setShowMap(true)}
-              className="gap-2 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/50"
+              className="gap-2 btn-blue-gradient"
             >
-              <MapIcon className="h-4 w-4 text-blue-500" />
+              <MapIcon className="h-4 w-4 text-white" />
               Show Map
             </Button>
           </div>
@@ -212,12 +210,12 @@ function DetailedSummarySection({
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden flex flex-col lg:col-span-3">
-        <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0">
+      <Card className="bg-white/60 backdrop-blur-md  rounded-md overflow-hidden flex flex-col lg:col-span-3">
+        <CardHeader className="pb-3 ">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
+            <div className="p-2 rounded-md bg-linear-to-b from-[#225999] to-[#56A5FF] flex items-center justify-center relative overflow-hidden group">
               <div className="absolute inset-0 bg-white/10 opacity-40"></div>
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white relative z-10">
                 <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M15 7H21V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -355,12 +353,11 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
   ]
 
   return (
-    <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden">
-      <CardHeader className="pb-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+    <Card className="bg-white/60 backdrop-blur-md rounded-xl overflow-hidden">
+      <CardHeader className="">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-white/10 opacity-40"></div>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white relative z-10">
+          <div className="p-2 rounded-md bg-linear-to-b from-[#225999] to-[#56A5FF] flex items-center justify-center relative overflow-hidden group">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white relative z-10">
               <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M15 7H21V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -382,9 +379,9 @@ function SummarySection({ data, show, detectionType }: { data: DetectionData; sh
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md"
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/80 backdrop-blur-md hover:scale-105 cursor-pointer transition-all duration-300 ease-in-out"
               >
-                <div className={`${stat.bgColor} p-3 rounded-lg mb-2 transition-all shadow-inner`}>
+                <div className={`${stat.bgColor} p-3 rounded-lg mb-2 transition-all`}>
                   <Icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
                 <div className={`text-xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
@@ -1022,11 +1019,11 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 rounded-xl overflow-hidden">
-        <CardHeader className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+      <Card className="bg-white/60 backdrop-blur-lg rounded-xl overflow-hidden">
+        <CardHeader className="">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-lg shadow-[#60a5fa]/20">
-              <Film className="h-5 w-5 text-white" />
+            <div className="p-2 rounded-md bg-linear-to-b from-[#225999] to-[#56A5FF]">
+              <Film className="h-8 w-8 text-white" />
             </div>
             <div>
               <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">
@@ -1142,7 +1139,7 @@ export default function VideoPlayerSection({ data, videoId, videoFile, detection
                       <div
                         key={`${log.frame}-${index}`}
                         onClick={() => seekToFrame(log.frame)}
-                        className="text-xs p-3 bg-white dark:bg-gray-900 rounded-md cursor-pointer hover:bg-accent/50 transition-colors shadow-sm"
+                        className="text-xs p-3 rounded-md border border-slate-200 bg-white cursor-pointer transition-colors"
 
                       >
                         <div className="flex items-center justify-between mb-2">

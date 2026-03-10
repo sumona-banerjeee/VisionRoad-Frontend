@@ -168,7 +168,7 @@ export default function VideoProcessingPage() {
                         </div>
                     )}
 
-                    <Card className="rounded-2xl overflow-hidden bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border border-white/40 dark:border-gray-800/40 shadow-2xl flex flex-col items-center justify-center py-12 px-8 min-h-[450px]">
+                    <Card className="rounded-md overflow-hidden bg-white/60 backdrop-blur-xl  flex flex-col items-center justify-center py-12 px-8 min-h-[450px]">
                         <div className="flex flex-col items-center justify-center w-full max-w-4xl space-y-8">
                             {/* Visual Spinner Area */}
                             <div className="relative">
