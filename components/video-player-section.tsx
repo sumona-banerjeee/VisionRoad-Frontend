@@ -236,7 +236,7 @@ function DetailedSummarySection({
               {allDetections.map(({ detection, locationName, packageName }, idx) => (
                 <div
                   key={`${detection.id}-${idx}`}
-                  className="text-xs p-2 bg-white dark:bg-gray-900 rounded shadow-sm border border-gray-100 dark:border-gray-800"
+                  className="text-xs p-2 bg-white border border-slate-200 rounded-md "
 
                 >
                   <div className="flex items-center justify-between mb-1">

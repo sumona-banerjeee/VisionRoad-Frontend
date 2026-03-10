@@ -317,9 +317,9 @@ export default function UploadPage() {
                                             <SelectItem value="sam3">
                                                 <span className="font-medium">OpenAI SAM 3 Segmentation Model</span>
                                             </SelectItem>
-                                            <SelectItem value="yoloe">
+                                            {/* <SelectItem value="yoloe">
                                                 <span className="font-medium">YOLOE Open-Vocabulary Detection</span>
-                                            </SelectItem>
+                                            </SelectItem> */}
                                         </SelectContent>
                                     </Select>
                                 </div>
