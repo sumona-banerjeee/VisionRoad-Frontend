@@ -15,7 +15,7 @@ interface LocationData {
 
 interface LocationBarChartProps {
     data: LocationData[]
-    isLoading: boolean
+    isLoading?: boolean
 }
 
 const COLORS = {
@@ -26,7 +26,7 @@ const COLORS = {
     good_sign_board: "#34d399"      // Lighter Emerald
 }
 
-export function LocationBarChart({ data, isLoading }: LocationBarChartProps) {
+export function LocationBarChart({ data, isLoading = false }: LocationBarChartProps) {
     if (isLoading) {
         return (
             <div className="h-[300px] flex items-center justify-center">

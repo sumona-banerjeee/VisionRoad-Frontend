@@ -8,6 +8,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Column<T> {
     key: string
@@ -42,51 +43,62 @@ export function DataTable<T extends Record<string, any>>({
     return (
         <div>
             {/* Header with Title and Add Button */}
-            <div className="mb-4 flex justify-between items-center bg-card p-3 rounded-xl border border-[var(--border)] shadow-sm">
-                <div>
-                    <h2 className="text-lg font-bold tracking-tight text-blue-600">{title}</h2>
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-medium">Total items: {data.length}</p>
+            <div className="flex justify-between items-center  p-3 ">
+                <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-bold tracking-tight heading-blue-gradient">{title}</h2>
+                    <span className="badge-blue min-w-[28px] h-[28px] px-2">
+                        {data.length}
+                    </span>
                 </div>
                 <Button
                     onClick={onAddNew}
-                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border-none h-8 px-4 text-xs font-semibold"
+                    className="btn-blue-gradient rounded-full text-sm px-4 py-2.5 h-auto flex items-center gap-2"
                 >
-                    <Plus className="h-3.5 w-3.5 mr-1.5 stroke-[3px]" />
+                    <Plus className="h-4 w-4" />
                     {addButtonText}
                 </Button>
             </div>
 
             {/* Table */}
-            <div className="rounded-2xl border border-[var(--border)] bg-card shadow-2xl shadow-black/5 overflow-hidden">
-                <div className="overflow-auto max-h-[400px]">
-                    <table className="min-w-full divide-y divide-gray-200/50 dark:divide-gray-700/50 border-collapse">
-                        <thead className="bg-[#f8fafc] dark:bg-gray-900/50 sticky top-0 z-10">
+            <div className="rounded-lg overflow-hidden">
+                <div className="overflow-auto max-h-[450px]">
+                    <table className="min-w-full rounded-lg!">
+                        <thead className="bg-white/40 backdrop-blur-md rounded-lg! sticky top-0 z-10">
                             <tr>
                                 {columns.map((col) => (
                                     <th
                                         key={col.key}
-                                        className="px-4 py-3 text-left text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.1em] border-b border-[var(--border)] bg-[#f8fafc] dark:bg-gray-900 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]"
+                                        className="px-4 py-3 text-slate-500 text-left font-bold"
                                     >
                                         {col.header}
                                     </th>
                                 ))}
                                 {showActions && (
-                                    <th className="px-4 py-3 text-right text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.1em] border-b border-[var(--border)] bg-[#f8fafc] dark:bg-gray-900 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                                    <th className="px-4 py-3 text-slate-500 text-left font-bold">
                                         Actions
                                     </th>
                                 )}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100/30 dark:divide-gray-800/30">
+                        <tbody className="divide-y divide-gray-300 backdrop-blur-lg bg-white/70">
                             {isLoading ? (
-                                <tr>
-                                    <td colSpan={totalCols} className="px-4 py-12 text-center">
-                                        <div className="flex flex-col items-center justify-center gap-3">
-                                            <div className="h-8 w-8 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-                                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Loading records...</span>
-                                        </div>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 5 }).map((_, idx) => (
+                                    <tr key={idx} className="border-b border-gray-100 dark:border-gray-800">
+                                        {columns.map((col) => (
+                                            <td key={col.key} className="px-4 py-4">
+                                                <Skeleton className="h-4 w-full max-w-[120px]" />
+                                            </td>
+                                        ))}
+                                        {showActions && (
+                                            <td className="px-4 py-4 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Skeleton className="h-8 w-8 rounded-sm" />
+                                                    <Skeleton className="h-8 w-8 rounded-sm" />
+                                                </div>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))
                             ) : data.length === 0 ? (
                                 <tr>
                                     <td colSpan={totalCols} className="px-4 py-12 text-center">
@@ -121,7 +133,7 @@ export function DataTable<T extends Record<string, any>>({
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         onClick={() => onEdit(item)}
-                                                                        className="h-8 w-8 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-600 hover:text-white dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-700"
+                                                                        className="h-8 w-8 rounded-sm bg-white text-blue-500 border-slate-200! border hover:bg-blue-500 hover:text-white"
                                                                     >
                                                                         <Edit2 className="h-4 w-4" />
                                                                     </Button>
@@ -138,7 +150,7 @@ export function DataTable<T extends Record<string, any>>({
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         onClick={() => onDelete(item)}
-                                                                        className="h-8 w-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white dark:bg-rose-900/40 dark:text-rose-400 dark:hover:bg-rose-700"
+                                                                        className="h-8 w-8 rounded-sm border border-slate-200! bg-white text-red-400 hover:bg-red-400 hover:text-white"
                                                                     >
                                                                         <Trash2 className="h-4 w-4" />
                                                                     </Button>

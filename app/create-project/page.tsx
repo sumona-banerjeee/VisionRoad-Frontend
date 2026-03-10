@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, CheckCircle2, FolderPlus, MapPin, Building2, Route, X } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { DataTable } from "@/components/data-table"
+import { PageHeader } from "@/components/page-header"
 import { createProject, fetchProjects, updateProject, deleteProject, type ProjectCreate, type Project, type ProjectUpdate } from "@/lib/api"
 import { toast } from "sonner"
 
@@ -159,7 +160,7 @@ export default function CreateProjectPage() {
                         {project.state.split(',').map((item, idx) => (
                             <span
                                 key={idx}
-                                className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[11px] font-semibold border border-blue-100 dark:border-blue-800 shadow-sm"
+                                className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold border border-blue-100 dark:border-blue-800"
                             >
                                 {item.trim()}
                             </span>
@@ -175,25 +176,17 @@ export default function CreateProjectPage() {
     ]
 
     return (
-        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen text-gray-900 dark:text-gray-100">
             <SidebarNavigation />
-            <main className="ml-16 min-h-screen relative overflow-hidden">
-                <div className="mx-auto px-6 py-8 max-w-7xl relative z-10">
+            <main className="ml-20 min-h-screen relative overflow-hidden">
+                <div className="mx-auto px-6 py-8 max-w-340 relative z-10">
                     {/* Refined Header */}
                     <div className="mb-8">
-                        <div className="flex items-center gap-5">
-                            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
-                                <FolderPlus className="h-8 w-8 text-white" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
-                                    Project Management
-                                </h1>
-                                <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium italic">
-                                    Manage road infrastructure projects
-                                </p>
-                            </div>
-                        </div>
+                        <PageHeader
+                            title="Project Management"
+                            description="Manage road infrastructure projects"
+                            icon={FolderPlus}
+                        />
                     </div>
 
                     {/* Error Message */}

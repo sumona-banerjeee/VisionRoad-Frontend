@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, CheckCircle2, MapPin, Navigation, Milestone } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { DataTable } from "@/components/data-table"
+import { PageHeader } from "@/components/page-header"
 import {
     fetchProjects,
     fetchPackagesByProject,
@@ -261,7 +262,7 @@ export default function CreateLocationPage() {
             render: (location: Location) => {
                 if (location.chainage_start_km !== null && location.chainage_end_km !== null) {
                     return (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] font-semibold border border-amber-100 dark:border-amber-800 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-semibold border border-amber-100 dark:border-amber-800 whitespace-nowrap">
                             {location.chainage_start_km} - {location.chainage_end_km}
                         </span>
                     )
@@ -273,7 +274,7 @@ export default function CreateLocationPage() {
             key: "start_gps",
             header: "Start GPS",
             render: (location: Location) => (
-                <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-mono border border-blue-100 dark:border-blue-800 whitespace-nowrap">
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 whitespace-nowrap">
                     {location.start_lat.toFixed(4)}, {location.start_lng.toFixed(4)}
                 </span>
             )
@@ -282,7 +283,7 @@ export default function CreateLocationPage() {
             key: "end_gps",
             header: "End GPS",
             render: (location: Location) => (
-                <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-mono border border-blue-100 dark:border-blue-800 whitespace-nowrap">
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 whitespace-nowrap">
                     {location.end_lat.toFixed(4)}, {location.end_lng.toFixed(4)}
                 </span>
             )
@@ -290,25 +291,17 @@ export default function CreateLocationPage() {
     ]
 
     return (
-        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen text-gray-900 dark:text-gray-100">
             <SidebarNavigation />
-            <main className="ml-16 min-h-screen relative overflow-hidden">
-                <div className="mx-auto px-6 py-8 max-w-7xl relative z-10">
+            <main className="ml-20 min-h-screen relative overflow-hidden">
+                <div className="mx-auto px-6 py-8 max-w-340 relative z-10">
                     {/* Refined Header */}
                     <div className="mb-8">
-                        <div className="flex items-center gap-5">
-                            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
-                                <MapPin className="h-8 w-8 text-white" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
-                                    Location Management
-                                </h1>
-                                <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium italic">
-                                    Manage road segment locations
-                                </p>
-                            </div>
-                        </div>
+                        <PageHeader
+                            title="Location Management"
+                            description="Manage road segment locations"
+                            icon={MapPin}
+                        />
                     </div>
 
                     {/* Error Message */}

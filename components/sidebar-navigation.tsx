@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation"
 import { LayoutDashboard, Plus, User, FolderPlus, Package, MapPin } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 
 interface NavItem {
     title: string
@@ -19,19 +20,19 @@ const navItems: NavItem[] = [
         gradient: "from-blue-400 to-indigo-500"
     },
     {
-        title: "Create Project",
+        title: "Project",
         href: "/create-project",
         icon: FolderPlus,
         gradient: "from-blue-400 to-blue-600"
     },
     {
-        title: "Create Package",
+        title: "Package",
         href: "/create-package",
         icon: Package,
         gradient: "from-violet-400 to-purple-500"
     },
     {
-        title: "Create Location",
+        title: "Location",
         href: "/create-location",
         icon: MapPin,
         gradient: "from-amber-400 to-orange-500"
@@ -57,7 +58,7 @@ export function SidebarNavigation() {
     const isNewAnalysisActive = pathname === "/new-analysis"
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-20 bg-white border-r border-slate-200 z-50 flex flex-col items-center py-8 shadow-sm">
+        <aside className="fixed left-0 top-0 h-screen w-20 bg-white/40 backdrop-blur-xl border-r border-slate-200/50 z-50 flex flex-col items-center py-8">
             {/* Navigation Items */}
             <nav className="flex-1 flex flex-col items-center gap-4">
                 {/* Dashboard - first item */}
@@ -66,58 +67,52 @@ export function SidebarNavigation() {
                     const Icon = item.icon
                     return (
                         <div key={item.href} className="relative group">
-                            <button
-                                onClick={() => handleNavigation(item)}
-                                className={`
-                                    relative w-12 h-12 rounded-xl flex items-center justify-center
-                                    ${isActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
-                                    hover:bg-[#2563eb] hover:border-[#2563eb]
-                                    border
-                                `}
-                            >
-                                <Icon
-                                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
-                                />
-                            </button>
-                            <div className="
-                                absolute left-full ml-3 top-1/2 -translate-y-1/2
-                                px-3 py-1.5 rounded-lg
-                                bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                whitespace-nowrap shadow-lg pointer-events-none
-                            ">
-                                {item.title}
-                                <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
-                            </div>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() => handleNavigation(item)}
+                                        className={`
+                                            relative w-12 h-12 rounded-md flex items-center justify-center
+                                            ${isActive ? 'bg-linear-to-b from-[#3895FF] to-[#86B8F1]' : 'bg-[#f0fafd]/60 border border-slate-100/50'}
+                                            hover:bg-linear-to-b hover:from-[#3895FF] hover:to-[#86B8F1] hover:border-none
+                                            transition-all ease-in-out duration-200
+                                        `}
+                                    >
+                                        <Icon
+                                            className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'} stroke-[2.5]`}
+                                        />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right" sideOffset={12}>
+                                    <p>{item.title}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     )
                 })}
 
                 {/* New Analysis - Special eye-catchy button */}
                 <div className="relative group">
-                    <button
-                        onClick={() => router.push("/new-analysis")}
-                        className={`
-                            relative w-12 h-12 rounded-xl flex items-center justify-center
-                            ${isNewAnalysisActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
-                            hover:bg-[#2563eb] hover:border-[#2563eb]
-                            border
-                        `}
-                    >
-                        <Plus
-                            className={`h-6 w-6 ${isNewAnalysisActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
-                        />
-                    </button>
-                    <div className="
-                        absolute left-full ml-3 top-1/2 -translate-y-1/2
-                        px-3 py-1.5 rounded-lg
-                        bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                        whitespace-nowrap shadow-lg pointer-events-none
-                    ">
-                        Start New Analysis
-                        <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
-                    </div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={() => router.push("/new-analysis")}
+                                className={`
+                                    relative w-12 h-12 rounded-md flex items-center justify-center 
+                                    ${isNewAnalysisActive ? 'bg-linear-to-b from-[#3895FF] to-[#86B8F1]' : 'bg-[#f0fafd]/60 border border-slate-100/50'}
+                                    hover:bg-linear-to-b hover:from-[#3895FF] hover:to-[#86B8F1] hover:border-none
+                                    transition-all ease-in-out duration-200
+                                `}
+                            >
+                                <Plus
+                                    className={`h-6 w-6 ${isNewAnalysisActive ? 'text-white' : 'text-slate-500 group-hover:text-white'} stroke-[2.5]`}
+                                />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={12}>
+                            <p>New Analysis</p>
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
 
                 {/* Divider */}
@@ -129,29 +124,26 @@ export function SidebarNavigation() {
                     const Icon = item.icon
                     return (
                         <div key={item.href} className="relative group">
-                            <button
-                                onClick={() => handleNavigation(item)}
-                                className={`
-                                    relative w-12 h-12 rounded-xl flex items-center justify-center
-                                    ${isActive ? 'bg-[#2563eb] border-[#2563eb] shadow-md' : 'bg-[#f0fafd] border-slate-100'}
-                                    hover:bg-[#2563eb] hover:border-[#2563eb]
-                                    border
-                                `}
-                            >
-                                <Icon
-                                    className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-900 group-hover:text-white'} stroke-[2.5]`}
-                                />
-                            </button>
-                            <div className="
-                                absolute left-full ml-3 top-1/2 -translate-y-1/2
-                                px-3 py-1.5 rounded-lg
-                                bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                whitespace-nowrap shadow-lg pointer-events-none
-                            ">
-                                {item.title}
-                                <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
-                            </div>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() => handleNavigation(item)}
+                                        className={`
+                                            relative w-12 h-12 rounded-md flex items-center justify-center
+                                            ${isActive ? 'bg-linear-to-b from-[#3895FF] to-[#86B8F1]' : 'bg-[#f0fafd]/60 border border-slate-100/50'}
+                                            hover:bg-linear-to-b hover:from-[#3895FF] hover:to-[#86B8F1] hover:border-none
+                                            transition-all duration-200
+                                        `}
+                                    >
+                                        <Icon
+                                            className={`h-6 w-6 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'} stroke-[2.5]`}
+                                        />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right" sideOffset={12}>
+                                    <p>{item.title}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     )
                 })}
@@ -160,23 +152,20 @@ export function SidebarNavigation() {
             {/* Bottom section */}
             <div className="mt-auto">
                 <div className="relative group">
-                    <button
-                        onClick={() => { }}
-                        className="w-12 h-12 rounded-full bg-[#f0fafd] flex items-center justify-center cursor-not-allowed opacity-80 border border-slate-100 hover:bg-[#2563eb] hover:border-[#2563eb]"
-                        disabled
-                    >
-                        <User className="h-6 w-6 text-slate-900 group-hover:text-white" />
-                    </button>
-                    <div className="
-                        absolute left-full ml-3 top-1/2 -translate-y-1/2
-                        px-3 py-1.5 rounded-lg
-                        bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                        whitespace-nowrap shadow-lg pointer-events-none
-                    ">
-                        Account (Coming Soon)
-                        <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
-                    </div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={() => { }}
+                                className="w-12 h-12 rounded-full flex items-center justify-center  bg-linear-to-b from-[#225999] to-[#56A5FF] transition-all duration-200"
+                                disabled
+                            >
+                                <User className="h-6 w-6 text-white" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={12}>
+                            <p>Account</p>
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
             </div>
         </aside>

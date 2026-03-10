@@ -9,7 +9,7 @@ interface DetectionDonutChartProps {
     roadCrack: number
     damagedRoadMarking: number
     goodSignboard: number
-    isLoading: boolean
+    isLoading?: boolean
 }
 
 const COLORS = {
@@ -26,7 +26,7 @@ export function DetectionDonutChart({
     roadCrack,
     damagedRoadMarking,
     goodSignboard,
-    isLoading
+    isLoading = false
 }: DetectionDonutChartProps) {
     if (isLoading) {
         return (

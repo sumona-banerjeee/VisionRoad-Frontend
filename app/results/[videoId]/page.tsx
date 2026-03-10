@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Loader2, TrendingUp } from "lucide-react"
 import VideoPlayerSection from "@/components/video-player-section"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
+import { PageHeader } from "@/components/page-header"
 import {
     type SessionContext,
     loadSession,
@@ -91,7 +92,7 @@ export default function VideoResultsPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                     <p className="text-gray-500">Loading detection results...</p>
@@ -102,7 +103,7 @@ export default function VideoResultsPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg text-center">
                     <p className="text-red-500 font-medium">{error}</p>
                     <div className="flex gap-4 mt-4">
@@ -115,22 +116,16 @@ export default function VideoResultsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen text-gray-900 dark:text-gray-100">
             <SidebarNavigation />
-            <main className="ml-16 min-h-screen">
+            <main className="ml-20 min-h-screen">
                 <div className="container mx-auto px-6 py-8 max-w-full">
-                    <div className="mb-8 flex items-center gap-5">
-                        <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
-                            <TrendingUp className="h-8 w-8 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent leading-tight">
-                                {getTitle()}
-                            </h1>
-                            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-                                Video ID: {videoId}
-                            </p>
-                        </div>
+                    <div className="mb-8">
+                        <PageHeader
+                            title={getTitle()}
+                            description={`Video ID: ${videoId}`}
+                            icon={TrendingUp}
+                        />
                     </div>
 
                     {session && (

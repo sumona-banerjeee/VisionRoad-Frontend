@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Eye, AlertCircle } from "lucide-react"
 import { type Video } from "@/lib/api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface RecentAnalysesTableProps {
     videos: Video[]
@@ -56,9 +57,19 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
             </CardHeader>
             <CardContent className="p-0">
                 {isLoading ? (
-                    <div className="p-6 space-y-3">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="h-14 bg-primary/5 rounded-lg" />
+                    <div className="p-6 space-y-4">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="flex items-center justify-between gap-4">
+                                <div className="flex-1 space-y-2">
+                                    <Skeleton className="h-4 w-[60%]" />
+                                    <Skeleton className="h-3 w-[40%]" />
+                                </div>
+                                <div className="flex gap-2">
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                </div>
+                                <Skeleton className="h-8 w-16" />
+                            </div>
                         ))}
                     </div>
                 ) : videos.length === 0 ? (
@@ -83,11 +94,11 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
                                             {formatDate(video.created_at)}
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                    <div className="flex items-center gap-2 shrink-0">
                                         {getDetectionTypeBadge(video.detection_type)}
                                         {getStatusBadge(video.status)}
                                     </div>
-                                    <div className="text-right flex-shrink-0 w-20">
+                                    <div className="text-right shrink-0 w-20">
                                         <p className="text-sm font-bold text-foreground">
                                             {video.detection_type === "pothole-detection"
                                                 ? video.unique_pothole ?? 0
@@ -103,7 +114,7 @@ export function RecentAnalysesTable({ videos, isLoading, onViewResults }: Recent
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => onViewResults(video.id, video.detection_type)}
-                                        className="ml-4 flex-shrink-0"
+                                        className="ml-4 shrink-0"
                                     >
                                         <Eye className="h-4 w-4 mr-1" />
                                         View

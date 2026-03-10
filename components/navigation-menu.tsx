@@ -114,12 +114,12 @@ export function NavigationMenu() {
                                     : "hover:bg-slate-50 border border-transparent hover:border-slate-100"
                                     }`}
                             >
-                                <div className={`p-2.5 rounded-lg transition-all duration-300 border shadow-sm ${isActive
-                                    ? "bg-[#2563eb] text-white border-[#2563eb]"
-                                    : "bg-[#f0fafd] text-slate-900 group-hover:bg-[#2563eb] group-hover:text-white group-hover:border-[#2563eb] border-slate-100"
+                                <div className={`p-2.5 rounded-lg transition-all duration-300 ${isActive
+                                    ? "bg-linear-to-b from-[#3895FF] to-[#86B8F1] text-white"
+                                    : "bg-[#f0fafd] text-slate-900 group-hover:bg-linear-to-b group-hover:from-[#3895FF] group-hover:to-[#86B8F1] group-hover:text-white border border-slate-100 shadow-sm"
                                     }`}>
                                     <Icon
-                                        className={`h-5 w-5 ${isActive ? 'stroke-[2.5]' : 'stroke-[2]'}`}
+                                        className={`h-5 w-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`}
                                     />
                                 </div>
                                 <div className="flex-1 min-w-0">

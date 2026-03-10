@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, TrendingUp } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
+import { PageHeader } from "@/components/page-header"
 import {
     type SessionContext,
     loadSession,
@@ -131,7 +132,7 @@ export default function UploadPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                 </div>
@@ -140,24 +141,21 @@ export default function UploadPage() {
     }
 
     return (
-        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen text-gray-900 dark:text-gray-100">
             {/* Sidebar Navigation */}
             <SidebarNavigation />
 
             {/* Main Content */}
-            <main className="ml-16 min-h-screen relative overflow-hidden flex flex-col">
+            <main className="ml-20 min-h-screen relative overflow-hidden flex flex-col">
 
-                <div className="flex-1 container mx-auto px-6 py-6 max-w-7xl relative z-10 flex flex-col">
+                <div className="flex-1 container mx-auto px-6 py-6 max-w-340 relative z-10 flex flex-col">
                     {/* Refined Header */}
-                    <div className="mb-6 flex items-center gap-5">
-                        <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
-                            <TrendingUp className="h-8 w-8 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent leading-tight">
-                                {getTitle()}
-                            </h1>
-                        </div>
+                    <div className="mb-6">
+                        <PageHeader
+                            title={getTitle()}
+                            description="Upload video file and fill in required details to start the road analysis"
+                            icon={TrendingUp}
+                        />
                     </div>
 
                     {/* Compact Session Info Bar */}

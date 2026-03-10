@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, TrendingUp } from "lucide-react"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
+import { PageHeader } from "@/components/page-header"
 import {
     type SessionContext,
     loadSession,
@@ -119,7 +120,7 @@ export default function VideoProcessingPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-mesh-gradient flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="p-8 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg">
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                 </div>
@@ -128,19 +129,16 @@ export default function VideoProcessingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-mesh-gradient text-gray-900 dark:text-gray-100">
+        <div className="min-h-screen text-gray-900 dark:text-gray-100">
             <SidebarNavigation />
-            <main className="ml-16 min-h-screen relative overflow-hidden flex flex-col">
-                <div className="flex-1 container mx-auto px-6 py-6 max-w-7xl relative z-10 flex flex-col">
-                    <div className="mb-6 flex items-center gap-5">
-                        <div className="p-3 rounded-2xl bg-gradient-to-br from-[#9bddeb] to-[#60a5fa] shadow-md flex items-center justify-center">
-                            <TrendingUp className="h-8 w-8 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent leading-tight">
-                                Processing Analysis
-                            </h1>
-                        </div>
+            <main className="ml-20 min-h-screen relative overflow-hidden flex flex-col">
+                <div className="flex-1 container mx-auto px-6 py-6 max-w-340 relative z-10 flex flex-col">
+                    <div className="mb-6">
+                        <PageHeader
+                            title="Processing Analysis"
+                            description={`Real-time analysis progress for video ID: ${videoId}`}
+                            icon={TrendingUp}
+                        />
                     </div>
 
                     {session && (

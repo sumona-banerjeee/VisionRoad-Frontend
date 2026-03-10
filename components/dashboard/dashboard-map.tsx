@@ -89,12 +89,12 @@ export function DashboardMap({
     }
 
     return (
-        <Card className={`overflow-hidden ${className}`}>
+        <Card className={`overflow-hidden pb-0 bg-white/60  rounded-b-none shadow-none  border-none    ${className}`}>
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-lg border-2 border-[#1e40af]">
-                            <MapPin className="h-5 w-5 text-[#2563eb]" />
+                        <div className="w-10 h-10 rounded-md  bg-linear-to-b from-[#225999] to-[#56A5FF]  flex items-center justify-center ">
+                            <MapPin className="h-5 w-5 text-white" />
                         </div>
                         <div>
                             <CardTitle className="text-base font-bold text-[#2563eb]">
@@ -132,7 +132,7 @@ export function DashboardMap({
                 </div>
             </CardHeader>
             <CardContent className="p-0">
-                <div className="h-[400px] w-full relative">
+                <div className="h-[500px]  p-2  w-full relative">
                     {isLoading ? (
                         <div className="h-full w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
                             <Loader2 className="h-8 w-8 text-indigo-500" />

@@ -5,16 +5,16 @@ import { DashboardMap } from "@/components/dashboard/dashboard-map"
 
 export default function MapPage() {
     return (
-        <div className="min-h-screen bg-mesh-gradient relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden ml-20">
             {/* Navigation Menu */}
             <NavigationMenu />
 
-            <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+            <div className="container mx-auto px-4 py-8 max-w-340 relative z-10">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-bold text-gradient leading-tight">
+                            <h1 className="text-3xl md:text-4xl font-bold heading-blue-gradient leading-tight">
                                 Detection Map
                             </h1>
                             <p className="text-muted-foreground mt-1">
