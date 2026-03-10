@@ -33,6 +33,10 @@ export default function CreatePackagePage() {
     const [error, setError] = useState<string | null>(null)
     const [loadingProjects, setLoadingProjects] = useState(false)
 
+    // Pagination state
+    const [skip, setSkip] = useState(0)
+    const [limit, setLimit] = useState(10)
+
     // Editing state
     const [isEditing, setIsEditing] = useState(false)
     const [currentPackage, setCurrentPackage] = useState<PackageType | null>(null)
@@ -43,11 +47,11 @@ export default function CreatePackagePage() {
     const [region, setRegion] = useState("")
 
     // Load packages and projects
-    const loadPackages = async () => {
+    const loadPackages = async (currentSkip = skip, currentLimit = limit) => {
         try {
             setIsLoading(true)
             setError(null)
-            const data = await fetchAllPackages()
+            const data = await fetchAllPackages({ skip: currentSkip, limit: currentLimit })
             setPackages(data)
         } catch (err) {
             setError("Failed to load packages. Please check if the backend is running.")
@@ -59,7 +63,7 @@ export default function CreatePackagePage() {
     const loadProjects = async () => {
         try {
             setLoadingProjects(true)
-            const data = await fetchProjects()
+            const data = await fetchProjects({ skip: 0, limit: 1000 }) // Load all projects for selector
             setProjects(data)
         } catch (err) {
             setError("Failed to load projects.")
@@ -69,9 +73,9 @@ export default function CreatePackagePage() {
     }
 
     useEffect(() => {
-        loadPackages()
+        loadPackages(skip, limit)
         loadProjects()
-    }, [])
+    }, [skip, limit])
 
     const resetForm = () => {
         setSelectedProjectId("")
@@ -229,6 +233,15 @@ export default function CreatePackagePage() {
                             onDelete={handleDelete}
                             addButtonText="Add New Package"
                             isLoading={isLoading}
+                            pagination={{
+                                skip,
+                                limit,
+                                onPageChange: setSkip,
+                                onLimitChange: (newLimit) => {
+                                    setLimit(newLimit);
+                                    setSkip(0); // Reset skip when limit changes
+                                }
+                            }}
                         />
                     </div>
 

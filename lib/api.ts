@@ -43,6 +43,11 @@ export interface Location {
     updated_at: string
 }
 
+export interface PaginationParams {
+    skip?: number;
+    limit?: number;
+}
+
 // Helper function for GET API requests
 async function apiRequest<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -241,36 +246,46 @@ export async function deleteLocation(locationId: string): Promise<{ message: str
 /**
  * Fetch all projects
  */
-export async function fetchProjects(): Promise<Project[]> {
-    return apiRequest<Project[]>("/projects/")
+export async function fetchProjects(params?: PaginationParams): Promise<Project[]> {
+    const skip = params?.skip ?? 0
+    const limit = params?.limit ?? 100
+    return apiRequest<Project[]>(`/projects/?skip=${skip}&limit=${limit}`)
 }
 
 /**
  * Fetch packages filtered by project ID
  */
-export async function fetchPackagesByProject(projectId: string): Promise<Package[]> {
-    return apiRequest<Package[]>(`/packages/?project_id=${projectId}`)
+export async function fetchPackagesByProject(projectId: string, params?: PaginationParams): Promise<Package[]> {
+    const skip = params?.skip ?? 0
+    const limit = params?.limit ?? 100
+    return apiRequest<Package[]>(`/packages/?project_id=${projectId}&skip=${skip}&limit=${limit}`)
 }
 
 /**
  * Fetch locations filtered by package ID
  */
-export async function fetchLocationsByPackage(packageId: string): Promise<Location[]> {
-    return apiRequest<Location[]>(`/locations/?package_id=${packageId}`)
+export async function fetchLocationsByPackage(packageId: string, params?: PaginationParams): Promise<Location[]> {
+    const skip = params?.skip ?? 0
+    const limit = params?.limit ?? 100
+    return apiRequest<Location[]>(`/locations/?package_id=${packageId}&skip=${skip}&limit=${limit}`)
 }
 
 /**
  * Fetch all packages (for dashboard)
  */
-export async function fetchAllPackages(): Promise<Package[]> {
-    return apiRequest<Package[]>("/packages/")
+export async function fetchAllPackages(params?: PaginationParams): Promise<Package[]> {
+    const skip = params?.skip ?? 0
+    const limit = params?.limit ?? 100
+    return apiRequest<Package[]>(`/packages/?skip=${skip}&limit=${limit}`)
 }
 
 /**
  * Fetch all locations (for dashboard)
  */
-export async function fetchAllLocations(): Promise<Location[]> {
-    return apiRequest<Location[]>("/locations/")
+export async function fetchAllLocations(params?: PaginationParams): Promise<Location[]> {
+    const skip = params?.skip ?? 0
+    const limit = params?.limit ?? 100
+    return apiRequest<Location[]>(`/locations/?skip=${skip}&limit=${limit}`)
 }
 
 // Video type for dashboard
@@ -293,7 +308,9 @@ export interface Video {
 /**
  * Fetch all videos (for dashboard)
  */
-export async function fetchVideos(): Promise<Video[]> {
+export async function fetchVideos(params?: PaginationParams): Promise<Video[]> {
+    const skip = params?.skip ?? 0
+    const limit = params?.limit ?? 100
     const response = await apiRequest<{
         videos: Array<{
             video_id: string;
@@ -309,7 +326,7 @@ export async function fetchVideos(): Promise<Video[]> {
                 total_detections?: number;
             }
         }>
-    }>("/videos")
+    }>(`/videos?skip=${skip}&limit=${limit}`)
 
     // Transform the response to match our Video interface
     return response.videos.map(v => ({

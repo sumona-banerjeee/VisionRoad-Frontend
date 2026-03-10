@@ -20,6 +20,10 @@ export default function CreateProjectPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
+    // Pagination state
+    const [skip, setSkip] = useState(0)
+    const [limit, setLimit] = useState(10)
+
     // Editing state
     const [isEditing, setIsEditing] = useState(false)
     const [currentProject, setCurrentProject] = useState<Project | null>(null)
@@ -34,11 +38,11 @@ export default function CreateProjectPage() {
     const [endLng, setEndLng] = useState("")
 
     // Load projects
-    const loadProjects = async () => {
+    const loadProjects = async (currentSkip = skip, currentLimit = limit) => {
         try {
             setIsLoading(true)
             setError(null)
-            const data = await fetchProjects()
+            const data = await fetchProjects({ skip: currentSkip, limit: currentLimit })
             setProjects(data)
         } catch (err) {
             setError("Failed to load projects. Please check if the backend is running.")
@@ -48,8 +52,8 @@ export default function CreateProjectPage() {
     }
 
     useEffect(() => {
-        loadProjects()
-    }, [])
+        loadProjects(skip, limit)
+    }, [skip, limit])
 
     const resetForm = () => {
         setName("")
@@ -210,6 +214,15 @@ export default function CreateProjectPage() {
                             onDelete={handleDelete}
                             addButtonText="Add New Project"
                             isLoading={isLoading}
+                            pagination={{
+                                skip,
+                                limit,
+                                onPageChange: setSkip,
+                                onLimitChange: (newLimit) => {
+                                    setLimit(newLimit);
+                                    setSkip(0); // Reset skip when limit changes
+                                }
+                            }}
                         />
                     </div>
 

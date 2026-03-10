@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Edit2, Trash2 } from "lucide-react"
+import { Plus, Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Tooltip,
@@ -25,6 +25,13 @@ interface DataTableProps<T> {
     isLoading?: boolean
     onEdit?: (item: T) => void
     onDelete?: (item: T) => void
+    pagination?: {
+        skip: number
+        limit: number
+        totalItems?: number
+        onPageChange: (newSkip: number) => void
+        onLimitChange: (newLimit: number) => void
+    }
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -35,7 +42,8 @@ export function DataTable<T extends Record<string, any>>({
     addButtonText,
     isLoading = false,
     onEdit,
-    onDelete
+    onDelete,
+    pagination
 }: DataTableProps<T>) {
     const showActions = !!onEdit || !!onDelete;
     const totalCols = columns.length + (showActions ? 1 : 0);
@@ -171,6 +179,52 @@ export function DataTable<T extends Record<string, any>>({
                     </table>
                 </div>
             </div>
+
+            {/* Pagination Controls */}
+            {pagination && (
+                <div className="flex items-center justify-between px-4 py-3 bg-white/40 backdrop-blur-md rounded-b-lg border-t border-gray-200 mt-1">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-gray-500">Rows per page:</span>
+                            <select
+                                value={pagination.limit}
+                                onChange={(e) => pagination.onLimitChange(Number(e.target.value))}
+                                className="bg-transparent text-xs font-bold text-gray-700 outline-none cursor-pointer focus:ring-0"
+                            >
+                                {[10, 25, 50, 100].map((pageSize) => (
+                                    <option key={pageSize} value={pageSize}>
+                                        {pageSize}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <span className="text-xs text-gray-500">
+                            Showing {pagination.skip + 1} - {pagination.skip + data.length} 
+                            {pagination.totalItems !== undefined && ` of ${pagination.totalItems}`}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={pagination.skip === 0 || isLoading}
+                            onClick={() => pagination.onPageChange(Math.max(0, pagination.skip - pagination.limit))}
+                            className="h-8 w-8 p-0 rounded-md hover:bg-blue-50 text-gray-600 disabled:opacity-30"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={data.length < pagination.limit || isLoading}
+                            onClick={() => pagination.onPageChange(pagination.skip + pagination.limit)}
+                            className="h-8 w-8 p-0 rounded-md hover:bg-blue-50 text-gray-600 disabled:opacity-30"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

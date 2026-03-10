@@ -39,6 +39,10 @@ export default function CreateLocationPage() {
     const [loadingProjects, setLoadingProjects] = useState(false)
     const [loadingPackages, setLoadingPackages] = useState(false)
 
+    // Pagination state
+    const [skip, setSkip] = useState(0)
+    const [limit, setLimit] = useState(10)
+
     // Editing state
     const [isEditing, setIsEditing] = useState(false)
     const [currentLocation, setCurrentLocation] = useState<Location | null>(null)
@@ -55,11 +59,11 @@ export default function CreateLocationPage() {
     const [endLng, setEndLng] = useState("")
 
     // Load locations and projects
-    const loadLocations = async () => {
+    const loadLocations = async (currentSkip = skip, currentLimit = limit) => {
         try {
             setIsLoading(true)
             setError(null)
-            const data = await fetchAllLocations()
+            const data = await fetchAllLocations({ skip: currentSkip, limit: currentLimit })
             setLocations(data)
         } catch (err) {
             setError("Failed to load locations. Please check if the backend is running.")
@@ -71,7 +75,7 @@ export default function CreateLocationPage() {
     const loadProjects = async () => {
         try {
             setLoadingProjects(true)
-            const data = await fetchProjects()
+            const data = await fetchProjects({ skip: 0, limit: 1000 })
             setProjects(data)
         } catch (err) {
             setError("Failed to load projects.")
@@ -82,7 +86,7 @@ export default function CreateLocationPage() {
 
     const loadAllPackages = async () => {
         try {
-            const data = await fetchAllPackages()
+            const data = await fetchAllPackages({ skip: 0, limit: 1000 })
             setAllPackages(data)
         } catch (err) {
             console.error("Failed to load all packages")
@@ -90,10 +94,10 @@ export default function CreateLocationPage() {
     }
 
     useEffect(() => {
-        loadLocations()
+        loadLocations(skip, limit)
         loadProjects()
         loadAllPackages()
-    }, [])
+    }, [skip, limit])
 
     // Load packages when project changes
     useEffect(() => {
@@ -107,7 +111,7 @@ export default function CreateLocationPage() {
             try {
                 setLoadingPackages(true)
                 if (!isEditing) setSelectedPackageId("")
-                const data = await fetchPackagesByProject(selectedProjectId)
+                const data = await fetchPackagesByProject(selectedProjectId, { skip: 0, limit: 1000 })
                 setPackages(data)
             } catch (err) {
                 setError("Failed to load packages for the selected project.")
@@ -325,6 +329,15 @@ export default function CreateLocationPage() {
                             onDelete={handleDelete}
                             addButtonText="Add New Location"
                             isLoading={isLoading}
+                            pagination={{
+                                skip,
+                                limit,
+                                onPageChange: setSkip,
+                                onLimitChange: (newLimit) => {
+                                    setLimit(newLimit);
+                                    setSkip(0); // Reset skip when limit changes
+                                }
+                            }}
                         />
                     </div>
 
