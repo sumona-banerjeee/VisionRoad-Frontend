@@ -1,11 +1,16 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { ProjectSelectionSection } from "@/components/project-selection-section"
+import dynamic from "next/dynamic"
 import { SidebarNavigation } from "@/components/sidebar-navigation"
 import { type SessionContext, saveSession } from "@/lib/api"
 import { TrendingUp } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
+
+const ProjectSelectionSection = dynamic(
+    () => import("@/components/project-selection-section").then(mod => mod.ProjectSelectionSection),
+    { ssr: false }
+)
 
 export default function NewAnalysisPage() {
     const router = useRouter()
