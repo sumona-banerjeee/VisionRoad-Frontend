@@ -161,7 +161,7 @@ export default function UploadPage() {
                     {/* Compact Session Info Bar */}
                     {session && (
                         <div className="mb-4">
-                            <div className="rounded-xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
+                            <div className="rounded-md px-4 py-3 bg-white/60 backdrop-blur-sm ">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex items-center gap-12">
                                         <div className="flex flex-col">
@@ -186,7 +186,7 @@ export default function UploadPage() {
                                     <Button
                                         size="sm"
                                         onClick={handleBackToSelection}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                                        className="btn-blue-gradient"
                                     >
                                         Change Selection
                                     </Button>
@@ -197,10 +197,10 @@ export default function UploadPage() {
                     )}
 
                     {/* Upload Card */}
-                    <Card className="rounded-xl overflow-hidden flex-1">
-                        <CardHeader className="pb-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
+                    <Card className="bg-white/60 backdrop-blur-md rounded-xl overflow-hidden flex-1">
+                        <CardHeader className="pb-4 ">
                             <CardTitle className="text-xl font-bold">
-                                <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-blue-400 dark:via-blue-300 dark:to-blue-400  bg-clip-text text-transparent">
+                                <span className="heading-gradient">
                                     Upload Video
                                 </span>
                             </CardTitle>
@@ -338,8 +338,8 @@ export default function UploadPage() {
                             <Button
                                 onClick={handleUpload}
                                 disabled={!file || uploading}
-                                className={`w-full h-12 text-sm font-semibold transition-all rounded-xl ${file && !uploading
-                                    ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-lg shadow-blue-500/25'
+                                className={`w-full h-12 text-sm font-semibold transition-all rounded-full ${file && !uploading
+                                    ? 'btn-blue-gradient'
                                     : ''
                                     }`}
                                 size="lg"

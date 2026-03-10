@@ -200,7 +200,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
   }
 
   return (
-    <Card className="">
+    <Card className="bg-white/20 backdrop-blur-md">
       <CardHeader>
         <CardTitle>Upload Video</CardTitle>
         <CardDescription>
@@ -356,7 +356,7 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
         <Button
           onClick={handleUpload}
           disabled={!file || uploading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25"
+          className="w-full btn-blue-gradient rounded-full"
 
           size="lg"
         >

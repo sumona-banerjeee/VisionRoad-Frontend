@@ -148,8 +148,8 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
     }
 
     return (
-        <Card className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl shadow-blue-500/5 overflow-hidden">
-            <CardHeader className="pb-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <Card className="bg-white/40 backdrop-blur-sm  overflow-hidden">
+            <CardHeader className="pb-6">
                 <div className="flex flex-col gap-4">
                     <div>
                         <CardTitle className="text-2xl font-semibold">Select Project Location</CardTitle>
@@ -167,8 +167,8 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                                 <div key={step} className="flex items-center">
                                     <div className="flex flex-col items-center">
                                         <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${status === 'completed' ? 'bg-primary text-primary-foreground' :
-                                                status === 'active' ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' :
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${status === 'completed' ? 'bg-linear-to-b from-[#225999] to-[#56A5FF] text-primary-foreground' :
+                                                status === 'active' ? 'bg-linear-to-b from-[#225999] to-[#56A5FF] text-primary-foreground ring-4 ring-primary/20' :
                                                     'bg-muted text-muted-foreground'
                                                 }`}
                                         >
@@ -180,7 +180,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                                         </span>
                                     </div>
                                     {index < 2 && (
-                                        <div className={`w-12 h-0.5 mx-2 mt-[-16px] rounded-full ${getStepStatus(step + 1) !== 'pending' ? 'bg-primary' : 'bg-border'
+                                        <div className={`w-12 h-0.5 mx-2 mt-[-16px] rounded-full ${getStepStatus(step + 1) !== 'pending' ? 'bg-linear-to-b from-[#225999] to-[#56A5FF]' : 'bg-border'
                                             }`} />
                                     )}
                                 </div>
@@ -317,7 +317,7 @@ export function ProjectSelectionSection({ onSelectionComplete }: ProjectSelectio
                 <Button
                     onClick={handleProceed}
                     disabled={!isComplete}
-                    className={`w-full h-14 text-base font-semibold rounded-xl ${isComplete ? 'btn-gradient text-white' : ''
+                    className={`w-full h-14 text-base font-semibold ${isComplete ? 'btn-blue-gradient text-white' : ''
                         }`}
                     size="lg"
                 >

@@ -591,7 +591,7 @@ export default function CreateLocationPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting || !isFormComplete}
-                                className="flex-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:from-blue-600 hover:via-indigo-600 hover:to-blue-700 text-white"
+                                className="flex-1 btn-blue-gradient"
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">

@@ -373,7 +373,7 @@ export default function CreatePackagePage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting || !name.trim() || !selectedProjectId}
-                                className="flex-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:from-blue-600 hover:via-indigo-600 hover:to-blue-700 text-white"
+                                className="flex-1 btn-blue-gradient text-white"
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">

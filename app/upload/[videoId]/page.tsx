@@ -143,7 +143,7 @@ export default function VideoProcessingPage() {
 
                     {session && (
                         <div className="mb-4">
-                            <div className="rounded-xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
+                            <div className="rounded-md px-4 py-3 bg-white/60 backdrop-blur-sm">
                                 <div className="flex items-center gap-12">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground leading-none mb-1.5">Project</span>
