@@ -339,6 +339,11 @@ export function UploadSection({ onDetectionComplete, onDetectionTypeChange }: Up
                     <span>YOLOE</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="yoloe_trained_vl">
+                  <div className="flex items-center gap-2">
+                    <span>YOLOE Trained</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
